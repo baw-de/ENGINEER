@@ -7,3 +7,8 @@ This repository contains the Python scripts for the hydraulic design of labyrint
 
 ## Usage
 ### General considerations
+This development can be used to design labyrinth weir structures consisting of a labyrinth weir and a parrallel flap gate. Furthermore, it is possible to estimate the hydraulic effect of the system over a given discharge spectrum. You can find more information about labyrinth weirs in the [BAWMitteilungen Nr. 105](https://hdl.handle.net/20.500.11970/107132).
+This repository consists of two Python files, among other things:
+* <pre>engineer.py</pre> This ist the brain. You should not modify this file unless you find an bug or want to further develop the project.
+* <pre>example.py</pre> This is an usage example. Feel free to adapt this file according to your wishes and your project.
+
