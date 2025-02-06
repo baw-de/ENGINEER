@@ -7,8 +7,30 @@ This repository contains the Python scripts for the hydraulic design of labyrint
 
 ## Usage
 ### General considerations
-This development can be used to design labyrinth weir structures consisting of a labyrinth weir and a parrallel flap gate. Furthermore, it is possible to estimate the hydraulic effect of the system over a given discharge spectrum. You can find more information about labyrinth weirs in the [BAWMitteilungen Nr. 105](https://hdl.handle.net/20.500.11970/107132).
+This development can be used to design labyrinth weir structures consisting of a labyrinth weir and a parrallel flap gate. Furthermore, it is possible to estimate the hydraulic effect of the system over a given discharge spectrum. You can find more information about labyrinth weirs in the [BAWMitteilungen Nr. 105](https://hdl.handle.net/20.500.11970/107132).<br>
 This repository consists of two Python files, among other things:
 * <pre>engineer.py</pre> This ist the brain. You should not modify this file unless you find an bug or want to further develop the project.
 * <pre>example.py</pre> This is an usage example. Feel free to adapt this file according to your wishes and your project.
 
+### Required Python libraries
+You need to have installed the following python libraries on your system:
+<pre>numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
+We recommend installing it either with pip or conda.<br><br>
+Example with pip:
+<pre>pip install numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
+Example with conda:
+<pre>conda install numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
+
+### Hydraulic Design
+#### Case 1: You already know the geometry of your labyrinth weir
+If you already know the geometry of your labyrinth weir you can plot it and calculate the upstream water level depending on the geometry, the discharge and the donwstream water level.
+<pre>
+  lab = labyrinth(  bottom_height=0.1,                          #bottom height [m]  
+                    downstream_water_level=1.09,                #downstream Water level [m]
+                    Q=10,                                       #discharge [m3/s]
+                    labyrinth_width=15,                         #labyrinth weir width [m]
+                    labyrinth_height=2.2,                       #labyrinth weir height [m]
+                    labyrinth_length=8,                         #labyrinth weir length in flow direction [m]
+                    key_angle=8,                                #key angle [degree]
+                    D=0.5)                                      #front wall width [m]
+</pre>
