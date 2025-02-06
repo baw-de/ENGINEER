@@ -6,7 +6,8 @@ The ENGINEER project is developing an automated digital design for labyrinth wei
 This repository contains the Python scripts for the hydraulic design of labyrinth weir structures developed by BAW.
 
 >[!WARNING]
->The developed source code is the result of a research project. BAW does not accept any responsibility for the correctness of the code or the results achieved with it.
+>The developed source code is the result of a research project. BAW does not accept any responsibility for the correctness of the code or the results achieved with it. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
 # Usage
 ## General considerations
