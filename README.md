@@ -7,7 +7,7 @@ This repository contains the Python scripts for the hydraulic design of labyrint
 
 ## Usage
 ### General considerations
-This development can be used to design labyrinth weir structures consisting of a labyrinth weir and a parrallel flap gate. Furthermore, it is possible to estimate the hydraulic effect of the system over a given discharge spectrum. You can find more information about labyrinth weirs in the [BAWMitteilungen Nr. 105](https://hdl.handle.net/20.500.11970/107132).<br>
+This development can be used to design labyrinth weir structures consisting of a labyrinth weir and a parrallel flap gate. Furthermore, it is possible to estimate the hydraulic effect of the system over a given discharge spectrum. You can find more information about labyrinth weirs in the BAWMitteilungen Nr. 105[^fn1]. The hydraulic calculation is based on the formulas published by Crookston & Tullis (2013)[^fn2] and Tullis et al. (2007)[^fn3]<br>
 This repository consists of two Python files, among other things:
 * <pre>engineer.py</pre> This ist the brain. You should not modify this file unless you find an bug or want to further develop the project.
 * <pre>example.py</pre> This is an usage example. Feel free to adapt this file according to your wishes and your project.
@@ -76,5 +76,21 @@ Second, start the optimization:
 ```python
 bestLab = optimize_labyrinth(labyrinth, bottom_level, UW_HQ, Q_HQ, available_width, OK_Labyrinth-bottom_level, available_length, path='', show_plot=True)
 ```
-As a result, you get the object ```bestLab``` of the class ```labyrinth```. You can continue to work with it as in case 1.
+As a result, you get the object ```bestLab``` of the class ```labyrinth```. You can continue to work with it as in Case 1.
+
+Again, you can postprocess your ```bestLab```:
+```python
+bestLab.plot_geometry()     #plot the optimized geometry
+bestLab.verbose = 1         #print output
+bestLab.print_results()     #print result parameters
+```
+
+## Literature
+[^fn1]: Bundesanstalt für Wasserbau (Hg.) (2020): Feste Wehre an Bundeswasserstraßen: Untersuchungen zur Machbarkeit sowie Empfehlungen zur Umsetzung. Karlsruhe: Bundesanstalt für Wasserbau (BAWMitteilungen, 105). [https://hdl.handle.net/20.500.11970/107132](https://hdl.handle.net/20.500.11970/107132)
+
+[^fn2]: Crookston, B. M.; Tullis, B. P. (2013): Hydraulic Design and Analysis of Labyrinth Weirs. I: Discharge Relationships. In: Journal of Irrigation and Drainage Engineering
+139 (5), S. 363–370. [https://doi.org/10.1061/(ASCE)IR.1943-4774.0000558](https://doi.org/10.1061/(ASCE)IR.1943-4774.0000558)
+
+[^fn3]: Tullis, B. P.; Young, J. C.; Chandler, M. A. (2007): Head-Discharge Relationships for Submerged Labyrinth Weirs. In: J. Hydraul. Eng. 133 (3), S. 248–254. [https://doi.org/10.1061/(ASCE)0733-9429(2007)133:3(248)](https://doi.org/10.1061/(ASCE)0733-9429(2007)133:3(248))
+
   
