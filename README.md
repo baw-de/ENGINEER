@@ -16,7 +16,7 @@ This repository consists of two Python files, among other things:
 * <pre>engineer.py</pre> This ist the brain. You should not modify this file unless you find an bug or want to further develop the project.
 * <pre>example.py</pre> This is an usage example. Feel free to adapt this file according to your wishes and your project.
 
-## Required Python libraries
+## Prerequisites
 You need to have installed the following python libraries on your system:
 <pre>numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
 We recommend installing it either with pip or conda.<br><br>
