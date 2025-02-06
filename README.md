@@ -24,7 +24,7 @@ Example with conda:
 ### Hydraulic Design
 #### Case 1: You already know the geometry of your labyrinth weir
 If you already know the geometry of your labyrinth weir you can plot it and calculate the upstream water level depending on the geometry, the discharge and the donwstream water level.
-<pre>
+```python
   lab = labyrinth(  bottom_height=0.1,                          #bottom height [m]  
                     downstream_water_level=1.09,                #downstream Water level [m]
                     Q=10,                                       #discharge [m3/s]
@@ -33,15 +33,16 @@ If you already know the geometry of your labyrinth weir you can plot it and calc
                     labyrinth_length=8,                         #labyrinth weir length in flow direction [m]
                     key_angle=8,                                #key angle [degree]
                     D=0.5)                                      #front wall width [m]
-</pre>
+```
 Now, the object `lab` from the class `labyrinth` is initialized and the upstream water level is calculated.<br>
 The overflow height `lab.hu`, or the absolute upstream water level `lab.yu` are now atributes of the objcet `lab`. In case that you change any atribut, e.g. the labyrinth weir 
 height `lab.P` you have to rerun the hydraulic calculation with `lab.update()`.<br>
 Furthermor you can get a text output of the calculation:
-<pre>
+```python
   lab.verbose = 1
   lab.print_results()
-
+```
+<pre>
   Key Laenge = 8.00 [m] 
   Key Frontwand = 0.5 [m]
   Key Winkel = 8 [°]
@@ -57,4 +58,23 @@ Furthermor you can get a text output of the calculation:
   hu = 0.17 [m] 
   Kein Rückstaueinfluss! 
 </pre>
+
+#### Case 2: You know how large your construction site is, how high the weir should be and the design discharge. Let ENGINEER design the labyrinth itself.
+In this case, ENGINEER will design the labyrinth weir to fit your construction field and to ensure that the lowest possible upstream water level occurs at the specified design discharge.<br><br>
+
+First, define your bounday conditions:
+```python
+bottom_level = 0.1      #bottom height [m o SL]
+available_width = 10    #available width for the labyrinth weir [m]
+available_length = 8    #available length in flow direction for the labyrinth weir [m]
+Q_HQ = 20               #design discharge [m3/s]
+UW_HQ = 1.8             #downstream water level at design discharge [m]
+OK_Labyrinth = 2.2      #crest height of labyrinth weir [m]    
+```
+
+Second, start the optimization:
+```python
+bestLab = optimize_labyrinth(labyrinth, bottom_level, UW_HQ, Q_HQ, available_width, OK_Labyrinth-bottom_level, available_length, path='', show_plot=True)
+```
+As a result, you get the object ```bestLab``` of the class ```labyrinth```. You can continue to work with it as in case 1.
   
