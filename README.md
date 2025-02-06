@@ -34,3 +34,27 @@ If you already know the geometry of your labyrinth weir you can plot it and calc
                     key_angle=8,                                #key angle [degree]
                     D=0.5)                                      #front wall width [m]
 </pre>
+Now, the object `lab` from the class `labyrinth` is initialized and the upstream water level is calculated.<br>
+The overflow height `lab.hu`, or the absolute upstream water level `lab.yu` are now atributes of the objcet `lab`. In case that you change any atribut, e.g. the labyrinth weir 
+height `lab.P` you have to rerun the hydraulic calculation with `lab.update()`.<br>
+Furthermor you can get a text output of the calculation:
+<pre>
+  lab.verbose = 1
+  lab.print_results()
+
+  Key Laenge = 8.00 [m] 
+  Key Frontwand = 0.5 [m]
+  Key Winkel = 8 [°]
+  Key Wandstaerke = 0.3 [m]
+  Key Hoehe = 2.20 [m]
+  Key Anzahl = 4 
+  Key Weite = 3.25 [m] 
+  Keys Weite = 12.99 [m] 
+  Seite Weite[S] = 2.01 [m] 
+  Wehr weite = 15.00 [m] 
+  L/W = 4.71 [m] 
+  Hu = 0.18 [m] 
+  hu = 0.17 [m] 
+  Kein Rückstaueinfluss! 
+</pre>
+  
