@@ -154,8 +154,37 @@ To use the `operational_model` the following steps are required:
   
 
    
-3. bla... 
+3. We assume that the planning will replace an existing control structure and that the future water level must be compared with the current water level in order to prove the prohibition of worsening. Therefore, the current water level must be specified for the discharge points given in step 1:
+   ```python
+   upstream_water_level_today = np.array([
+            2.03,
+            2.15,
+            2.16,
+            2.19,
+            2.22,
+            2.21,
+            2.33,
+            2.33,
+            2.47,
+            2.47,
+            2.47])
+    ```
 
+4. The flap gate object and the labyrinth weir must be initialized like explained above.
+5. bla
+    ```python
+    results, results_events = operational_model(Lab = bestLab,
+                                  Kla =  kla,
+                                  Abfluss = discharge,
+                                  Unterwasser = downstream_water_level,
+                                  Oberwasser = upstream_water_level_today,
+                                  Stauziel = Stauziel,
+                                  flap_gateWinkel_max = Kalpha_max,
+                                  H_fische= H_fische,
+                                  interpolation='exponential',
+                                  show_plot=True,
+                                  save_plot=True)
+    ```
 
 # Literature
 [^fn1]: Bundesanstalt für Wasserbau (Hg.) (2020): Feste Wehre an Bundeswasserstraßen: Untersuchungen zur Machbarkeit sowie Empfehlungen zur Umsetzung. Karlsruhe: Bundesanstalt für Wasserbau (BAWMitteilungen, 105). [https://hdl.handle.net/20.500.11970/107132](https://hdl.handle.net/20.500.11970/107132)
