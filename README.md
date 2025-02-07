@@ -14,7 +14,7 @@ GNU General Public License for more details.
 This development can be used to design labyrinth weir structures consisting of a labyrinth weir and a parrallel flap gate. Furthermore, it is possible to estimate the hydraulic effect of the system over a given discharge spectrum. You can find more information about labyrinth weirs in the BAWMitteilungen Nr. 105[^fn1]. The hydraulic calculation is based on the formulas published by Crookston & Tullis (2013)[^fn2] and Tullis et al. (2007)[^fn3]<br>
 This repository consists of two Python files, among other things:
 * <pre>engineer.py</pre> This ist the brain. You should not modify this file unless you find an bug or want to further develop the project.
-* <pre>example.py</pre> This is an usage example. Feel free to adapt this file according to your wishes and your project. You will find all the code snippets from this README.md in ```exmaple.py```
+* <pre>example.py</pre> This is an usage example. Feel free to adapt this file according to your wishes and your project. You will find all the code snippets from this README.md in <pre>exmaple.py</pre>
 
 ## Prerequisites
 You need to have installed the following python libraries on your system:
