@@ -113,6 +113,46 @@ print(kla.hu)
 
 ## Operational Model
 <img src="codeblocks/codeblock_operational_model.png" width="50%" height="50%"><br>
+The labyrinth weir and gate are coupled via the common upstream water level. The discharge is divided depending on the capacity of the two parts. This coupling is automatically done in the code with the function `coupling`. As the total discharge increases, the valve is opened further and further to ensure that the legally required design water level is maintained. As soon as the flap is fully lowered, the water begins to flow over the labyrinth weir.  This is implemented by the `operational_model` function.<br>
+To use the `operational_model` the following steps are required:
+1. The discharge and the downstream rating curve must be defined. Both is has to be defined as a numpy array.
+   ```python
+   discharge = np.array([
+        2.09,
+        2.79,
+        6.01,
+        11.90,
+        13.90,
+        16.30,
+        16.50,
+        18.60,
+        20.50,
+        22.90,
+        24.50])
+   ```
+    
+   ```python
+    downstream_water_level = np.array([
+          1.07,
+          1.15,
+          1.19,
+          1.25,
+          1.38,
+          1.39,
+          1.74,
+          1.74,
+          1.94,
+          2.67,
+          2.67])
+   ```
+   The model will calculate a continuous discharge curve and interpolate discharges and tailwater levels for this purpose. To do this, you have to decide on an interpolation method. To try out the available interpolation methods, the  `interpolate_downstream_curve` function can be used.
+   ```python
+   interpolate_downstream_curve(discharge,downstream_water_level,interpolation='all',show_plot=True, save_plot=False)
+   ```
+  
+
+   
+3. bla... 
 
 
 # Literature
