@@ -26,6 +26,7 @@ Example with conda:
 <pre>conda install numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
 
 ## Hydraulic Design
+![](dimensions.svg)
 ### Case 1: You already know the geometry of your labyrinth weir
 If you already know the geometry of your labyrinth weir you can plot it and calculate the upstream water level depending on the geometry, the discharge and the donwstream water level.
 ```python
