@@ -67,6 +67,7 @@ Furthermor you can get a text output of the calculation:
 </pre>
 
 ### Case 2: You know how large your construction site is, how high the weir should be and the design discharge. Let ENGINEER design the labyrinth itself.
+<img src="codeblocks/codeblock_optim_geometry.png" width="50%" height="50%">
 In this case, ENGINEER will design the labyrinth weir to fit your construction field and to ensure that the lowest possible upstream water level occurs at the specified design discharge.<br><br>
 
 First, define your bounday conditions:
