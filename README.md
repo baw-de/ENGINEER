@@ -170,7 +170,7 @@ To use the `operational_model` the following steps are required:
             2.47])
     ```
 
-4. The flap gate object and the labyrinth weir must be initialized like explained above.
+4. An instance of the class `flap_gate` one and the class `labyrinth` must be initialized like explained above.
 5. bla
     ```python
     results, results_events = operational_model(Lab = bestLab,
