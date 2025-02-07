@@ -93,6 +93,19 @@ bestLab.verbose = 1         #print output
 bestLab.print_results()     #print result parameters
 ```
 
+### Flap Gate
+<img src="codeblocks/codeblock_flap_gate.png" width="50%" height="50%"><br>
+The objects of the class ```flap_gate``` work simular like the class ```labyrinth``` . You have to define the maximum height of the flap gate, the angle against the vertical, the discharge and the downstream water level. The object will calculate the upstream water level:
+```python
+kla  = flap_gate(  bottom_height=0.1,       #bottom height [m]
+                  UW=1.09,                  #downstream water level [m]
+                  Q=10,                     #discharge [m3/s]
+                  flap_gateBreite=1.4,      #flap width [m]
+                  flap_gateHoehe=2.35,      #flap height [m]
+                  flap_gateWinkel=74)       #flap angle [degree]
+```
+The upstream water level is calculated according to Bollrich (2019)[^fn4]
+
 # Literature
 [^fn1]: Bundesanstalt für Wasserbau (Hg.) (2020): Feste Wehre an Bundeswasserstraßen: Untersuchungen zur Machbarkeit sowie Empfehlungen zur Umsetzung. Karlsruhe: Bundesanstalt für Wasserbau (BAWMitteilungen, 105). [https://hdl.handle.net/20.500.11970/107132](https://hdl.handle.net/20.500.11970/107132)
 
@@ -100,5 +113,7 @@ bestLab.print_results()     #print result parameters
 139 (5), S. 363–370. [https://doi.org/10.1061/(ASCE)IR.1943-4774.0000558](https://doi.org/10.1061/(ASCE)IR.1943-4774.0000558)
 
 [^fn3]: Tullis, B. P.; Young, J. C.; Chandler, M. A. (2007): Head-Discharge Relationships for Submerged Labyrinth Weirs. In: J. Hydraul. Eng. 133 (3), S. 248–254. [https://doi.org/10.1061/(ASCE)0733-9429(2007)133:3(248)](https://doi.org/10.1061/(ASCE)0733-9429(2007)133:3(248))
+
+[^fn4]: Bollrich, Gerhard (2019): Technische Hydromechanik 1. Grundlagen. Berlin: Beuth Verlag GmbH.
 
   
