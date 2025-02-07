@@ -149,6 +149,8 @@ To use the `operational_model` the following steps are required:
    ```python
    interpolate_downstream_curve(discharge,downstream_water_level,interpolation='all',show_plot=True, save_plot=False)
    ```
+   <img src="pictures/Q_interpolate_downstream_curve_all.svg" width="50%" height="50%"><br>
+   Please consider the plot with engineering expertise and decide on the interpolation method that best matches the given tailwater levels.
   
 
    
