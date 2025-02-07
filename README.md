@@ -111,6 +111,10 @@ print(kla.hu)
 2.7284763202006874
 ```
 
+## Operational Model
+<img src="codeblocks/codeblock_operational_model.png" width="50%" height="50%"><br>
+
+
 # Literature
 [^fn1]: Bundesanstalt für Wasserbau (Hg.) (2020): Feste Wehre an Bundeswasserstraßen: Untersuchungen zur Machbarkeit sowie Empfehlungen zur Umsetzung. Karlsruhe: Bundesanstalt für Wasserbau (BAWMitteilungen, 105). [https://hdl.handle.net/20.500.11970/107132](https://hdl.handle.net/20.500.11970/107132)
 
