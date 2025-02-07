@@ -28,6 +28,8 @@ Example with conda:
 ## Hydraulic Design
 ![](dimensions.svg)
 ### Case 1: You already know the geometry of your labyrinth weir
+<img src="codeblocks/codeblock_labyrinth.png" width="50%" height="50%">
+
 If you already know the geometry of your labyrinth weir you can plot it and calculate the upstream water level depending on the geometry, the discharge and the donwstream water level.
 ```python
   lab = labyrinth(  bottom_height=0.1,                          #bottom height [m]  
