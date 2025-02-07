@@ -104,7 +104,12 @@ kla  = flap_gate(  bottom_height=0.1,       #bottom height [m]
                   flap_gateHoehe=2.35,      #flap height [m]
                   flap_gateWinkel=74)       #flap angle [degree]
 ```
-The upstream water level is calculated according to Bollrich (2019)[^fn4]
+The upstream water level is calculated according to Bollrich (2019)[^fn4]. <br>
+To print to overflow height, do:
+```python
+print(kla.hu)
+2.7284763202006874
+```
 
 # Literature
 [^fn1]: Bundesanstalt für Wasserbau (Hg.) (2020): Feste Wehre an Bundeswasserstraßen: Untersuchungen zur Machbarkeit sowie Empfehlungen zur Umsetzung. Karlsruhe: Bundesanstalt für Wasserbau (BAWMitteilungen, 105). [https://hdl.handle.net/20.500.11970/107132](https://hdl.handle.net/20.500.11970/107132)
