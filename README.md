@@ -29,7 +29,7 @@ Example with conda:
 <pre>conda install numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
 
 ## Hydraulic Design
-![](dimensions.svg)
+![](pictures/dimensions.svg)
 ### Case 1: You already know the geometry of your labyrinth weir
 <img src="codeblocks/codeblock_labyrinth.png" width="50%" height="50%">
 
