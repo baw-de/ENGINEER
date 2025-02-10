@@ -177,7 +177,8 @@ To use the `operational_model` the following steps are required:
 
 4. An instance of the class `flap_gate` and the class `labyrinth` must be initialized like explained above. For this, either a self-designed labyrinth weir or the optimized one from case 2 can be used.
    
-6. In order to operate the valve, the following data is required: the design water level and the maximum angle of the flap in relation to the vertical. Now the operational model can be initialized. 
+6. In order to operate the valve, the following data is required: the design water level and the maximum angle of the flap in relation to the vertical. Now the operational model can be initialized.
+   ```python
     results, results_events = operational_model(Lab = bestLab,
                                   Kla =  kla,
                                   Abfluss = discharge,
@@ -191,7 +192,7 @@ To use the `operational_model` the following steps are required:
                                   save_plot=True)
     ```
 
-7. The return value is two variables of the type [pandas.DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html): results and results_evens:
+8. The return value is two variables of the type [pandas.DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html): results and results_evens:
    - `results` contains discharge, downstream water level, upstream water level, discharge over the labyrinth weir, discharge over the flap gate and flap angle for the following range: `np.arange(min(discharge), max(discharge), 0.1)`.
    - `results_events` contains the same parameters like `results` but for the grid point given in `discharge`.
    - In addition, a figure is displayed that contains the following representations (from top to bottom): downstream water level grid points and interpolation curve, fractions of discharge over labyrinth weir and flap gate, upstream water level in the design and actual state, flap angle. The x-axis of all plots indicates the total discharge through the system.<br>
