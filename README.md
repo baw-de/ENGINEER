@@ -190,6 +190,12 @@ To use the `operational_model` the following steps are required:
                                   save_plot=True)
     ```
 
+7. Results
+   Als Rückgabewert werden zwei Variablen vom Typ [pandas.DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html) ausgegeben: results und results_evens:
+   - `results` contains discharge, downstream water level, upstream water level, discharge over the labyrinth weir, discharge over the flap gate and flap angle for the following range: `np.arange(min(discharge), max(discharge), 0.1)`.
+   - `results_events` contains the same parameters like `results` but for the grid point given in `discharge`.
+   
+
 # Literature
 [^fn1]: Bundesanstalt für Wasserbau (Hg.) (2020): Feste Wehre an Bundeswasserstraßen: Untersuchungen zur Machbarkeit sowie Empfehlungen zur Umsetzung. Karlsruhe: Bundesanstalt für Wasserbau (BAWMitteilungen, 105). [https://hdl.handle.net/20.500.11970/107132](https://hdl.handle.net/20.500.11970/107132)
 
