@@ -173,15 +173,16 @@ To use the `operational_model` the following steps are required:
             2.47])
     ```
 
-4. An instance of the class `flap_gate` one and the class `labyrinth` must be initialized like explained above.
-5. bla
+4. An instance of the class `flap_gate` one and the class `labyrinth` must be initialized like explained above. For this, either a self-designed labyrinth weir or the one optimized in case 2 can be used.
+   
+6. In order to operate the valve, the following data is required: the design water level and the maximum angle of the flap in relation to the vertical. Now the operational model can be initialized. The hyddraulic calculation will start at the initialization process. 
     ```python
     results, results_events = operational_model(Lab = bestLab,
                                   Kla =  kla,
                                   Abfluss = discharge,
                                   Unterwasser = downstream_water_level,
                                   Oberwasser = upstream_water_level_today,
-                                  Stauziel = Stauziel,
+                                  Stauziel = design_water_lebel,
                                   flap_gateWinkel_max = Kalpha_max,
                                   H_fische= H_fische,
                                   interpolation='exponential',
