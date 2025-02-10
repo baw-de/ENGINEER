@@ -190,10 +190,11 @@ To use the `operational_model` the following steps are required:
                                   save_plot=True)
     ```
 
-7. Results
-   Als Rückgabewert werden zwei Variablen vom Typ [pandas.DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html) ausgegeben: results und results_evens:
+7. The return value is two variables of the type [pandas.DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html): results and results_evens:
    - `results` contains discharge, downstream water level, upstream water level, discharge over the labyrinth weir, discharge over the flap gate and flap angle for the following range: `np.arange(min(discharge), max(discharge), 0.1)`.
    - `results_events` contains the same parameters like `results` but for the grid point given in `discharge`.
+   - In addition, a figure is displayed that contains the following representations (from top to bottom): downstream water level grid points and interpolation curve, fractions of discharge over labyrinth weir and flap gate, upstream water level in the design and actual state, flap angle. The x-axis of all plots indicates the total discharge through the system.<br>
+   <img src="pictures/results_plot.png" width="50%" height="50%"><br>
    
 
 # Literature
