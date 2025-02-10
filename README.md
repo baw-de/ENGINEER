@@ -1,4 +1,4 @@
-<img src="pictures/Logo_ENGINEER.PNG" width="50%" height="50%"><br>
+<img src="pictures/Logo_ENGINEER.PNG" ><br>
 # ENGINEER
 Welcome to the ENGINEER project (**En**twicklun**g** standardisierter **In**formationsmodelle für die Planung am B**e**ispiel von Labyrinth-W**e**h**r**anlagen)!
 
