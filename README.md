@@ -91,10 +91,12 @@ As a result, you get the object ```bestLab``` of the class ```labyrinth```. You 
 
 Again, you can postprocess your ```bestLab```:
 ```python
-bestLab.plot_geometry()     #plot the optimized geometry
+bestLab.plot_geometry()     #plot the optimized geometry (see plot below)
 bestLab.verbose = 1         #print output
 bestLab.print_results()     #print result parameters
 ```
+<img src="pictures/best_lab_plot.png" width="35%" height="35%">
+
 
 ### Flap Gate
 <img src="codeblocks/codeblock_flap_gate.png" width="50%" height="50%"><br>
