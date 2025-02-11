@@ -4,7 +4,7 @@ Welcome to the ENGINEER project (**En**twicklun**g** standardisierter **In**form
 
 The ENGINEER project is developing an automated digital design for labyrinth weir structures. The project was funded by [mFUND](https://bmdv.bund.de/DE/Themen/Digitales/mFund/Projekte/mfund-projekte.html). Participants include the [BAW](www.baw.de), [WNA Magdeburg](https://www.wna-magdeburg.wsv.de/Webs/WNA/WNA-Magdeburg/DE/Startseite/startseite_node.html), [Arcadis](https://www.arcadis.com/de-de) and [Cadcom](https://cadcom.de/). The project is funded until end of February 2025. After that, even smaller bug fixes are carried out if required and if the appropriate resources are available.
 
-This repository contains the Python scripts for the hydraulic design of labyrinth weir structures developed by BAW.
+This repository contains the Python scripts for the hydraulic design of labyrinth weir structures developed by BAW. This is only a small part of the developements from the ENGINEER project, but it might be useful for you.
 
 >[!WARNING]
 >The developed source code is the result of a research project. BAW does not accept any responsibility for the correctness of the code or the results achieved with it. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
