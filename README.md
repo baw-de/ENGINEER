@@ -67,7 +67,7 @@ The output looks similar to:
   Key Weite = 3.25 [m] 
   Keys Weite = 12.99 [m] 
   Seite Weite[S] = 2.01 [m] 
-  Wehr weite = 15.00 [m] 
+  Wehr Weite = 15.00 [m] 
   L/W = 4.71 [m] 
   Hu = 0.18 [m] 
   hu = 0.17 [m] 
