@@ -164,7 +164,7 @@ To use the `operational_model` the following steps are required:
   
 
    
-3. We assume that the planning will replace an existing control structure and that the future water level must be compared with the current water level in order to prove the prohibition of worsening. Therefore, the current water level must be specified for the discharge points given from step 1:
+3. We assume that the planning will replace an existing control structure and that the future water level must be compared with the current water level in order to prove that the discharge capacity remains unchanged. Therefore, the current water level must be specified for the discharge points given from step 1:
    ```python
    upstream_water_level_today = np.array([
             2.03,
