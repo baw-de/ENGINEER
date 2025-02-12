@@ -2,30 +2,30 @@
 # ENGINEER
 Welcome to the ENGINEER project (**En**twicklun**g** standardisierter **In**formationsmodelle für die Planung am B**e**ispiel von Labyrinth-W**e**h**r**anlagen)!
 
-The ENGINEER project is developing an automated digital design for labyrinth weir structures. The project was funded by [mFUND](https://bmdv.bund.de/DE/Themen/Digitales/mFund/Projekte/mfund-projekte.html). Participants include the [BAW](www.baw.de), [WNA Magdeburg](https://www.wna-magdeburg.wsv.de/Webs/WNA/WNA-Magdeburg/DE/Startseite/startseite_node.html), [Arcadis](https://www.arcadis.com/de-de) and [Cadcom](https://cadcom.de/). The project is funded until end of February 2025. After that, even smaller bug fixes are carried out if required and if the appropriate resources are available.
+The ENGINEER project is developing an automated digital design for labyrinth weir structures. The project was funded by [mFUND](https://bmdv.bund.de/DE/Themen/Digitales/mFund/Projekte/mfund-projekte.html). Participants include the [BAW](https://www.baw.de), [WNA Magdeburg](https://www.wna-magdeburg.wsv.de/Webs/WNA/WNA-Magdeburg/DE/Startseite/startseite_node.html), [Arcadis](https://www.arcadis.com/de-de) and [Cadcom](https://cadcom.de/). The project is funded until end of February 2025. After that, further development will be limited to minor bug fixes as needed and subject to availability of resources.
 
-This repository contains the Python scripts for the hydraulic design of labyrinth weir structures developed by BAW. This is only a small part of the developements from the ENGINEER project, but it might be useful for you.
+This repository contains the Python scripts for the hydraulic design of labyrinth weir structures developed by BAW. This is only a small part of the developements from the ENGINEER project but it might be useful for you.
 
 >[!WARNING]
 >The developed source code is the result of a research project. BAW does not accept any responsibility for the correctness of the code or the results achieved with it. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+[GNU General Public License](LICENSE) for more details.
 
 Currently the code is written in "Denglish" which is a mixture of German and English language. Sorry for that. We are working on it. Volunteers are welcome to help with the translation.
 
 # Usage
 ## General considerations
-This development can be used to design labyrinth weir structures consisting of a labyrinth weir and a parrallel flap gate. Furthermore, it is possible to estimate the hydraulic effect of the system over a given discharge spectrum. You can find more information about labyrinth weirs in the BAWMitteilungen Nr. 105[^fn1]. The hydraulic calculation is based on the formulas published by Crookston & Tullis (2013)[^fn2] and Tullis et al. (2007)[^fn3]
-This repository consists of two Python files, among other things:
-* <pre>engineer.py</pre> This ist the brain. You should not modify this file unless you find an bug or want to further develop the project.<br><br>
-* <pre>example.py</pre> This is an usage example. Feel free to adapt this file according to your wishes and your project. You will find all the code snippets from this README.md in example.py.
+This code can be used to design labyrinth weir structures consisting of a labyrinth weir and a parrallel flap gate. Furthermore, it is possible to estimate the hydraulic effect of the system over a given discharge range. You can find more information about labyrinth weirs in the BAWMitteilungen Nr. 105[^fn1]. The hydraulic calculation is based on the formulas published by Crookston & Tullis (2013)[^fn2] and Tullis et al. (2007)[^fn3].
+This repository consists mainly of two Python files:
+* <pre>engineer.py</pre> This ist the brain. You should not modify this file unless you find an bug or want to develop the project further.<br><br>
+* <pre>example.py</pre> This is an application example. Feel free to adapt this file according to your wishes and your project. You will find all the code snippets from this README.md in example.py.
 
 ## Prerequisites
-You need to have installed the following python libraries on your system:
+You need to have the following python libraries installed on your system:
 <pre>numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
-We recommend installing it either with [pip](https://packaging.python.org/en/latest/tutorials/installing-packages/) or [conda](https://docs.conda.io/projects/conda/en/23.3.x/user-guide/getting-started.html).<br><br>
-Example with pip:
+We recommend installing these either with [pip](https://packaging.python.org/en/latest/tutorials/installing-packages/) or [conda](https://docs.conda.io/projects/conda/en/23.3.x/user-guide/getting-started.html).<br><br>
+Example of installation with pip:
 <pre>pip install numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
-Example with conda:
+Example of installation with conda:
 <pre>conda install numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
 
 ## Hydraulic Design
@@ -33,7 +33,8 @@ Example with conda:
 ### Case 1: You already know the geometry of your labyrinth weir
 <img src="codeblocks/codeblock_labyrinth.png" width="50%" height="50%">
 
-If you already know the geometry of your labyrinth weir you can plot it and calculate the upstream water level depending on the geometry, the discharge and the downstream water level.
+If you already know the geometry of your labyrinth weir you can plot it and calculate the upstream water level depending on the geometry, the discharge and the downstream water level. You can initialise an object `lab` from the class `labyrinth` and calculate the upstream water level as shown below.
+
 ```python
   lab = labyrinth(  bottom_height=0.1,                          #bottom height [m]  
                     downstream_water_level=1.09,                #downstream Water level [m]
@@ -44,14 +45,18 @@ If you already know the geometry of your labyrinth weir you can plot it and calc
                     key_angle=8,                                #key angle [degree]
                     D=0.5)                                      #front wall width [m]
 ```
-Now, the object `lab` from the class `labyrinth` is initialized and the upstream water level is calculated.<br>
-The overflow height `lab.hu` and the absolute upstream water level `lab.yu` are now atributes of the object `lab`. In case that you change any atribut, e.g. the labyrinth weir 
-height `lab.P`, you have to rerun the hydraulic calculation with `lab.update()`.<br><br>
-Furthermor you can get a text output of the calculation:
+
+The object `lab` includes the attributes overflow height `lab.hu` and the absolute upstream water level `lab.yu`. In case you change any attribute, e.g. the labyrinth weir 
+height `lab.P`, you have to rerun the hydraulic calculation with `lab.update()`.
+
+Furthermore, you can output a summary of the input and output parameters of the calculation:
 ```python
   lab.verbose = 1
   lab.print_results()
 ```
+
+The output looks similar to:
+
 <pre>
   Key Laenge = 8.00 [m] 
   Key Frontwand = 0.5 [m]
@@ -71,9 +76,9 @@ Furthermor you can get a text output of the calculation:
 
 ### Case 2: You know how large your construction site is, how high the weir should be and the design discharge. Let ENGINEER design the labyrinth itself.
 <img src="codeblocks/codeblock_optim_geometry.png" width="50%" height="50%">
-In this case, ENGINEER will design the labyrinth weir to fit your construction field and to ensure that the lowest possible upstream water level occurs at the specified design discharge.<br><br>
-
+In this case, ENGINEER will design the labyrinth weir to fit your construction site and to ensure the lowest possible upstream water level at the specified design discharge.<br/><br/>
 First, define your bounday conditions:
+
 ```python
 bottom_level = 0.1      #bottom height [m o SL]
 available_width = 10    #available width for the labyrinth weir [m]
@@ -83,11 +88,11 @@ UW_HQ = 1.8             #downstream water level at design discharge [m]
 OK_Labyrinth = 2.2      #crest height of labyrinth weir [m]    
 ```
 
-Second, start the optimization:
+Then start the optimization:
 ```python
 bestLab = optimize_labyrinth(labyrinth, bottom_level, UW_HQ, Q_HQ, available_width, OK_Labyrinth-bottom_level, available_length, path='', show_plot=True)
 ```
-As a result, you get the object ```bestLab``` of the class ```labyrinth```. You can continue to work with it as in Case 1.
+This code gives you the object ```bestLab```, which is an instance of the class ```labyrinth```. Now you can continue to work with it, as in Case 1.
 
 Again, you can postprocess your ```bestLab```:
 ```python
@@ -100,7 +105,7 @@ bestLab.print_results()     #print result parameters
 
 ### Flap Gate
 <img src="codeblocks/codeblock_flap_gate.png" width="50%" height="50%"><br>
-The objects of the class ```flap_gate``` work simular like the class ```labyrinth``` . You have to define the maximum height of the flap gate, the angle against the vertical, the discharge and the downstream water level. The object will calculate the upstream water level:
+The objects of the class ```flap_gate``` work similar to the class ```labyrinth```. You have to define the maximum height of the flap gate, the angle to the horizontal, the discharge and the downstream water level. The object will calculate the upstream water level:
 ```python
 kla  = flap_gate(  bottom_height=0.1,       #bottom height [m]
                   UW=1.09,                  #downstream water level [m]
@@ -118,9 +123,9 @@ print(kla.hu)
 
 ## Operational Model
 <img src="codeblocks/codeblock_operational_model.png" width="50%" height="50%"><br>
-The labyrinth weir and the flap gate are coupled via the common upstream water level. The discharge is divided depending on the capacity of the two parts. This coupling is automatically done in the code with the function `coupling`. As the total discharge increases, the valve is opened further and further to ensure that the legally required design water level is maintained. As soon as the flap is fully lowered, the water begins to flow over the labyrinth weir.  This is implemented by the `operational_model` function.<br><br>
+The labyrinth weir and the flap gate are coupled via the common upstream water level. The discharge is distributed depending on the capacity of the two parts. This coupling is automatically done in the code with the function `coupling`. As the total discharge increases, the valve is opened further and further to ensure that the legally required design water level is maintained. As soon as the flap is fully lowered, the water begins to flow over the labyrinth weir.  This is implemented by the `operational_model` function.<br><br>
 To use the `operational_model` the following steps are required:
-1. The discharge and the downstream rating curve must be defined. Both has to be defined as a numpy array.
+1. The discharge and the downstream rating curve must be defined. Both must be defined as a numpy array.
    ```python
    discharge = np.array([
         2.09,
@@ -150,16 +155,16 @@ To use the `operational_model` the following steps are required:
           2.67,
           2.67])
    ```
-   The model will calculate a continuous discharge curve in steps of 0.1 l/s and interpolate discharges and tailwater levels for this purpose. To do this, you have to decide on an interpolation method. To try out the available interpolation methods, the  `interpolate_downstream_curve` function can be used.
+   The model will calculate a continuous discharge curve in steps of 0.1 l/s and interpolate discharges and tailwater levels for this purpose. To do this, you have to choose an interpolation method. To try out the available interpolation methods, the  `interpolate_downstream_curve` function can be used.
    ```python
    interpolate_downstream_curve(discharge,downstream_water_level,interpolation='all',show_plot=True, save_plot=False)
    ```
    <img src="pictures/Q_interpolate_downstream_curve_all.svg" width="50%" height="50%"><br>
-   Please consider the plot with engineering expertise and decide on the interpolation method that best matches the given tailwater levels.
+   Please interpret the plot with engineering expertise and decide on the interpolation method that best matches the given tailwater levels.
   
 
    
-3. We assume that the planning will replace an existing control structure and that the future water level must be compared with the current water level in order to prove the prohibition of worsening. Therefore, the current water level must be specified for the discharge points given from step 1:
+3. We assume that the planning will replace an existing control structure and that the future water level must be compared with the current water level in order to prove that the discharge capacity remains unchanged. Therefore, the current water level must be specified for the discharge points given from step 1:
    ```python
    upstream_water_level_today = np.array([
             2.03,
@@ -175,9 +180,9 @@ To use the `operational_model` the following steps are required:
             2.47])
     ```
 
-4. An instance of the class `flap_gate` and the class `labyrinth` must be initialized like explained above. For this, either a self-designed labyrinth weir or the optimized one from case 2 can be used.
+4. An instance of the class `flap_gate` and the class `labyrinth` must be initialized as explained above. For doing this, either a self-designed labyrinth weir or the optimized one from case 2 can be used.
    
-6. In order to operate the valve, the following data is required: the design water level and the maximum angle of the flap in relation to the vertical. Now the operational model can be initialized.
+6. In order to operate the valve, the following data is required: the design water level and the maximum angle of the flap to the horizontal. Now the operational model can be initialized.
    ```python
     results, results_events = operational_model(Lab = bestLab,
                                   Kla =  kla,
@@ -194,7 +199,7 @@ To use the `operational_model` the following steps are required:
 
 8. The return value is two variables of the type [pandas.DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html): results and results_evens:
    - `results` contains discharge, downstream water level, upstream water level, discharge over the labyrinth weir, discharge over the flap gate and flap angle for the following range: `np.arange(min(discharge), max(discharge), 0.1)`.
-   - `results_events` contains the same parameters like `results` but for the grid point given in `discharge`.
+   - `results_events` contains the same parameters as `results` but for the grid point given in `discharge`.
    - In addition, a figure is displayed that contains the following representations (from top to bottom): downstream water level grid points and interpolation curve, fractions of discharge over labyrinth weir and flap gate, upstream water level in the design and actual state, flap angle. The x-axis of all plots indicates the total discharge through the system.<br>
    <img src="pictures/results_plot.png" width="50%" height="50%"><br>
    
