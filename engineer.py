@@ -313,7 +313,7 @@ class labyrinth(): #this is only one geometry
                   'Key Weite = %2.2f [m]' % self.w,'\n'
                   'Keys Weite = %2.2f [m]'% (self.N*self.w),'\n'
                   'Seite Weite[S] = %2.2f [m]' % self.S,'\n'
-                  'Wehr weite = %2.2f [m]' % self.W,'\n'
+                  'Wehr Weite = %2.2f [m]' % self.W,'\n'
                   'L/W = %2.2f [m]'% (self.L/self.W),'\n'
                   'Hu = %2.2f [m]' % self.Hu,'\n',
                   'hu = %2.2f [m]' % self.hu,'\n',
