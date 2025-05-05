@@ -28,6 +28,7 @@ from engineer import labyrinth, betriebsmodell, klappe, optimale_Labyrinth, UW_i
 import matplotlib.pyplot as plt
 import numpy as np
 import os, shutil
+import pandas as pd
 
 plt.close('all')
 
@@ -157,8 +158,29 @@ results, results_events = betriebsmodell(Lab = bestLab,
                               show_plot=True,
                               save_plot=True)
 
-# plot_check_FAA_FAbA(kla, 
-#                     results, 
-#                     results_events, 
-#                     fish_name = 'Bachforelle',
-#                     Bemessungsgeschwindigkeit = 1.6)
+
+
+
+# Export Geometry Parameters according to Pralong et al. 2011 or Tullis 20XX
+# for further usage in e.g. automatic CAD geometry generation
+def write_excel(lab):
+    # SI-Units
+    dict = {
+        "W": lab.W,        # width
+        "B": lab.B,        # length
+        "P": lab.P,        # height including crest
+        "Ts": lab.t,       # thickness
+        "alpha": lab.alpha,  # sidewall angle
+        "L": lab.L,        # developed length
+        "N": lab.N,        # number of keys
+        "D": lab.D,        # front wall length
+        "w": lab.w,        # key width
+        "S": lab.S         # overall additional wall width 
+        }
+
+    df = pd.DataFrame([dict])
+    df.to_excel('labyrinth.xlsx', index=False)
+    
+write_excel(lab)
+
+
