@@ -191,7 +191,30 @@ def write_lab_excel(lab):
         pd.DataFrame([row_numbers]).to_excel(writer, index=False, header=False, startrow=0)
         # Dann Spaltennamen + Werte
         df.to_excel(writer, index=False, startrow=1)
+        
+def write_flap_excel(flap):
+    data = {
+        'width': flap.KW,
+        'height': flap.KP, 
+        'angle': flap.Kalpha 
+            }
+        
+    columns = list(data.keys())
+    values = list(data.values())
+    row_numbers = list(range(len(columns)))
+
+    # DataFrame vorbereiten
+    df = pd.DataFrame([values], columns=columns)
+
+    # Laufnummern und Spaltennamen manuell schreiben
+    with pd.ExcelWriter("flap.xlsx", engine="openpyxl") as writer:
+        # Erst Laufnummern
+        pd.DataFrame([row_numbers]).to_excel(writer, index=False, header=False, startrow=0)
+        # Dann Spaltennamen + Werte
+        df.to_excel(writer, index=False, startrow=1)
+        
     
 write_lab_excel(lab)
+write_flap_excel(kla)
 
 
