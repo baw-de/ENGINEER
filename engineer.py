@@ -1820,7 +1820,57 @@ def plot_check_FAA_FAbA(Kla, results, results_events, fish_name = None, Bemessun
     plt.savefig('check_FAbA_FAA.png')
 
 
+# Export Geometry Parameters according to Pralong et al. 2011 or Tullis 20XX
+# for further usage in e.g. automatic CAD geometry generation
+def write_lab_excel(lab):
+    # SI-Units
+    data = {
+        "W": lab.W,        # width
+        "B": lab.B,        # length
+        "P": lab.P,        # height including crest
+        "Ts": lab.t,       # thickness
+        "alpha": lab.alpha,  # sidewall angle
+        "L": lab.L,        # developed length
+        "N": lab.N,        # number of keys
+        "D": lab.D,        # front wall length
+        "w": lab.w,        # key width
+        "S": lab.S         # overall additional wall width 
+        }
 
+    columns = list(data.keys())
+    values = list(data.values())
+    row_numbers = list(range(len(columns)))
+
+    # DataFrame vorbereiten
+    df = pd.DataFrame([values], columns=columns)
+
+    # Laufnummern und Spaltennamen manuell schreiben
+    with pd.ExcelWriter("labyrinth.xlsx", engine="openpyxl") as writer:
+        # Erst Laufnummern
+        pd.DataFrame([row_numbers]).to_excel(writer, index=False, header=False, startrow=0)
+        # Dann Spaltennamen + Werte
+        df.to_excel(writer, index=False, startrow=1)
+        
+def write_flap_excel(flap):
+    data = {
+        'width': flap.KW,
+        'height': flap.KP, 
+        'angle': flap.Kalpha 
+            }
+        
+    columns = list(data.keys())
+    values = list(data.values())
+    row_numbers = list(range(len(columns)))
+
+    # DataFrame vorbereiten
+    df = pd.DataFrame([values], columns=columns)
+
+    # Laufnummern und Spaltennamen manuell schreiben
+    with pd.ExcelWriter("flap.xlsx", engine="openpyxl") as writer:
+        # Erst Laufnummern
+        pd.DataFrame([row_numbers]).to_excel(writer, index=False, header=False, startrow=0)
+        # Dann Spaltennamen + Werte
+        df.to_excel(writer, index=False, startrow=1)
 
 
 
