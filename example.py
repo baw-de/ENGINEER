@@ -165,7 +165,7 @@ results, results_events = betriebsmodell(Lab = bestLab,
 # for further usage in e.g. automatic CAD geometry generation
 def write_excel(lab):
     # SI-Units
-    dict = {
+    data = {
         "W": lab.W,        # width
         "B": lab.B,        # length
         "P": lab.P,        # height including crest
@@ -178,8 +178,19 @@ def write_excel(lab):
         "S": lab.S         # overall additional wall width 
         }
 
-    df = pd.DataFrame([dict])
-    df.to_excel('labyrinth.xlsx', index=False)
+    columns = list(data.keys())
+    values = list(data.values())
+    row_numbers = list(range(len(columns)))
+
+    # DataFrame vorbereiten
+    df = pd.DataFrame([values], columns=columns)
+
+    # Laufnummern und Spaltennamen manuell schreiben
+    with pd.ExcelWriter("labyrinth.xlsx", engine="openpyxl") as writer:
+        # Erst Laufnummern
+        pd.DataFrame([row_numbers]).to_excel(writer, index=False, header=False, startrow=0)
+        # Dann Spaltennamen + Werte
+        df.to_excel(writer, index=False, startrow=1)
     
 write_excel(lab)
 
