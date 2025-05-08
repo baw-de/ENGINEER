@@ -163,7 +163,7 @@ results, results_events = betriebsmodell(Lab = bestLab,
 
 # Export Geometry Parameters according to Pralong et al. 2011 or Tullis 20XX
 # for further usage in e.g. automatic CAD geometry generation
-def write_excel(lab):
+def write_lab_excel(lab):
     # SI-Units
     data = {
         "W": lab.W,        # width
@@ -192,6 +192,6 @@ def write_excel(lab):
         # Dann Spaltennamen + Werte
         df.to_excel(writer, index=False, startrow=1)
     
-write_excel(lab)
+write_lab_excel(lab)
 
 
