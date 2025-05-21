@@ -67,15 +67,15 @@ plt.rcParams['figure.subplot.top'] = 0.975
 
 class labyrinth(): #this is only one geometry
 
-    def __init__(self,sohleHoehe=None,UW=None,Q=None,labyrinthBreite=None,labyrinthHoehe=None,labyrinthLaenge=None,keyWinkel=None,path='',show_errors=True,show_geometry=False,show_results=False,D=0.3,t=0.3,skip_zero_check=False): #instance attribute
-         self.Sh = sohleHoehe           #Sohlhöhe [m ü. NHN]   
-         self.UW = UW                   #Unterwasserstand [m ü. NHN] 
-         self.Q = Q                     #Abfluss [m3/sec]
-         self.W = labyrinthBreite       #Labyrinth_Breite [m]
-         self.B = labyrinthLaenge       # Labyrinth_Laenge [m]    #tino
-         self.P = labyrinthHoehe
-         self.alpha = keyWinkel
-         self.g  = 9.81                 #g = Erdbeschleunigung [m2/sec]
+    def __init__(self, bottom_level=None, downstream_water_level=None, discharge=None, labyrinth_width=None, labyrinth_height=None, labyrinth_length=None, labyrinth_key_angle=None, path='', show_errors=True, show_geometry=False, show_results=False, D=0.3, t=0.3, skip_zero_check=False): #instance attribute
+         self.Sh = bottom_level           #Sohlhöhe [m ü. NHN]
+         self.UW = downstream_water_level                   #Unterwasserstand [m ü. NHN]
+         self.Q = discharge                     #Abfluss [m3/sec]
+         self.W = labyrinth_width       #Labyrinth_Breite [m]
+         self.B = labyrinth_length       # Labyrinth_Laenge [m]    #tino
+         self.P = labyrinth_height
+         self.alpha = labyrinth_key_angle
+         self.gravity  = 9.81                 #g = Erdbeschleunigung [m2/sec]
          self.D  = D                    #D  = Dicke der Stirnwand
          self.t  = t
          self.show_errors = show_errors
@@ -207,11 +207,11 @@ class labyrinth(): #this is only one geometry
     
             n = n+1
     
-            Hu_alt = pow((1.5*(self.Q/(Cd_alt*self.L*pow((2*self.g),0.5)))),(2/3))
+            Hu_alt = pow((1.5 * (self.Q / (Cd_alt * self.L * pow((2 * self.gravity), 0.5)))), (2 / 3))
     
             Cd_neu = self.a * pow((Hu_alt/self.P),(self.b*(pow((Hu_alt/self.P),self.c)))) + self.d
     
-            Q_neu  = (2/3)*Cd_neu*self.L*pow((2*self.g),0.5)*pow(Hu_alt,1.5)
+            Q_neu  = (2/3) * Cd_neu * self.L * pow((2 * self.gravity), 0.5) * pow(Hu_alt, 1.5)
             # print('Q_neu = ' + str(Q_neu)) #DEBUG
     
             
@@ -235,7 +235,7 @@ class labyrinth(): #this is only one geometry
            
         self.hd = (self.UW - self.Sh) - self.P
         self.vd = self.Q / (self.W*(self.hd + self.P))
-        self.Hd = self.hd + ((self.vd*self.vd)/(2*self.g))
+        self.Hd = self.hd + ((self.vd*self.vd) / (2 * self.gravity))
         self.rs = "Kein Rückstaueinfluss!"
         
         if self.hd>0:
@@ -278,7 +278,7 @@ class labyrinth(): #this is only one geometry
         
         while m>=0:
             m = m +1
-            h = self.Hu - ((v_alt*v_alt)/(2*self.g))
+            h = self.Hu - ((v_alt*v_alt) / (2 * self.gravity))
             v_neu = self.Q / (self.W*(h +self.P))
             
             if v_alt - v_neu <= 0.000001:
@@ -291,7 +291,7 @@ class labyrinth(): #this is only one geometry
     
     def cal_hu(self):
         
-        self.hu = self.Hu - pow(self.v, 2)/(2*self.g)
+        self.hu = self.Hu - pow(self.v, 2)/(2 * self.gravity)
     
     
     def cal_yu(self):

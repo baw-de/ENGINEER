@@ -36,14 +36,14 @@ plt.close('all')
 # Initialisierung
 # Initialise the labyrinth-weir object
 
-lab = labyrinth(sohleHoehe=0.1,     #bottom height [m]  
-            UW=1.09,                #downstream Water level [m]
-            Q=10,                   #discharge [m3/s]
-            labyrinthBreite=15,     #labyrinth weir width [m]
-            labyrinthHoehe=2.2,     #labyrinth weir height [m]
-            labyrinthLaenge=8,      #labyrinth weir length in flow direction [m]
-            keyWinkel=8,            #key angle [degree]
-            D=0.5)                  #front wall width [m]
+lab = labyrinth(bottom_level=0.1,  #bottom height [m]
+                downstream_water_level=1.09,  #downstream Water level [m]
+                discharge=10,  #discharge [m3/s]
+                labyrinth_width=15,  #labyrinth weir width [m]
+                labyrinth_height=2.2,  #labyrinth weir height [m]
+                labyrinth_length=8,  #labyrinth weir length in flow direction [m]
+                labyrinth_key_angle=8,  #key angle [degree]
+                D=0.5)                  #front wall width [m]
 
 # Adjust parameters
 # After adjustment of parameters, the hydraulics ans geometry mus be recalculated
