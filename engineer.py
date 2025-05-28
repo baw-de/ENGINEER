@@ -22,20 +22,16 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import numpy as np
-
-import pandas as pd
-
 import math
-
 import re
 import sys
 
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from matplotlib.patches import Arc
-
-from scipy.optimize import fsolve, curve_fit, minimize, minimize_scalar
 from scipy.interpolate import interp1d
+from scipy.optimize import fsolve, curve_fit, minimize, minimize_scalar
 
 '''plots format style'''''''''''''''''''''
 
@@ -475,14 +471,14 @@ def optimale_Labyrinth(labyrinth, sohleHoehe, UW, Q, labyrinthBreite, labyrinthH
 
 class klappe():
 
-    def __init__(self, sohleHoehe=None, UW=None, Q=None, klappeBreite=None, klappeHoehe=None, klappeWinkel=None,
+    def __init__(self, bottom_level=None, downstream_water_level=None, discharge=None, flap_gate_width=None, flap_gate_height=None, flap_gate_angle=None,
                  show_errors=0, skip_zero_check=False):  # instance attribute
-        self.Sh = sohleHoehe  # Sohlhöhe [m ü. NHN]
-        self.UW = UW  # Unterwasserstand [m ü. NHN]
-        self.Q = Q  # Abfluss [m3/sec]
-        self.KW = klappeBreite  # Breite des Klappe [m]
-        self.KP = klappeHoehe
-        self.Kalpha = klappeWinkel
+        self.Sh = bottom_level  # Sohlhöhe [m ü. NHN]
+        self.UW = downstream_water_level  # Unterwasserstand [m ü. NHN]
+        self.Q = discharge  # Abfluss [m3/sec]
+        self.KW = flap_gate_width  # Breite des Klappe [m]
+        self.KP = flap_gate_height
+        self.Kalpha = flap_gate_angle
         self.g = 9.81  # g = Erdbeschleunigung [m2/sec]
         self.show_errors = show_errors
         self.skip_zero_check = skip_zero_check
@@ -1011,8 +1007,8 @@ def UW_interpolation(Abfluss, Unterwasser, interpolation, path='', show_plot=Fal
     return UW
 
 
-def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=None, Stauziel=None, KlappeWinkel_max=None,
-                   H_fische=None, show_plot=False, save_plot=False, path=""):
+def operational_model(labyrinth_object, discharge_vector, downstream_water_level_vector, upstream_water_level_vector, interpolation_method, flap_gate_opject=None, design_upstream_water_level=None, max_flap_gate_angle=None,
+                      fish_body_height=None, show_plot=False, save_plot=False, path=""):
     def check_and_exit_on_input_errors():
         def input_plausibilty(eingabe_name, eingabe_wert, max_value=None, min_value=None):
             fehler = []  # Store error messages
@@ -1034,25 +1030,25 @@ def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=Non
         fehler = []  # Initialize the fehler list
 
         # Check Abfluss values
-        for i, abfluss_wert in enumerate(Abfluss):
-            fehler_abfluss = input_plausibilty("Abfluss " + str(Abfluss[i]), abfluss_wert)
+        for i, abfluss_wert in enumerate(discharge_vector):
+            fehler_abfluss = input_plausibilty("Abfluss " + str(discharge_vector[i]), abfluss_wert)
             fehler.extend(fehler_abfluss)
 
-        for i, unterwasser_wert in enumerate(Unterwasser):
-            fehler_unterwasser = input_plausibilty("Unterwasser " + str(Unterwasser[i]), unterwasser_wert)
+        for i, unterwasser_wert in enumerate(downstream_water_level_vector):
+            fehler_unterwasser = input_plausibilty("Unterwasser " + str(downstream_water_level_vector[i]), unterwasser_wert)
             fehler.extend(fehler_unterwasser)
 
-        for i, oberwasser_wert in enumerate(Oberwasser):
-            fehler_oberwasser = input_plausibilty("Oberwasser " + str(Oberwasser[i]), oberwasser_wert)
+        for i, oberwasser_wert in enumerate(upstream_water_level_vector):
+            fehler_oberwasser = input_plausibilty("Oberwasser " + str(upstream_water_level_vector[i]), oberwasser_wert)
             fehler.extend(fehler_oberwasser)
 
         # Check Stauziel, SohleHoehe, LabyrinthMaxBreite, LabyrinthMaxLaenge, and LabyrinthHoehe
-        fehler += input_plausibilty("Stauziel", Stauziel)
-        fehler += input_plausibilty("Klappe Winkel max", KlappeWinkel_max)
-        fehler += input_plausibilty("Fishe Hoehe", H_fische)
+        fehler += input_plausibilty("Stauziel", design_upstream_water_level)
+        fehler += input_plausibilty("Klappe Winkel max", max_flap_gate_angle)
+        fehler += input_plausibilty("Fishe Hoehe", fish_body_height)
 
         valid_interpolations = ["exponential", "linear", "quadratic", "cubic"]
-        if interpolation not in valid_interpolations:
+        if interpolation_method not in valid_interpolations:
             fehler.append("Interpolationsmethode ist ungültig.")
 
         return fehler
@@ -1070,29 +1066,29 @@ def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=Non
 
     def betriebsmodell_ohneklappe():
 
-        Q_con = np.arange(0.1, np.max(Abfluss) + 0.5, 0.5)
-        UW_con = UW_interpolation(Abfluss, Unterwasser, interpolation, path=path, save_plot=True)
+        Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
+        UW_con = UW_interpolation(discharge_vector, downstream_water_level_vector, interpolation_method, path=path, save_plot=True)
         Q_UW = np.stack((Q_con, UW_con), axis=1)
 
         Lab_upstream = np.zeros(np.size(Q_con))
         Lab_hu = np.zeros(np.size(Q_con))
 
         for i, (Q, UW) in enumerate(zip(Q_UW[:, 0], Q_UW[:, 1])):
-            Lab.Q = Q
-            Lab.UW = UW
-            Lab.update()
-            Lab_upstream[i] = Lab.yu
-            Lab_hu[i] = Lab.hu
+            labyrinth_object.Q = Q
+            labyrinth_object.UW = UW
+            labyrinth_object.update()
+            Lab_upstream[i] = labyrinth_object.yu
+            Lab_hu[i] = labyrinth_object.hu
 
         def print_results():
             fig, ax = plt.subplots(3, sharex=True)
 
             ax[0].plot(Q_UW[:, 0], Q_UW[:, 1], color='r')
             ax[0].set_ylabel('UW [m ü. NHN]')
-            ax[0].scatter(Abfluss, Unterwasser)
+            ax[0].scatter(discharge_vector, downstream_water_level_vector)
 
             ax[1].plot(Q_UW[:, 0], Lab_upstream, label='Mit labyrinth')
-            ax[1].scatter(Abfluss, Oberwasser, label='Ohne Labyrinth')
+            ax[1].scatter(discharge_vector, upstream_water_level_vector, label='Ohne Labyrinth')
             ax[1].set_ylabel('OW [m ü. NHN]')
             ax[1].legend()
 
@@ -1139,10 +1135,10 @@ def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=Non
             abfluss_values = results_arr[:, 0]
 
             # Interpolate for each column based on Abfluss values
-            results_events = np.zeros((len(Abfluss), results_arr.shape[1]))
+            results_events = np.zeros((len(discharge_vector), results_arr.shape[1]))
             for i in range(results_arr.shape[1]):
                 f = interp1d(abfluss_values, results_arr[:, i])
-                results_events[:, i] = f(Abfluss)
+                results_events[:, i] = f(discharge_vector)
 
             results_events_df = pd.DataFrame(results_events, index=range(1, len(results_events) + 1))
             results_events_col = ['Abfluss', 'UW', 'OW', 'Oberfallhöhe']
@@ -1164,9 +1160,9 @@ def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=Non
         return results, results_events
 
     def betriebsmodell_mitklappe():
-        Q_con = np.arange(0.1, np.max(Abfluss) + 0.5, 0.5)
-        SZ = Stauziel
-        Klawinkel_Max = KlappeWinkel_max
+        Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
+        SZ = design_upstream_water_level
+        Klawinkel_Max = max_flap_gate_angle
 
         Klappe_al = np.zeros(np.size(Q_con))
         Abfluss_R = np.zeros(np.size(Q_con))
@@ -1180,9 +1176,9 @@ def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=Non
 
         P_new = np.zeros(np.size(Q_con))
 
-        Kla.Kalpha = 0
+        flap_gate_opject.Kalpha = 0
 
-        UW_con = UW_interpolation(Abfluss, Unterwasser, interpolation, path=path, save_plot=True)
+        UW_con = UW_interpolation(discharge_vector, downstream_water_level_vector, interpolation_method, path=path, save_plot=True)
         Q_UW = np.stack((Q_con, UW_con), axis=1)
 
         for i, (Q, UW) in enumerate(zip(Q_UW[:, 0], Q_UW[:, 1])):
@@ -1202,11 +1198,11 @@ def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=Non
             # =============================================================================
 
             def Objective_fn(Kalpha):
-                Kla.Kalpha = Kalpha
-                Kla.cal_P_neu()
-                kopplung(Q, UW, Lab, Kla)
+                flap_gate_opject.Kalpha = Kalpha
+                flap_gate_opject.cal_P_neu()
+                kopplung(Q, UW, labyrinth_object, flap_gate_opject)
 
-                return abs(Kla.yu - SZ)
+                return abs(flap_gate_opject.yu - SZ)
 
             # initial values
             Kalpha0 = Klappe_al[i - 1] if i > 0 else [10]
@@ -1218,16 +1214,16 @@ def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=Non
             Klappe_al[i] = result.x
             # print(result.x)
 
-            Kla_upstream[i] = Kla.yu
+            Kla_upstream[i] = flap_gate_opject.yu
 
-            Kla_hu[i] = Kla.hu
-            Kla_vd[i] = Kla.vd
+            Kla_hu[i] = flap_gate_opject.hu
+            Kla_vd[i] = flap_gate_opject.vd
 
-            Lab_upstream[i] = Lab.yu
-            Abfluss_R[i] = Lab.Q / Kla.Q
-            Lab_Q[i] = Lab.Q
-            Kla_Q[i] = Kla.Q
-            P_new[i] = Kla.P_neu
+            Lab_upstream[i] = labyrinth_object.yu
+            Abfluss_R[i] = labyrinth_object.Q / flap_gate_opject.Q
+            Lab_Q[i] = labyrinth_object.Q
+            Kla_Q[i] = flap_gate_opject.Q
+            P_new[i] = flap_gate_opject.P_neu
 
         # return Q_con, Lab_Q, Kla_Q, Klappe_al, y_upstream
 
@@ -1237,7 +1233,7 @@ def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=Non
 
             ax[0].plot(Q_UW[:, 0], Q_UW[:, 1], color='r')
             ax[0].set_ylabel('UW [m ü. NHN]')
-            ax[0].scatter(Abfluss, Unterwasser)
+            ax[0].scatter(discharge_vector, downstream_water_level_vector)
 
             ax[1].plot(Q_UW[:, 0], Lab_Q, label='Labyrinth')
             ax[1].set_ylabel('Q Labyrinth [m³/s]')
@@ -1247,7 +1243,7 @@ def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=Non
 
             ax[2].plot(Q_UW[:, 0], Lab_upstream, marker='+', label='Labyrinth')
             ax[2].plot(Q_UW[:, 0], Kla_upstream, label='Klappe', color='c')
-            ax[2].scatter(Abfluss, Oberwasser, label='Ist')
+            ax[2].scatter(discharge_vector, upstream_water_level_vector, label='Ist')
             ax[2].legend()
             ax[2].set_ylabel('OW [m ü. NHN]')
 
@@ -1267,7 +1263,7 @@ def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=Non
 
             # Stauziel annotation
             kla_upstream = np.round(Kla_upstream, 3)
-            constant_range = np.nonzero(kla_upstream <= Stauziel)
+            constant_range = np.nonzero(kla_upstream <= design_upstream_water_level)
             const_range = constant_range[0]
             const_range_start = const_range[0]
             const_range_end = const_range[-1]
@@ -1315,10 +1311,10 @@ def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=Non
             abfluss_values = results_arr[:, 0]
 
             # Interpolate for each column based on Abfluss values
-            results_events = np.zeros((len(Abfluss), results_arr.shape[1]))
+            results_events = np.zeros((len(discharge_vector), results_arr.shape[1]))
             for i in range(results_arr.shape[1]):
                 f = interp1d(abfluss_values, results_arr[:, i])
-                results_events[:, i] = f(Abfluss)
+                results_events[:, i] = f(discharge_vector)
 
             results_events_df = pd.DataFrame(results_events, index=range(1, len(results_events) + 1))
             results_events_col = ['Abfluss', 'UW', 'OW', 'Labyrinth Q', 'Klappe Q', 'Klappe winkel']
@@ -1339,7 +1335,7 @@ def betriebsmodell(Lab, Abfluss, Unterwasser, Oberwasser, interpolation, Kla=Non
 
         return results, results_events
 
-    if Kla is None:
+    if flap_gate_opject is None:
         results, results_events = betriebsmodell_ohneklappe()
     else:
         results, results_events = betriebsmodell_mitklappe()
