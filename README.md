@@ -21,12 +21,12 @@ This repository consists mainly of two Python files:
 
 ## Prerequisites
 You need to have the following python libraries installed on your system:
-<pre>numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
+<pre>numpy matplotlib os shutil pandas math re sys scipy</pre>
 We recommend installing these either with [pip](https://packaging.python.org/en/latest/tutorials/installing-packages/) or [conda](https://docs.conda.io/projects/conda/en/23.3.x/user-guide/getting-started.html).<br><br>
 Example of installation with pip:
-<pre>pip install numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
+<pre>pip install numpy matplotlib os shutil pandas math re sys scipy</pre>
 Example of installation with conda:
-<pre>conda install numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
+<pre>conda install numpy matplotlib os shutil pandas math re sys scipy</pre>
 
 ## Hydraulic Design
 ![](pictures/dimensions.svg)
@@ -36,7 +36,7 @@ Example of installation with conda:
 If you already know the geometry of your labyrinth weir you can plot it and calculate the upstream water level depending on the geometry, the discharge and the downstream water level. You can initialise an object `lab` from the class `labyrinth` and calculate the upstream water level as shown below.
 
 ```python
-   labyrinth_weir = labyrinth(bottom_level=0.1,  # bottom height [m]
+   labyrinth_weir = Labyrinth(bottom_level=0.1,  # bottom height [m]
                               downstream_water_level=1.09,  # downstream Water level [m]
                               discharge=10,  # discharge [m3/s]
                               labyrinth_width=15,  # labyrinth weir width [m]
@@ -90,7 +90,7 @@ labyrinth_crest_height = 2.2  # crest height of labyrinth weir [m]
 
 Then start the optimization:
 ```python
-optimized_labyrinth = optimale_Labyrinth(labyrinth, bottom_level, design_downstream_water_level, design_discharge,
+optimized_labyrinth = optimize_labyrinth_geometry(labyrinth, bottom_level, design_downstream_water_level, design_discharge,
                                          labyrinth_width, labyrinth_crest_height - bottom_level + 0, labyrinth_length,
                                          path='', show_plot=False)
 
@@ -110,7 +110,7 @@ optimized_labyrinth.print_results()     #print result parameters
 <img src="codeblocks/codeblock_flap_gate.png" width="50%" height="50%"><br>
 The objects of the class ```flap_gate``` work similar to the class ```labyrinth```. You have to define the maximum height of the flap gate, the angle to the horizontal, the discharge and the downstream water level. The object will calculate the upstream water level:
 ```python
-flap_gate = klappe(bottom_level=0.1,  # bottom height [m]
+flap_gate = FlapGate(bottom_level=0.1,  # bottom height [m]
                    downstream_water_level=1.09,  # downstream water level [m]
                    discharge=10,  # discharge [m3/s]
                    flap_gate_width=1.4,  # flap width [m]
