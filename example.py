@@ -155,8 +155,8 @@ results, results_events = betriebsmodell(Lab = bestLab,
                               KlappeWinkel_max = Kalpha_max,
                               H_fische= H_fische,
                               interpolation='exponential',
-                              show_plot=True,
-                              save_plot=True)
+                              show_plot=False,
+                              save_plot=False)
 
 
 
