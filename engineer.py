@@ -58,7 +58,7 @@ plt.rcParams['figure.subplot.top'] = 0.975
 ''''''''''''''''''''''''''''''''''''''
 
 
-class labyrinth():  # this is only one geometry
+class Labyrinth():  # this is only one geometry
 
     def __init__(self, bottom_level=None, downstream_water_level=None, discharge=None, labyrinth_width=None,
                  labyrinth_height=None, labyrinth_length=None, labyrinth_key_angle=None, path='', show_errors=True,
@@ -384,8 +384,8 @@ class labyrinth():  # this is only one geometry
 
 
 # Berechnung einer hydraulisch optimalen Geometrie aus den baulichen Randbedingungen
-def optimale_Labyrinth(labyrinth, sohleHoehe, UW, Q, labyrinthBreite, labyrinthHoehe, labyrinthLaengeMax, path,
-                       show_results=False, show_plot=False):
+def optimize_labyrinth_geometry(labyrinth, sohleHoehe, UW, Q, labyrinthBreite, labyrinthHoehe, labyrinthLaengeMax, path,
+                                show_results=False, show_plot=False):
     B_vector = np.arange(1, labyrinthLaengeMax + 0.1, 0.1)
     Angle_vector = np.arange(6, 36, 1)
 
@@ -469,7 +469,7 @@ def optimale_Labyrinth(labyrinth, sohleHoehe, UW, Q, labyrinthBreite, labyrinthH
     return bestLab
 
 
-class klappe():
+class FlapGate():
 
     def __init__(self, bottom_level=None, downstream_water_level=None, discharge=None, flap_gate_width=None, flap_gate_height=None, flap_gate_angle=None,
                  show_errors=0, skip_zero_check=False):  # instance attribute
@@ -1064,7 +1064,7 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             print(f"{i}. {fehler_message}")
         return fehler
 
-    def betriebsmodell_ohneklappe():
+    def operational_model_without_flap():
 
         Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
         UW_con = UW_interpolation(discharge_vector, downstream_water_level_vector, interpolation_method, path=path, save_plot=True)
@@ -1110,11 +1110,6 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
                     fig.savefig('result.png')
 
         def save_results():
-            aReg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
-            aKey = winreg.OpenKey(aReg, r'Control Panel\International')
-
-            [csvSeperator, regtype] = (winreg.QueryValueEx(aKey, "sList"))
-
             # save results of all discharge values
             results_arr = np.stack((Q_con, UW_con, Lab_upstream, Lab_hu), axis=1)
 
@@ -1125,9 +1120,9 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             results_df = results_df.round(2)
 
             if path:
-                results_df.to_csv(path + '\\results.csv', sep=csvSeperator, float_format='%.2f', header=results_col)
+                results_df.to_csv(path + '\\results.csv', sep=';', float_format='%.2f', header=results_col)
             else:
-                results_df.to_csv('results.csv', sep=csvSeperator, float_format='%.2f', header=results_col)
+                results_df.to_csv('results.csv', sep=';', float_format='%.2f', header=results_col)
 
             '''save the results for specific discahrge events'''
 
@@ -1146,10 +1141,10 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             results_events_df = results_events_df.round(2)
 
             if path:
-                results_events_df.to_csv(path + '\\results_events.csv', sep=csvSeperator, float_format='%.2f',
+                results_events_df.to_csv(path + '\\results_events.csv', sep=';', float_format='%.2f',
                                          header=results_events_col)
             else:
-                results_events_df.to_csv('results_events.csv', sep=csvSeperator, float_format='%.2f',
+                results_events_df.to_csv('results_events.csv', sep=';', float_format='%.2f',
                                          header=results_events_col)
 
             return results_df, results_events_df
@@ -1159,7 +1154,7 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
 
         return results, results_events
 
-    def betriebsmodell_mitklappe():
+    def operational_model_with_flap():
         Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
         SZ = design_upstream_water_level
         Klawinkel_Max = max_flap_gate_angle
@@ -1336,9 +1331,9 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
         return results, results_events
 
     if flap_gate_opject is None:
-        results, results_events = betriebsmodell_ohneklappe()
+        results, results_events = operational_model_without_flap()
     else:
-        results, results_events = betriebsmodell_mitklappe()
+        results, results_events = operational_model_with_flap()
 
     return results, results_events
 

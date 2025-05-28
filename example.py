@@ -27,7 +27,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import matplotlib.pyplot as plt
 import numpy as np
 
-from engineer import labyrinth, operational_model, klappe, optimale_Labyrinth, write_flap_excel, write_lab_excel
+from engineer import Labyrinth, operational_model, FlapGate, optimize_labyrinth_geometry, write_flap_excel, write_lab_excel
 
 plt.close('all')
 
@@ -35,7 +35,7 @@ plt.close('all')
 # Initialisierung
 # Initialise the labyrinth-weir object
 
-labyrinth_weir = labyrinth(bottom_level=0.1,  # bottom height [m]
+labyrinth_weir = Labyrinth(bottom_level=0.1,  # bottom height [m]
                            downstream_water_level=1.09,  # downstream Water level [m]
                            discharge=10,  # discharge [m3/s]
                            labyrinth_width=15,  # labyrinth weir width [m]
@@ -53,16 +53,15 @@ labyrinth_weir = labyrinth(bottom_level=0.1,  # bottom height [m]
 # Plot the labyrinth geometry
 # lab.plot_geometry()
 
-
 # %% flap gate
 # (Fischbauch)klappe
 # Usage like the labyrinth
-flap_gate = klappe(bottom_level=0.1,  # bottom height [m]
-                   downstream_water_level=1.09,  # downstream water level [m]
-                   discharge=10,  # discharge [m3/s]
-                   flap_gate_width=1.4,  # flap width [m]
-                   flap_gate_height=2.35,  # flap height [m]
-                   flap_gate_angle=74)  # flap angle [degree]
+flap_gate = FlapGate(bottom_level=0.1,  # bottom height [m]
+                     downstream_water_level=1.09,  # downstream water level [m]
+                     discharge=10,  # discharge [m3/s]
+                     flap_gate_width=1.4,  # flap width [m]
+                     flap_gate_height=2.35,  # flap height [m]
+                     flap_gate_angle=74)  # flap angle [degree]
 
 # %% Optimize the geometry of the labyrinth weir to the maximum hydraulic capacity
 # Boundary conditions: 
@@ -78,9 +77,9 @@ design_downstream_water_level = 1.8  # downstream water level at design discharg
 labyrinth_crest_height = 2.2  # crest height of labyrinth weir [m]
 
 # Optimization: the return value is a labyrinth-object
-optimized_labyrinth = optimale_Labyrinth(labyrinth, bottom_level, design_downstream_water_level, design_discharge,
-                                         labyrinth_width, labyrinth_crest_height - bottom_level + 0, labyrinth_length,
-                                         path='', show_plot=False)
+optimized_labyrinth = optimize_labyrinth_geometry(Labyrinth, bottom_level, design_downstream_water_level, design_discharge,
+                                                  labyrinth_width, labyrinth_crest_height - bottom_level + 0, labyrinth_length,
+                                                  path='', show_plot=False)
 
 # Postprozess
 optimized_labyrinth.plot_geometry()  # plot the optimized geometry
