@@ -21,12 +21,12 @@ This repository consists mainly of two Python files:
 
 ## Prerequisites
 You need to have the following python libraries installed on your system:
-<pre>numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
+<pre>numpy matplotlib os shutil pandas math re sys scipy</pre>
 We recommend installing these either with [pip](https://packaging.python.org/en/latest/tutorials/installing-packages/) or [conda](https://docs.conda.io/projects/conda/en/23.3.x/user-guide/getting-started.html).<br><br>
 Example of installation with pip:
-<pre>pip install numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
+<pre>pip install numpy matplotlib os shutil pandas math re sys scipy</pre>
 Example of installation with conda:
-<pre>conda install numpy matplotlib os shutil pandas math re sys winreg scipy</pre>
+<pre>conda install numpy matplotlib os shutil pandas math re sys scipy</pre>
 
 ## Hydraulic Design
 ![](pictures/dimensions.svg)
@@ -36,23 +36,23 @@ Example of installation with conda:
 If you already know the geometry of your labyrinth weir you can plot it and calculate the upstream water level depending on the geometry, the discharge and the downstream water level. You can initialise an object `lab` from the class `labyrinth` and calculate the upstream water level as shown below.
 
 ```python
-  lab = labyrinth(  bottom_height=0.1,                          #bottom height [m]  
-                    downstream_water_level=1.09,                #downstream Water level [m]
-                    Q=10,                                       #discharge [m3/s]
-                    labyrinth_width=15,                         #labyrinth weir width [m]
-                    labyrinth_height=2.2,                       #labyrinth weir height [m]
-                    labyrinth_length=8,                         #labyrinth weir length in flow direction [m]
-                    key_angle=8,                                #key angle [degree]
-                    D=0.5)                                      #front wall width [m]
+   labyrinth_weir = Labyrinth(bottom_level=0.1,  # bottom height [m]
+                              downstream_water_level=1.09,  # downstream Water level [m]
+                              discharge=10,  # discharge [m3/s]
+                              labyrinth_width=15,  # labyrinth weir width [m]
+                              labyrinth_height=2.2,  # labyrinth weir height [m]
+                              labyrinth_length=8,  # labyrinth weir length in flow direction [m]
+                              labyrinth_key_angle=8,  # key angle [degree]
+                              D=0.5)  # front wall width [m]
 ```
 
-The object `lab` includes the attributes overflow height `lab.hu` and the absolute upstream water level `lab.yu`. In case you change any attribute, e.g. the labyrinth weir 
-height `lab.P`, you have to rerun the hydraulic calculation with `lab.update()`.
+The object `labyrinth_weir` includes the attributes overflow height `labyrinth_weir.hu` and the absolute upstream water level `labyrinth_weir.yu`. In case you change any attribute, e.g. the labyrinth weir 
+height `labyrinth_weir.P`, you have to rerun the hydraulic calculation with `labyrinth_weir.update()`.
 
 Furthermore, you can output a summary of the input and output parameters of the calculation:
 ```python
-  lab.verbose = 1
-  lab.print_results()
+  labyrinth_weir.verbose = 1
+  labyrinth_weir.print_results()
 ```
 
 The output looks similar to:
@@ -80,25 +80,28 @@ In this case, ENGINEER will design the labyrinth weir to fit your construction s
 First, define your bounday conditions:
 
 ```python
-bottom_level = 0.1      #bottom height [m o SL]
-available_width = 10    #available width for the labyrinth weir [m]
-available_length = 8    #available length in flow direction for the labyrinth weir [m]
-Q_HQ = 20               #design discharge [m3/s]
-UW_HQ = 1.8             #downstream water level at design discharge [m]
-OK_Labyrinth = 2.2      #crest height of labyrinth weir [m]    
+bottom_level = 0.1  # bottom height [m]
+labyrinth_width = 10  # available width for the labyrinth weir [m]
+labyrinth_length = 8  # available length in flow direction for the labyrinth weir [m]
+design_discharge = 20  # design discharge [m3/s]
+design_downstream_water_level = 1.8  # downstream water level at design discharge [m]
+labyrinth_crest_height = 2.2  # crest height of labyrinth weir [m] 
 ```
 
 Then start the optimization:
 ```python
-bestLab = optimize_labyrinth(labyrinth, bottom_level, UW_HQ, Q_HQ, available_width, OK_Labyrinth-bottom_level, available_length, path='', show_plot=True)
-```
-This code gives you the object ```bestLab```, which is an instance of the class ```labyrinth```. Now you can continue to work with it, as in Case 1.
+optimized_labyrinth = optimize_labyrinth_geometry(labyrinth, bottom_level, design_downstream_water_level, design_discharge,
+                                         labyrinth_width, labyrinth_crest_height - bottom_level + 0, labyrinth_length,
+                                         path='', show_plot=False)
 
-Again, you can postprocess your ```bestLab```:
+```
+This code gives you the object ```optimized_labyrinth```, which is an instance of the class ```labyrinth```. Now you can continue to work with it, as in Case 1.
+
+Again, you can postprocess your ```optimized_labyrinth```:
 ```python
-bestLab.plot_geometry()     #plot the optimized geometry (see plot below)
-bestLab.verbose = 1         #print output
-bestLab.print_results()     #print result parameters
+optimized_labyrinth.plot_geometry()     #plot the optimized geometry (see plot below)
+optimized_labyrinth.verbose = 1         #print output
+optimized_labyrinth.print_results()     #print result parameters
 ```
 <img src="pictures/best_lab_plot.png" width="35%" height="35%">
 
@@ -107,17 +110,17 @@ bestLab.print_results()     #print result parameters
 <img src="codeblocks/codeblock_flap_gate.png" width="50%" height="50%"><br>
 The objects of the class ```flap_gate``` work similar to the class ```labyrinth```. You have to define the maximum height of the flap gate, the angle to the horizontal, the discharge and the downstream water level. The object will calculate the upstream water level:
 ```python
-kla  = flap_gate(  bottom_height=0.1,       #bottom height [m]
-                  UW=1.09,                  #downstream water level [m]
-                  Q=10,                     #discharge [m3/s]
-                  flap_gateBreite=1.4,      #flap width [m]
-                  flap_gateHoehe=2.35,      #flap height [m]
-                  flap_gateWinkel=74)       #flap angle [degree]
+flap_gate = FlapGate(bottom_level=0.1,  # bottom height [m]
+                   downstream_water_level=1.09,  # downstream water level [m]
+                   discharge=10,  # discharge [m3/s]
+                   flap_gate_width=1.4,  # flap width [m]
+                   flap_gate_height=2.35,  # flap height [m]
+                   flap_gate_angle=74)  # flap angle [degree]
 ```
 The upstream water level is calculated according to Bollrich (2019)[^fn4]. <br><br>
 To print to overflow height, do:
 ```python
-print(kla.hu)
+print(flap_gate.hu)
 2.7284763202006874
 ```
 
@@ -166,7 +169,7 @@ To use the `operational_model` the following steps are required:
    
 3. We assume that the planning will replace an existing control structure and that the future water level must be compared with the current water level in order to prove that the discharge capacity remains unchanged. Therefore, the current water level must be specified for the discharge points given from step 1:
    ```python
-   upstream_water_level_today = np.array([
+   downstream_water_level = np.array([
             2.03,
             2.15,
             2.16,
@@ -184,17 +187,17 @@ To use the `operational_model` the following steps are required:
    
 6. In order to operate the valve, the following data is required: the design water level and the maximum angle of the flap to the horizontal. Now the operational model can be initialized.
    ```python
-    results, results_events = operational_model(Lab = bestLab,
-                                  Kla =  kla,
-                                  Abfluss = discharge,
-                                  Unterwasser = downstream_water_level,
-                                  Oberwasser = upstream_water_level_today,
-                                  Stauziel = design_water_lebel,
-                                  flap_gateWinkel_max = Kalpha_max,
-                                  H_fische= H_fische,
-                                  interpolation='exponential',
-                                  show_plot=True,
-                                  save_plot=True)
+   results, results_events = operational_model(labyrinth_object=optimized_labyrinth,
+                                               flap_gate_opject=flap_gate,
+                                               discharge_vector=discharge,
+                                               downstream_water_level_vector=downstream_water_level,
+                                               upstream_water_level_vector=upstream_water_level_today,
+                                               design_upstream_water_level=design_upstream_water_level,
+                                               max_flap_gate_angle=max_flap_gate_angle,
+                                               fish_body_height=fish_body_height,
+                                               interpolation_method='exponential',
+                                               show_plot=False,
+                                               save_plot=False)
     ```
 
 8. The return value is two variables of the type [pandas.DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html): results and results_evens:
