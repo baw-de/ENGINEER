@@ -854,7 +854,7 @@ def kopplung(Q, UW, Lab, Kla):  # Funktion zur Optimierung der Entladung zwische
         return Lab.Q, Kla.Q, Lab.yu, Kla.yu
 
 
-def UW_interpolation(Abfluss, Unterwasser, interpolation, path='', show_plot=False, save_plot=False):
+def UW_interpolation(Abfluss, Unterwasser, Q_con, interpolation, path='', show_plot=False, save_plot=False):
     def check_and_exit_on_input_errors():
         def input_plausibilty(eingabe_name, eingabe_wert, max_value=None, min_value=None):
             fehler = []  # Store error messages
@@ -974,7 +974,7 @@ def UW_interpolation(Abfluss, Unterwasser, interpolation, path='', show_plot=Fal
         if show_plot:
             plt.show()
 
-    Q_con = np.arange(0.1, np.max(Abfluss) + 0.5, 0.5)
+    # Q_con = np.arange(0.1, np.max(Abfluss) + 0.5, 0.5)
     interpolation_types = ['exponential', 'linear', 'quadratic', 'cubic']
     plot_colors = ['black', 'green', 'brown', 'blue']
 
@@ -1007,7 +1007,7 @@ def UW_interpolation(Abfluss, Unterwasser, interpolation, path='', show_plot=Fal
     return UW
 
 
-def operational_model(labyrinth_object, discharge_vector, downstream_water_level_vector, upstream_water_level_vector, interpolation_method, flap_gate_opject=None, design_upstream_water_level=None, max_flap_gate_angle=None,
+def operational_model(labyrinth_object, discharge_vector, downstream_water_level_vector, upstream_water_level_vector, interpolation_method, interpolation_stepsize=1, flap_gate_opject=None, design_upstream_water_level=None, max_flap_gate_angle=None,
                       fish_body_height=None, show_plot=False, save_plot=False, path=""):
     def check_and_exit_on_input_errors():
         def input_plausibilty(eingabe_name, eingabe_wert, max_value=None, min_value=None):
@@ -1066,14 +1066,16 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
 
     def operational_model_without_flap():
 
-        Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
-        UW_con = UW_interpolation(discharge_vector, downstream_water_level_vector, interpolation_method, path=path, save_plot=True)
+        # Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
+        Q_con = np.arange(50, np.max(discharge_vector) + interpolation_stepsize, interpolation_stepsize)
+        UW_con = UW_interpolation(discharge_vector, downstream_water_level_vector, Q_con, interpolation_method, path=path, save_plot=True)
         Q_UW = np.stack((Q_con, UW_con), axis=1)
 
         Lab_upstream = np.zeros(np.size(Q_con))
         Lab_hu = np.zeros(np.size(Q_con))
 
         for i, (Q, UW) in enumerate(zip(Q_UW[:, 0], Q_UW[:, 1])):
+            print(Q)
             labyrinth_object.Q = Q
             labyrinth_object.UW = UW
             labyrinth_object.update()
@@ -1155,7 +1157,8 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
         return results, results_events
 
     def operational_model_with_flap():
-        Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
+        # Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
+        Q_con = np.arange(50, np.max(discharge_vector) + interpolation_stepsize, interpolation_stepsize)
         SZ = design_upstream_water_level
         Klawinkel_Max = max_flap_gate_angle
 
@@ -1173,10 +1176,11 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
 
         flap_gate_opject.Kalpha = 0
 
-        UW_con = UW_interpolation(discharge_vector, downstream_water_level_vector, interpolation_method, path=path, save_plot=True)
+        UW_con = UW_interpolation(discharge_vector, downstream_water_level_vector, Q_con, interpolation_method, path=path, save_plot=True)
         Q_UW = np.stack((Q_con, UW_con), axis=1)
 
         for i, (Q, UW) in enumerate(zip(Q_UW[:, 0], Q_UW[:, 1])):
+            print(Q)
             # =============================================================================
             #         alpha = np.arange(Kla.Kalpha, KlappeWinkel_max+0.2,0.2)
             #
