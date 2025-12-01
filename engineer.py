@@ -1075,7 +1075,7 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
         Lab_hu = np.zeros(np.size(Q_con))
 
         for i, (Q, UW) in enumerate(zip(Q_UW[:, 0], Q_UW[:, 1])):
-            print(Q)
+            # print(Q)
             labyrinth_object.Q = Q
             labyrinth_object.UW = UW
             labyrinth_object.update()
@@ -1180,7 +1180,7 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
         Q_UW = np.stack((Q_con, UW_con), axis=1)
 
         for i, (Q, UW) in enumerate(zip(Q_UW[:, 0], Q_UW[:, 1])):
-            print(Q)
+            # print(Q)
             # =============================================================================
             #         alpha = np.arange(Kla.Kalpha, KlappeWinkel_max+0.2,0.2)
             #
