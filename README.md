@@ -1,4 +1,4 @@
-<img src="pictures/Logo_ENGINEER.PNG" ><br>
+<img src="assets/pictures/Logo_ENGINEER.PNG" ><br>
 
 # ENGINEER
 
@@ -47,11 +47,11 @@ Alternatively, you can install the libraries manually:
 
 ## Hydraulic Design
 
-![](pictures/dimensions.svg)
+![](assets/pictures/dimensions.svg)
 
 ### Case 1: You already know the geometry of your labyrinth weir
 
-<img src="codeblocks/codeblock_labyrinth.png" width="50%" height="50%">
+<img src="assets/codeblocks/codeblock_labyrinth.png" width="50%" height="50%">
 
 If you already know the geometry of your labyrinth weir you can plot it and calculate the upstream water level depending on the geometry, the discharge and the downstream water level. You can initialise an object `lab` from the class `labyrinth` and calculate the upstream water level as shown below.
 
@@ -97,7 +97,7 @@ The output looks similar to:
 
 ### Case 2: You know how large your construction site is, how high the weir should be and the design discharge. Let ENGINEER design the labyrinth itself.
 
-<img src="codeblocks/codeblock_optim_geometry.png" width="50%" height="50%">
+<img src="assets/codeblocks/codeblock_optim_geometry.png" width="50%" height="50%">
 In this case, ENGINEER will design the labyrinth weir to fit your construction site and to ensure the lowest possible upstream water level at the specified design discharge.<br/><br/>
 First, define your bounday conditions:
 
@@ -129,11 +129,11 @@ optimized_labyrinth.verbose = 1         #print output
 optimized_labyrinth.print_results()     #print result parameters
 ```
 
-<img src="pictures/best_lab_plot.png" width="35%" height="35%">
+<img src="assets/pictures/best_lab_plot.png" width="35%" height="35%">
 
 ### Flap Gate
 
-<img src="codeblocks/codeblock_flap_gate.png" width="50%" height="50%"><br>
+<img src="assets/codeblocks/codeblock_flap_gate.png" width="50%" height="50%"><br>
 The objects of the class `flap_gate` work similar to the class `labyrinth`. You have to define the maximum height of the flap gate, the angle to the horizontal, the discharge and the downstream water level. The object will calculate the upstream water level:
 
 ```python
@@ -155,7 +155,7 @@ print(flap_gate.hu)
 
 ## Operational Model
 
-<img src="codeblocks/codeblock_operational_model.png" width="50%" height="50%"><br>
+<img src="assets/codeblocks/codeblock_operational_model.png" width="50%" height="50%"><br>
 The labyrinth weir and the flap gate are coupled via the common upstream water level. The discharge is distributed depending on the capacity of the two parts. This coupling is automatically done in the code with the function `coupling`. As the total discharge increases, the valve is opened further and further to ensure that the legally required design water level is maintained. As soon as the flap is fully lowered, the water begins to flow over the labyrinth weir. This is implemented by the `operational_model` function.<br><br>
 To use the `operational_model` the following steps are required:
 
@@ -192,7 +192,7 @@ To use the `operational_model` the following steps are required:
    ```python
    interpolate_downstream_curve(discharge,downstream_water_level,interpolation='all',show_plot=True, save_plot=False)
    ```
-   <img src="pictures/Q_interpolate_downstream_curve_all.svg" width="50%" height="50%"><br>
+   <img src="assets/pictures/Q_interpolate_downstream_curve_all.svg" width="50%" height="50%"><br>
    Please interpret the plot with engineering expertise and decide on the interpolation method that best matches the given tailwater levels.
 2. We assume that the planning will replace an existing control structure and that the future water level must be compared with the current water level in order to prove that the discharge capacity remains unchanged. Therefore, the current water level must be specified for the discharge points given from step 1:
 
@@ -232,7 +232,7 @@ To use the `operational_model` the following steps are required:
    - `results` contains discharge, downstream water level, upstream water level, discharge over the labyrinth weir, discharge over the flap gate and flap angle for the following range: `np.arange(min(discharge), max(discharge), 0.1)`.
    - `results_events` contains the same parameters as `results` but for the grid point given in `discharge`.
    - In addition, a figure is displayed that contains the following representations (from top to bottom): downstream water level grid points and interpolation curve, fractions of discharge over labyrinth weir and flap gate, upstream water level in the design and actual state, flap angle. The x-axis of all plots indicates the total discharge through the system.<br>
-     <img src="pictures/results_plot.png" width="50%" height="50%"><br>
+     <img src="assets/pictures/results_plot.png" width="50%" height="50%"><br>
 
 ## REST API
 
