@@ -23,11 +23,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import math
+import os
 import re
-import sys
 
 import matplotlib
-matplotlib.use("Agg")  # use non-GUI backend for server / headless environments
+# Automatically use non-GUI backend in server mode
+if os.environ.get("SERVER_MODE") == "1":
+    matplotlib.use("Agg")  # use non-GUI backend for server / headless environments
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -1170,10 +1172,12 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
 
             results_df = results_df.round(2)
 
-            if path:
-                results_df.to_csv(path + '\\results.csv', sep=';', float_format='%.2f', header=results_col)
-            else:
-                results_df.to_csv('results.csv', sep=';', float_format='%.2f', header=results_col)
+            # Skip CSV export in server mode
+            if os.environ.get("SERVER_MODE") != "1":
+                if path:
+                    results_df.to_csv(path + '\\results.csv', sep=';', float_format='%.2f', header=results_col)
+                else:
+                    results_df.to_csv('results.csv', sep=';', float_format='%.2f', header=results_col)
 
             '''save the results for specific discahrge events'''
 
@@ -1191,12 +1195,14 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             results_events_df.columns = results_events_col
             results_events_df = results_events_df.round(2)
 
-            if path:
-                results_events_df.to_csv(path + '\\results_events.csv', sep=';', float_format='%.2f',
-                                         header=results_events_col)
-            else:
-                results_events_df.to_csv('results_events.csv', sep=';', float_format='%.2f',
-                                         header=results_events_col)
+            # Skip CSV export in server mode
+            if os.environ.get("SERVER_MODE") != "1":
+                if path:
+                    results_events_df.to_csv(path + '\\results_events.csv', sep=';', float_format='%.2f',
+                                             header=results_events_col)
+                else:
+                    results_events_df.to_csv('results_events.csv', sep=';', float_format='%.2f',
+                                             header=results_events_col)
 
             return results_df, results_events_df
 
@@ -1353,10 +1359,12 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
 
             results_df = results_df.round(2)
 
-            if path:
-                results_df.to_csv(path + '\\results.csv', sep=';', float_format='%.2f', header=results_col)
-            else:
-                results_df.to_csv('results.csv', sep=';', float_format='%.2f', header=results_col)
+            # Skip CSV export in server mode
+            if os.environ.get("SERVER_MODE") != "1":
+                if path:
+                    results_df.to_csv(path + '\\results.csv', sep=';', float_format='%.2f', header=results_col)
+                else:
+                    results_df.to_csv('results.csv', sep=';', float_format='%.2f', header=results_col)
 
             '''save the results for specific discahrge events'''
 
@@ -1374,12 +1382,14 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             results_events_df.columns = results_events_col
             results_events_df = results_events_df.round(2)
 
-            if path:
-                results_events_df.to_csv(path + '\\results_events.csv', sep=';', float_format='%.2f',
-                                         header=results_events_col)
-            else:
-                results_events_df.to_csv('results_events.csv', sep=';', float_format='%.2f',
-                                         header=results_events_col)
+            # Skip CSV export in server mode
+            if os.environ.get("SERVER_MODE") != "1":
+                if path:
+                    results_events_df.to_csv(path + '\\results_events.csv', sep=';', float_format='%.2f',
+                                             header=results_events_col)
+                else:
+                    results_events_df.to_csv('results_events.csv', sep=';', float_format='%.2f',
+                                             header=results_events_col)
 
             return results_df, results_events_df
 

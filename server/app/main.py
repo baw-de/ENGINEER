@@ -1,5 +1,7 @@
+import os
+# Set server mode before importing engineer to disable GUI backend and CSV exports
+os.environ["SERVER_MODE"] = "1"
 from fastapi import FastAPI
-
 from server.app.routes.flap_gate import router as flap_gate_router
 from server.app.routes.labyrinth import router as labyrinth_router
 from server.app.routes.operational import router as operational_router
