@@ -1,95 +1,95 @@
-# LABYRINTH API - Benutzeranleitung
+# LABYRINTH API - User Guide
 
-## Lokale Entwicklung / Serverstart
+## Local Development / Server Startup
 
-### Voraussetzungen
+### Prerequisites
 
-- Python 3.9+ installiert
-- Repository geklont, Arbeitsverzeichnis: Projekt-Root (`ENGINEER/`)
+- Python 3.9+ installed
+- Repository cloned, working directory: project root (`ENGINEER/`)
 
-### Abhängigkeiten installieren
+### Install Dependencies
 
-Im Projekt-Root in den `ENGINEER`-Ordner wechseln und ein virtuelles Environment + Dependencies installieren:
+Navigate to the project root `ENGINEER` folder and set up a virtual environment + dependencies:
 
 ```bash
 cd ENGINEER
-python -m venv .venv
-source .venv/bin/activate  # unter Windows: .venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate  # on Windows: .venv\Scripts\activate
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### FastAPI-Server lokal starten
+### Start FastAPI Server Locally
 
-Es gibt zwei empfohlene Varianten (immer aus dem Ordner `ENGINEER/`):
+Start (always from the `ENGINEER/` folder):
 
-- **Mit FastAPI-CLI** (falls installiert):
+- **With FastAPI-CLI** (if installed):
 
 ```bash
 fastapi dev main.py
 ```
 
-Nach dem Start:
+After startup:
 
 - **Base URL:** `http://localhost:8000`
-- **Interaktive API-Dokumentation:** `http://localhost:8000/docs`
+- **Interactive API Documentation:** `http://localhost:8000/docs`
 
 ---
 
-## Übersicht
+## Overview
 
-Die LABYRINTH API ist eine REST-API zur hydraulischen Berechnung von Labyrinth-Wehren und Klappenwehren. Sie ermöglicht die Berechnung hydraulischer Kennwerte, die Optimierung von Wehrgeometrien und die Simulation des Betriebsverhaltens.
+The LABYRINTH API is a REST API for hydraulic calculations of labyrinth weirs and flap gates. It enables the calculation of hydraulic parameters, optimization of weir geometries, and simulation of operational behavior.
 
-**Base URL:** `http://localhost:8000` (lokal) oder Ihre Server-URL
+**Base URL:** `http://localhost:8000` (locally) or your server URL
 
-**API-Dokumentation:** Nach dem Starten des Servers unter `/docs` verfügbar (z.B. `http://localhost:8000/docs`)
+**API Documentation:** Available at `/docs` after starting the server (e.g., `http://localhost:8000/docs`)
 
 ---
 
-## Endpunkte
+## Endpoints
 
-### 1. Labyrinth-Wehr berechnen
+### 1. Calculate Labyrinth Weir
 
 **POST** `/labyrinth/compute`
 
-Berechnet die hydraulischen Kennwerte für ein Labyrinth-Wehr mit gegebenen Geometrieparametern.
+Calculates the hydraulic parameters for a labyrinth weir with given geometry parameters.
 
-#### Request Schema (Eingabe)
+#### Request Schema (Input)
 
-| Feld                     | Typ              | Beschreibung                      | Einheit  | Pflicht        |
+| Field                    | Type             | Description                       | Unit     | Required       |
 | ------------------------ | ---------------- | --------------------------------- | -------- | -------------- |
-| `bottom_level`           | float            | Sohlhöhe                          | m ü. NHN | ✓              |
-| `downstream_water_level` | float            | Unterwasserstand                  | m ü. NHN | ✓              |
-| `discharge`              | float (>0)       | Abfluss                           | m³/s     | ✓              |
-| `labyrinth_width`        | float (>0)       | Gesamtbreite des Labyrinth-Wehrs  | m        | ✓              |
-| `labyrinth_height`       | float (>0)       | Höhe des Labyrinth-Wehrs          | m        | ✓              |
-| `labyrinth_length`       | float (>0)       | Länge eines Keys in Fließrichtung | m        | ✓              |
-| `labyrinth_key_angle`    | float (>0)       | Winkel der schrägen Seitenwände   | °        | ✓              |
-| `D`                      | float (optional) | Dicke der Stirnwand               | m        | (Default: 0.3) |
-| `t`                      | float (optional) | Wandstärke der Keys               | m        | (Default: 0.3) |
+| `bottom_level`           | float            | Bottom height                     | m a.s.l. | ✓              |
+| `downstream_water_level` | float            | Downstream water level            | m a.s.l. | ✓              |
+| `discharge`              | float (>0)       | Discharge                         | m³/s     | ✓              |
+| `labyrinth_width`        | float (>0)       | Total width of labyrinth weir     | m        | ✓              |
+| `labyrinth_height`       | float (>0)       | Height of labyrinth weir          | m        | ✓              |
+| `labyrinth_length`       | float (>0)       | Length of a key in flow direction | m        | ✓              |
+| `labyrinth_key_angle`    | float (>0)       | Angle of inclined side walls      | °        | ✓              |
+| `D`                      | float (optional) | Front wall thickness              | m        | (Default: 0.3) |
+| `t`                      | float (optional) | Wall thickness of keys            | m        | (Default: 0.3) |
 
-#### Response Schema (Ausgabe)
+#### Response Schema (Output)
 
-| Feld          | Typ          | Beschreibung                       | Einheit  |
-| ------------- | ------------ | ---------------------------------- | -------- |
-| **Geometrie** |
-| `N`           | int          | Anzahl der Keys                    | -        |
-| `L`           | float        | Gesamte entwickelte Wehrlänge      | m        |
-| `w`           | float        | Breite eines einzelnen Keys        | m        |
-| `l`           | float        | Länge der schrägen Seitenwand      | m        |
-| `S`           | float        | Verbleibende gerade Wehrlänge      | m        |
-| **Hydraulik** |
-| `Hu`          | float        | Oberwasser-Energiehöhe             | m        |
-| `hu`          | float        | Wasserstand über Wehrkrone         | m        |
-| `yu`          | float        | Oberwasserstand (absolut)          | m ü. NHN |
-| `Cd`          | float        | Abflussbeiwert                     | -        |
-| `v`           | float        | Geschwindigkeit                    | m/s      |
-| `hd`          | float        | Unterwasser über Wehrkrone         | m        |
-| `Hd`          | float        | Spezifische Energie im Unterwasser | m        |
-| `rs`          | string       | Rückstaueinfluss-Status            | -        |
-| `warnings`    | List[string] | Warnungen (falls vorhanden)        | -        |
+| Field          | Type         | Description                     | Unit     |
+| -------------- | ------------ | ------------------------------- | -------- |
+| **Geometry**   |
+| `N`            | int          | Number of keys                  | -        |
+| `L`            | float        | Total developed weir length     | m        |
+| `w`            | float        | Width of a single key           | m        |
+| `l`            | float        | Length of inclined side wall    | m        |
+| `S`            | float        | Remaining straight weir length  | m        |
+| **Hydraulics** |
+| `Hu`           | float        | Upstream energy head            | m        |
+| `hu`           | float        | Water level above crest         | m        |
+| `yu`           | float        | Upstream water level (absolute) | m a.s.l. |
+| `Cd`           | float        | Discharge coefficient           | -        |
+| `v`            | float        | Velocity                        | m/s      |
+| `hd`           | float        | Tailwater above crest           | m        |
+| `Hd`           | float        | Specific energy in tailwater    | m        |
+| `rs`           | string       | Backwater influence status      | -        |
+| `warnings`     | List[string] | Warnings (if any)               | -        |
 
-#### Beispiel Request
+#### Example Request
 
 ```json
 {
@@ -107,41 +107,41 @@ Berechnet die hydraulischen Kennwerte für ein Labyrinth-Wehr mit gegebenen Geom
 
 ---
 
-### 2. Labyrinth-Wehr optimieren
+### 2. Optimize Labyrinth Weir
 
 **POST** `/labyrinth/optimize`
 
-Findet die optimale Geometrie eines Labyrinth-Wehrs für maximale hydraulische Kapazität bei gegebenen Randbedingungen.
+Finds the optimal geometry of a labyrinth weir for maximum hydraulic capacity under given boundary conditions.
 
-#### Request Schema (Eingabe)
+#### Request Schema (Input)
 
-| Feld                     | Typ        | Beschreibung              | Einheit  | Pflicht |
-| ------------------------ | ---------- | ------------------------- | -------- | ------- |
-| `bottom_level`           | float      | Sohlhöhe                  | m ü. NHN | ✓       |
-| `downstream_water_level` | float      | Unterwasserstand          | m ü. NHN | ✓       |
-| `discharge`              | float (>0) | Bemessungsabfluss         | m³/s     | ✓       |
-| `labyrinth_width`        | float (>0) | Verfügbare Breite         | m        | ✓       |
-| `labyrinth_height`       | float (>0) | Verfügbare Höhe           | m        | ✓       |
-| `labyrinth_length_max`   | float (>0) | Maximale verfügbare Länge | m        | ✓       |
+| Field                    | Type       | Description              | Unit     | Required |
+| ------------------------ | ---------- | ------------------------ | -------- | -------- |
+| `bottom_level`           | float      | Bottom height            | m a.s.l. | ✓        |
+| `downstream_water_level` | float      | Downstream water level   | m a.s.l. | ✓        |
+| `discharge`              | float (>0) | Design discharge         | m³/s     | ✓        |
+| `labyrinth_width`        | float (>0) | Available width          | m        | ✓        |
+| `labyrinth_height`       | float (>0) | Available height         | m        | ✓        |
+| `labyrinth_length_max`   | float (>0) | Maximum available length | m        | ✓        |
 
-#### Response Schema (Ausgabe)
+#### Response Schema (Output)
 
-| Feld                   | Typ   | Beschreibung                    | Einheit |
-| ---------------------- | ----- | ------------------------------- | ------- |
-| **Optimale Geometrie** |
-| `B_best`               | float | Optimale Key-Länge              | m       |
-| `Angle_best`           | float | Optimaler Key-Winkel            | °       |
-| `N_best`               | int   | Optimale Anzahl Keys            | -       |
-| `w_best`               | float | Optimale Key-Breite             | m       |
-| `l_best`               | float | Optimale Seitenwand-Länge       | m       |
-| `S_best`               | float | Optimale gerade Wehrlänge       | m       |
-| `L_best`               | float | Optimale Gesamtlänge            | m       |
-| **Optimale Hydraulik** |
-| `Hu_best`              | float | Minimale Oberwasser-Energiehöhe | m       |
-| `Cd_best`              | float | Optimaler Abflussbeiwert        | -       |
-| `v_best`               | float | Optimale Geschwindigkeit        | m/s     |
+| Field                  | Type  | Description                   | Unit |
+| ---------------------- | ----- | ----------------------------- | ---- |
+| **Optimal Geometry**   |
+| `B_best`               | float | Optimal key length            | m    |
+| `Angle_best`           | float | Optimal key angle             | °    |
+| `N_best`               | int   | Optimal number of keys        | -    |
+| `w_best`               | float | Optimal key width             | m    |
+| `l_best`               | float | Optimal side wall length      | m    |
+| `S_best`               | float | Optimal straight weir length  | m    |
+| `L_best`               | float | Optimal total length          | m    |
+| **Optimal Hydraulics** |
+| `Hu_best`              | float | Minimum upstream energy head  | m    |
+| `Cd_best`              | float | Optimal discharge coefficient | -    |
+| `v_best`               | float | Optimal velocity              | m/s  |
 
-#### Beispiel Request
+#### Example Request
 
 ```json
 {
@@ -156,43 +156,43 @@ Findet die optimale Geometrie eines Labyrinth-Wehrs für maximale hydraulische K
 
 ---
 
-### 3. Klappenwehr berechnen
+### 3. Calculate Flap Gate
 
 **POST** `/flap/compute`
 
-Berechnet die hydraulischen Kennwerte für ein Klappenwehr (Fischbauchklappe).
+Calculates the hydraulic parameters for a flap gate (fish-belly flap).
 
-#### Request Schema (Eingabe)
+#### Request Schema (Input)
 
-| Feld                     | Typ        | Beschreibung          | Einheit  | Pflicht |
-| ------------------------ | ---------- | --------------------- | -------- | ------- |
-| `bottom_level`           | float      | Sohlhöhe              | m ü. NHN | ✓       |
-| `downstream_water_level` | float      | Unterwasserstand      | m ü. NHN | ✓       |
-| `discharge`              | float (>0) | Abfluss               | m³/s     | ✓       |
-| `flap_gate_width`        | float (>0) | Breite der Klappe     | m        | ✓       |
-| `flap_gate_height`       | float (>0) | Höhe der Klappe       | m        | ✓       |
-| `flap_gate_angle`        | float      | Winkel zur Vertikalen | °        | ✓       |
+| Field                    | Type       | Description            | Unit     | Required |
+| ------------------------ | ---------- | ---------------------- | -------- | -------- |
+| `bottom_level`           | float      | Bottom height          | m a.s.l. | ✓        |
+| `downstream_water_level` | float      | Downstream water level | m a.s.l. | ✓        |
+| `discharge`              | float (>0) | Discharge              | m³/s     | ✓        |
+| `flap_gate_width`        | float (>0) | Flap width             | m        | ✓        |
+| `flap_gate_height`       | float (>0) | Flap height            | m        | ✓        |
+| `flap_gate_angle`        | float      | Angle to vertical      | °        | ✓        |
 
-#### Response Schema (Ausgabe)
+#### Response Schema (Output)
 
-| Feld             | Typ          | Beschreibung                              | Einheit  |
-| ---------------- | ------------ | ----------------------------------------- | -------- |
-| **Geometrie**    |
-| `P_neu`          | float        | Effektive Wehrhöhe (nach Winkelkorrektur) | m        |
-| **Hydraulik**    |
-| `mu`             | float        | Abflussbeiwert                            | -        |
-| `mu_ratio`       | float        | Verhältnis der Abflussbeiwerte            | -        |
-| `hu`             | float        | Oberwasserstand über Wehrkrone            | m        |
-| `yu`             | float        | Oberwasserstand (absolut)                 | m ü. NHN |
-| `hd`             | float        | Unterwasserstand über Wehrkrone           | m        |
-| `v`              | float        | Geschwindigkeit                           | m/s      |
-| `vd`             | float        | Unterwasser-Geschwindigkeit               | m/s      |
-| `beschleunigung` | float        | Beschleunigung entlang der Klappe         | m/(s·m)  |
-| `h_gr`           | float        | Kritische Wassertiefe                     | m        |
-| `v_gr`           | float        | Kritische Geschwindigkeit                 | m/s      |
-| `warnings`       | List[string] | Warnungen (falls vorhanden)               | -        |
+| Field            | Type         | Description                                    | Unit     |
+| ---------------- | ------------ | ---------------------------------------------- | -------- |
+| **Geometry**     |
+| `P_neu`          | float        | Effective weir height (after angle correction) | m        |
+| **Hydraulics**   |
+| `mu`             | float        | Discharge coefficient                          | -        |
+| `mu_ratio`       | float        | Ratio of discharge coefficients                | -        |
+| `hu`             | float        | Upstream water level above crest               | m        |
+| `yu`             | float        | Upstream water level (absolute)                | m a.s.l. |
+| `hd`             | float        | Tailwater level above crest                    | m        |
+| `v`              | float        | Velocity                                       | m/s      |
+| `vd`             | float        | Tailwater velocity                             | m/s      |
+| `beschleunigung` | float        | Acceleration along the gate                    | m/(s·m)  |
+| `h_gr`           | float        | Critical water depth                           | m        |
+| `v_gr`           | float        | Critical velocity                              | m/s      |
+| `warnings`       | List[string] | Warnings (if any)                              | -        |
 
-#### Beispiel Request
+#### Example Request
 
 ```json
 {
@@ -207,50 +207,50 @@ Berechnet die hydraulischen Kennwerte für ein Klappenwehr (Fischbauchklappe).
 
 ---
 
-### 4. Betriebsmodell simulieren
+### 4. Simulate Operational Model
 
 **POST** `/operational-model`
 
-Simuliert das Betriebsverhalten eines Labyrinth-Wehrs (optional mit Klappenwehr) über eine gesamte Abflusskurve.
+Simulates the operational behavior of a labyrinth weir (optionally with flap gate) over an entire discharge curve.
 
-#### Request Schema (Eingabe)
+#### Request Schema (Input)
 
-**Labyrinth-Parameter:**
+**Labyrinth Parameters:**
 
-- `bottom_level`, `downstream_water_level`, `discharge` (wie oben)
+- `bottom_level`, `downstream_water_level`, `discharge` (as above)
 - `labyrinth_width`, `labyrinth_height`, `labyrinth_length`, `labyrinth_key_angle`
 
-**Abfluss- und Wasserstandskurven:**
+**Discharge and Water Level Curves:**
 
-- `discharge_vector`: Liste von Abflusswerten [m³/s]
-- `downstream_water_level_vector`: Liste von Unterwasserständen [m ü. NHN]
-- `upstream_water_level_vector`: Liste von Ist-Oberwasserständen [m ü. NHN]
+- `discharge_vector`: List of discharge values [m³/s]
+- `downstream_water_level_vector`: List of downstream water levels [m a.s.l.]
+- `upstream_water_level_vector`: List of actual upstream water levels [m a.s.l.]
 
 **Interpolation:**
 
 - `interpolation_method`: "exponential", "linear", "quadratic", "cubic" (Default: "exponential")
 
-**Optionale Klappenwehr-Parameter:**
+**Optional Flap Gate Parameters:**
 
 - `flap_gate_bottom_level`, `flap_gate_downstream_water_level`, `flap_gate_discharge`
 - `flap_gate_width`, `flap_gate_height`, `flap_gate_angle`
 
-**Bemessungsparameter (bei Klappenwehr erforderlich):**
+**Design Parameters (required for flap gate):**
 
-- `design_upstream_water_level`: Stauziel [m ü. NHN]
-- `max_flap_gate_angle`: Maximaler Klappenwinkel [°]
-- `fish_body_height`: Fischkörperhöhe für Bypass-Bemessung [m]
+- `design_upstream_water_level`: Design water level [m a.s.l.]
+- `max_flap_gate_angle`: Maximum flap gate angle [°]
+- `fish_body_height`: Fish body height for bypass design [m]
 
-#### Response Schema (Ausgabe)
+#### Response Schema (Output)
 
-| Feld      | Typ    | Beschreibung  |
-| --------- | ------ | ------------- |
-| `message` | string | Statusmeldung |
-| `status`  | string | Status        |
+| Field     | Type   | Description    |
+| --------- | ------ | -------------- |
+| `message` | string | Status message |
+| `status`  | string | Status         |
 
-_Hinweis: Vollständige Implementierung folgt._
+_Note: Full implementation follows._
 
-#### Beispiel Request
+#### Example Request
 
 ```json
 {
@@ -279,32 +279,32 @@ _Hinweis: Vollständige Implementierung folgt._
 
 ---
 
-## Wichtige Hinweise
+## Important Notes
 
-- **Einheiten:** Alle Längen in Metern [m], Abflüsse in m³/s, Winkel in Grad [°]
-- **Wasserstände:** Absolute Werte in m ü. NHN (Meter über Normalhöhennull)
-- **Optionale Parameter:** Werden nicht angegeben, werden Standardwerte verwendet
-- **Validierung:** Die API validiert automatisch Eingabewerte (z.B. Abfluss > 0)
-- **Warnungen:** Bei ungültigen Bereichsgrenzen werden Warnungen in `warnings` zurückgegeben
+- **Units:** All lengths in meters [m], discharges in m³/s, angles in degrees [°]
+- **Water Levels:** Absolute values in m a.s.l. (meters above sea level)
+- **Optional Parameters:** If not specified, default values are used
+- **Validation:** The API automatically validates input values (e.g., discharge > 0)
+- **Warnings:** Invalid range limits return warnings in `warnings`
 
 ---
 
-## Fehlerbehandlung
+## Error Handling
 
-Die API gibt standardmäßige HTTP-Statuscodes zurück:
+The API returns standard HTTP status codes:
 
-- **`200 OK`**: Erfolgreiche Berechnung.
-- **`422 Unprocessable Entity`**: Eingabefehler.
-  - Entweder Pydantic-Validierung (z.B. fehlende Pflichtfelder, falsche Typen), dann enthält `detail` die üblichen FastAPI/Pydantic-Felddetails.
-  - Oder fachliche Validierung aus dem ENGINEER-Kern (`EngineerInputError`), z.B.:
-    - negative oder nicht plausible hydraulische Größen (Abfluss, Höhen, Winkel),
-    - Unterwasser ≤ Sohle (UW - Sohle ≤ 0),
-    - bei `/operational`: leere Vektoren oder Vektoren mit unterschiedlicher Länge.
-  - In diesen Fällen liefern die Endpunkte ein `detail`-Objekt der Form:
-    - Labyrinth / Flap: `{"message": "...", "errors": ["Fehler 1", "Fehler 2", ...]}`
+- **`200 OK`**: Successful calculation.
+- **`422 Unprocessable Entity`**: Input error.
+  - Either Pydantic validation (e.g., missing required fields, wrong types), then `detail` contains the usual FastAPI/Pydantic field details.
+  - Or domain validation from the ENGINEER core (`EngineerInputError`), e.g.:
+    - negative or implausible hydraulic quantities (discharge, heights, angles),
+    - tailwater ≤ bottom (UW - bottom ≤ 0),
+    - for `/operational`: empty vectors or vectors with different lengths.
+  - In these cases, the endpoints return a `detail` object of the form:
+    - Labyrinth / Flap: `{"message": "...", "errors": ["Error 1", "Error 2", ...]}`
     - Operational: `{"message": "Operational model input is invalid.", "errors": [...]}`.
-- **`500 Internal Server Error`**: Unerwarteter Serverfehler.
-  - Für `/operational` wird ein strukturiertes JSON zurückgegeben:
+- **`500 Internal Server Error`**: Unexpected server error.
+  - For `/operational` a structured JSON is returned:
     `{"message": "Operational model failed due to an internal error.", "error_type": "...", "error": "..."}`.
 
-Bei Validierungsfehlern enthält die Antwort Details zu den fehlerhaften Feldern bzw. eine Liste fachlicher Fehlermeldungen.
+For validation errors, the response contains details about the invalid fields or a list of domain error messages.
