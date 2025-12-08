@@ -1,0 +1,12 @@
+fastapi==0.122.0
+fastapi-cli==0.0.16
+uvicorn[standard]==0.30.6
+
+numpy==2.3.4
+scipy==1.16.3
+pandas==2.3.3
+matplotlib==3.10.7
+openpyxl==3.1.5
+
+pydantic==2.12.5
+python-multipart==0.0.20

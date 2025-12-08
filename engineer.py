@@ -23,15 +23,31 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import math
+import os
 import re
-import sys
 
+import matplotlib
+# Automatically use non-GUI backend in server mode
+if os.environ.get("SERVER_MODE") == "1":
+    matplotlib.use("Agg")  # use non-GUI backend for server / headless environments
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.patches import Arc
 from scipy.interpolate import interp1d
 from scipy.optimize import fsolve, curve_fit, minimize, minimize_scalar
+
+
+class EngineerInputError(Exception):
+    """Grouping of all input errors."""
+
+    def __init__(self, messages):
+        if isinstance(messages, str):
+            self.messages = [messages]
+        else:
+            self.messages = list(messages)
+        message = "; ".join(self.messages) if self.messages else "Invalid input parameters."
+        super().__init__(message)
 
 '''plots format style'''''''''''''''''''''
 
@@ -131,14 +147,19 @@ class Labyrinth():  # this is only one geometry
         fehler += input_plausibilty("D", self.D)
         fehler += input_plausibilty("t", self.t)
 
+        # additional combined plausibility checks that depend on multiple parameters
+        # ensure that downstream water level is above the bottom level to avoid zero water depth
+        if not self.skip_zero_check and self.UW - self.Sh <= 0:
+            fehler.append("Unterwasser muss über der Sohle liegen (UW - SohleHoehe > 0).")
+
         if all(fehler_message.startswith("Achtung:") for fehler_message in fehler):
+            # Only warnings -> optionally print to console, but allow computation to continue
             for i, fehler_message in enumerate(fehler, start=1):
-                print(f"{i}. {fehler_message}")
+                print(f"[Labyrinth] {i}. {fehler_message}")
             fehler = None
         else:
-            for i, fehler_message in enumerate(fehler, start=1):
-                print(f"{i}. {fehler_message}")
-            sys.exit()
+            # Hard input errors -> raise exception without additional print (avoid duplicate output)
+            raise EngineerInputError(fehler)
 
     # Berechnung der Wehrgeometrie
     def geometrie(self):
@@ -538,14 +559,19 @@ class FlapGate():
         fehler += input_plausibilty("Klappe Hoehe", self.KP)
         fehler += input_plausibilty("Klappe Winkel", self.Kalpha)
 
+        # additional combined plausibility checks that depend on multiple parameters
+        # ensure that downstream water level is above the bottom level to avoid zero water depth
+        if not self.skip_zero_check and self.UW - self.Sh <= 0:
+            fehler.append("Unterwasser (FlapGate) must be above the bottom level (UW - SohleHoehe > 0).")
+
         if all(message.startswith("Achtung:") for message in fehler):
+            # Only warnings -> optionally print to console, but allow computation to continue
             for i, fehler_message in enumerate(fehler, start=1):
-                print(f"{i}. {fehler_message}")
+                print(f"[FlapGate] {i}. {fehler_message}")
             fehler = None
         else:
-            for i, fehler_message in enumerate(fehler, start=1):
-                print(f"{i}. {fehler_message}")
-            sys.exit()
+            # Hard input errors -> raise exception without additional print
+            raise EngineerInputError(fehler)
 
     def abflussbeiwert(self):
 
@@ -755,7 +781,7 @@ def kopplung(Q, UW, Lab, Kla):  # Funktion zur Optimierung der Entladung zwische
 
     fehler = check_and_exit_on_input_errors()
     if fehler:
-        print(fehler)
+        print(f"[kopplung] Eingabefehler: {fehler}")
         return fehler
 
     # check_and_exit_on_input_errors()
@@ -854,7 +880,7 @@ def kopplung(Q, UW, Lab, Kla):  # Funktion zur Optimierung der Entladung zwische
         return Lab.Q, Kla.Q, Lab.yu, Kla.yu
 
 
-def UW_interpolation(Abfluss, Unterwasser, Q_con, interpolation, path='', show_plot=False, save_plot=False):
+def UW_interpolation(Abfluss, Unterwasser, interpolation, path='', show_plot=False, save_plot=False):
     def check_and_exit_on_input_errors():
         def input_plausibilty(eingabe_name, eingabe_wert, max_value=None, min_value=None):
             fehler = []  # Store error messages
@@ -892,13 +918,13 @@ def UW_interpolation(Abfluss, Unterwasser, Q_con, interpolation, path='', show_p
 
     fehler = check_and_exit_on_input_errors()
     if all(message.startswith("Achtung:") for message in fehler):
+        # Only warnings -> optionally print to console
         for i, fehler_message in enumerate(fehler, start=1):
-            print(f"{i}. {fehler_message}")
+            print(f"[UW_interpolation] {i}. {fehler_message}")
         fehler = None
     else:
-        for i, fehler_message in enumerate(fehler, start=1):
-            print(f"{i}. {fehler_message}")
-        return fehler
+        # Harte Eingabefehler -> Exception, kein zusätzlicher Print
+        raise EngineerInputError(fehler)
 
     def perform_interpolation(interpolation, Abfluss, Unterwasser, Q_con):
         if interpolation == 'exponential':
@@ -974,7 +1000,7 @@ def UW_interpolation(Abfluss, Unterwasser, Q_con, interpolation, path='', show_p
         if show_plot:
             plt.show()
 
-    # Q_con = np.arange(0.1, np.max(Abfluss) + 0.5, 0.5)
+    Q_con = np.arange(0.1, np.max(Abfluss) + 0.5, 0.5)
     interpolation_types = ['exponential', 'linear', 'quadratic', 'cubic']
     plot_colors = ['black', 'green', 'brown', 'blue']
 
@@ -1007,7 +1033,7 @@ def UW_interpolation(Abfluss, Unterwasser, Q_con, interpolation, path='', show_p
     return UW
 
 
-def operational_model(labyrinth_object, discharge_vector, downstream_water_level_vector, upstream_water_level_vector, interpolation_method, interpolation_stepsize=1, flap_gate_opject=None, design_upstream_water_level=None, max_flap_gate_angle=None,
+def operational_model(labyrinth_object, discharge_vector, downstream_water_level_vector, upstream_water_level_vector, interpolation_method, flap_gate_opject=None, design_upstream_water_level=None, max_flap_gate_angle=None,
                       fish_body_height=None, show_plot=False, save_plot=False, path=""):
     def check_and_exit_on_input_errors():
         def input_plausibilty(eingabe_name, eingabe_wert, max_value=None, min_value=None):
@@ -1029,6 +1055,14 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
 
         fehler = []  # Initialize the fehler list
 
+        # Ensure vectors are not empty
+        if len(discharge_vector) == 0:
+            fehler.append("discharge_vector must not be empty.")
+        if len(downstream_water_level_vector) == 0:
+            fehler.append("downstream_water_level_vector must not be empty.")
+        if len(upstream_water_level_vector) == 0:
+            fehler.append("upstream_water_level_vector must not be empty.")
+
         # Check Abfluss values
         for i, abfluss_wert in enumerate(discharge_vector):
             fehler_abfluss = input_plausibilty("Abfluss " + str(discharge_vector[i]), abfluss_wert)
@@ -1041,6 +1075,17 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
         for i, oberwasser_wert in enumerate(upstream_water_level_vector):
             fehler_oberwasser = input_plausibilty("Oberwasser " + str(upstream_water_level_vector[i]), oberwasser_wert)
             fehler.extend(fehler_oberwasser)
+
+        # Ensure that all vectors have the same length (required for element-wise operations)
+        if not (
+            len(discharge_vector)
+            == len(downstream_water_level_vector)
+            == len(upstream_water_level_vector)
+        ):
+            fehler.append(
+                "discharge_vector, downstream_water_level_vector and upstream_water_level_vector "
+                "must have the same length."
+            )
 
         # Check Stauziel, SohleHoehe, LabyrinthMaxBreite, LabyrinthMaxLaenge, and LabyrinthHoehe
         fehler += input_plausibilty("Stauziel", design_upstream_water_level)
@@ -1056,26 +1101,32 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
     fehler = check_and_exit_on_input_errors()
 
     if all(message.startswith("Achtung:") for message in fehler):
+        # Only warnings -> optionally print to console
         for i, fehler_message in enumerate(fehler, start=1):
-            print(f"{i}. {fehler_message}")
+            print(f"[operational_model] {i}. {fehler_message}")
         fehler = None
     else:
-        for i, fehler_message in enumerate(fehler, start=1):
-            print(f"{i}. {fehler_message}")
-        return fehler
+        # Hard input errors -> raise exception without additional print
+        raise EngineerInputError(fehler)
 
     def operational_model_without_flap():
 
-        # Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
-        Q_con = np.arange(50, np.max(discharge_vector) + interpolation_stepsize, interpolation_stepsize)
-        UW_con = UW_interpolation(discharge_vector, downstream_water_level_vector, Q_con, interpolation_method, path=path, save_plot=True)
+        Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
+        # In server context we never want to open GUI windows; only save plots if explicitly requested.
+        UW_con = UW_interpolation(
+            discharge_vector,
+            downstream_water_level_vector,
+            interpolation_method,
+            path=path,
+            show_plot=show_plot,
+            save_plot=save_plot,
+        )
         Q_UW = np.stack((Q_con, UW_con), axis=1)
 
         Lab_upstream = np.zeros(np.size(Q_con))
         Lab_hu = np.zeros(np.size(Q_con))
 
         for i, (Q, UW) in enumerate(zip(Q_UW[:, 0], Q_UW[:, 1])):
-            # print(Q)
             labyrinth_object.Q = Q
             labyrinth_object.UW = UW
             labyrinth_object.update()
@@ -1121,10 +1172,12 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
 
             results_df = results_df.round(2)
 
-            if path:
-                results_df.to_csv(path + '\\results.csv', sep=';', float_format='%.2f', header=results_col)
-            else:
-                results_df.to_csv('results.csv', sep=';', float_format='%.2f', header=results_col)
+            # Skip CSV export in server mode
+            if os.environ.get("SERVER_MODE") != "1":
+                if path:
+                    results_df.to_csv(path + '\\results.csv', sep=';', float_format='%.2f', header=results_col)
+                else:
+                    results_df.to_csv('results.csv', sep=';', float_format='%.2f', header=results_col)
 
             '''save the results for specific discahrge events'''
 
@@ -1142,12 +1195,14 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             results_events_df.columns = results_events_col
             results_events_df = results_events_df.round(2)
 
-            if path:
-                results_events_df.to_csv(path + '\\results_events.csv', sep=';', float_format='%.2f',
-                                         header=results_events_col)
-            else:
-                results_events_df.to_csv('results_events.csv', sep=';', float_format='%.2f',
-                                         header=results_events_col)
+            # Skip CSV export in server mode
+            if os.environ.get("SERVER_MODE") != "1":
+                if path:
+                    results_events_df.to_csv(path + '\\results_events.csv', sep=';', float_format='%.2f',
+                                             header=results_events_col)
+                else:
+                    results_events_df.to_csv('results_events.csv', sep=';', float_format='%.2f',
+                                             header=results_events_col)
 
             return results_df, results_events_df
 
@@ -1157,8 +1212,7 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
         return results, results_events
 
     def operational_model_with_flap():
-        # Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
-        Q_con = np.arange(50, np.max(discharge_vector) + interpolation_stepsize, interpolation_stepsize)
+        Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
         SZ = design_upstream_water_level
         Klawinkel_Max = max_flap_gate_angle
 
@@ -1176,11 +1230,17 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
 
         flap_gate_opject.Kalpha = 0
 
-        UW_con = UW_interpolation(discharge_vector, downstream_water_level_vector, Q_con, interpolation_method, path=path, save_plot=True)
+        UW_con = UW_interpolation(
+            discharge_vector,
+            downstream_water_level_vector,
+            interpolation_method,
+            path=path,
+            show_plot=show_plot,
+            save_plot=save_plot,
+        )
         Q_UW = np.stack((Q_con, UW_con), axis=1)
 
         for i, (Q, UW) in enumerate(zip(Q_UW[:, 0], Q_UW[:, 1])):
-            # print(Q)
             # =============================================================================
             #         alpha = np.arange(Kla.Kalpha, KlappeWinkel_max+0.2,0.2)
             #
@@ -1299,10 +1359,12 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
 
             results_df = results_df.round(2)
 
-            if path:
-                results_df.to_csv(path + '\\results.csv', sep=';', float_format='%.2f', header=results_col)
-            else:
-                results_df.to_csv('results.csv', sep=';', float_format='%.2f', header=results_col)
+            # Skip CSV export in server mode
+            if os.environ.get("SERVER_MODE") != "1":
+                if path:
+                    results_df.to_csv(path + '\\results.csv', sep=';', float_format='%.2f', header=results_col)
+                else:
+                    results_df.to_csv('results.csv', sep=';', float_format='%.2f', header=results_col)
 
             '''save the results for specific discahrge events'''
 
@@ -1320,12 +1382,14 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             results_events_df.columns = results_events_col
             results_events_df = results_events_df.round(2)
 
-            if path:
-                results_events_df.to_csv(path + '\\results_events.csv', sep=';', float_format='%.2f',
-                                         header=results_events_col)
-            else:
-                results_events_df.to_csv('results_events.csv', sep=';', float_format='%.2f',
-                                         header=results_events_col)
+            # Skip CSV export in server mode
+            if os.environ.get("SERVER_MODE") != "1":
+                if path:
+                    results_events_df.to_csv(path + '\\results_events.csv', sep=';', float_format='%.2f',
+                                             header=results_events_col)
+                else:
+                    results_events_df.to_csv('results_events.csv', sep=';', float_format='%.2f',
+                                             header=results_events_col)
 
             return results_df, results_events_df
 
