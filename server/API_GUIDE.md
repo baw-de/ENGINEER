@@ -209,7 +209,7 @@ Calculates the hydraulic parameters for a flap gate (fish-belly flap).
 
 ### 4. Simulate Operational Model
 
-**POST** `/operational-model`
+**POST** `/operational`
 
 Simulates the operational behavior of a labyrinth weir (optionally with flap gate) over an entire discharge curve.
 

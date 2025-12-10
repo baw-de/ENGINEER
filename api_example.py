@@ -75,7 +75,7 @@ print("Antwort:", response.text)
 
 
 ## Operational Model (inkl. Kopplung)
-url = "http://127.0.0.1:8000/operational-model"
+url = "http://127.0.0.1:8000/operational"
 
 data = {
   "bottom_level": 0.1,
