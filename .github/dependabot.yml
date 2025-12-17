@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    # group the dependencies
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"
