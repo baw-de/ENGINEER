@@ -31,6 +31,7 @@ ignore = [
     "B023", # function uses loop variable - sometimes necessary
     "B905", # zip() without an explicit strict= parameter - Python < 3.10 compatibility
     "C408", # dict() calls - sometimes clearer
+    "E741", # ambiguous variable name - allow single letters in math code
 ]
 
 [tool.ruff.lint.isort]
