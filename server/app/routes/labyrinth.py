@@ -1,12 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
 from engineer import EngineerInputError, Labyrinth, optimize_labyrinth_geometry
-from ..schemas import (
-    LabyrinthOptimizeRequest,
-    LabyrinthOptimizeResult,
-    LabyrinthRequest,
-    LabyrinthResult,
-)
+
+from ..schemas import LabyrinthOptimizeRequest, LabyrinthOptimizeResult, LabyrinthRequest, LabyrinthResult
 
 router = APIRouter()
 
@@ -83,7 +79,10 @@ def optimize_labyrinth(req: LabyrinthOptimizeRequest) -> LabyrinthOptimizeResult
         # Input validation error during optimization
         raise HTTPException(
             status_code=422,
-            detail={"message": "Optimization failed due to invalid inputs.", "errors": exc.messages},
+            detail={
+                "message": "Optimization failed due to invalid inputs.",
+                "errors": exc.messages,
+            },
         ) from exc
 
     return LabyrinthOptimizeResult(
@@ -98,4 +97,3 @@ def optimize_labyrinth(req: LabyrinthOptimizeRequest) -> LabyrinthOptimizeResult
         Cd_best=best_labyrinth.Cd,
         v_best=best_labyrinth.v,
     )
-
