@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Wed Aug  3 14:05:07 2022
 
@@ -27,6 +26,7 @@ import os
 import re
 
 import matplotlib
+
 # Automatically use non-GUI backend in server mode
 if os.environ.get("SERVER_MODE") == "1":
     matplotlib.use("Agg")  # use non-GUI backend for server / headless environments
@@ -35,7 +35,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.patches import Arc
 from scipy.interpolate import interp1d
-from scipy.optimize import fsolve, curve_fit, minimize, minimize_scalar
+from scipy.optimize import curve_fit, fsolve, minimize, minimize_scalar
 
 
 class EngineerInputError(Exception):
@@ -49,36 +49,50 @@ class EngineerInputError(Exception):
         message = "; ".join(self.messages) if self.messages else "Invalid input parameters."
         super().__init__(message)
 
-'''plots format style'''''''''''''''''''''
 
-plt.rcParams['text.usetex'] = False
-plt.rcParams['font.family'] = 'serif'
+"""plots format style""" """""" """""" """"""
+
+plt.rcParams["text.usetex"] = False
+plt.rcParams["font.family"] = "serif"
 # plt.rcParams['font.serif'] = ['Cambria']
-plt.rcParams['font.size'] = 11
-plt.rcParams['axes.grid'] = True
-plt.rcParams['axes.grid.axis'] = 'both'
-plt.rcParams['axes.grid.which'] = 'both'
-plt.rcParams['grid.linestyle'] = 'dashed'
-plt.rcParams['grid.linewidth'] = 0.5
-plt.rcParams['grid.color'] = 'grey'
-plt.rcParams['grid.alpha'] = 0.8
-plt.rcParams['figure.figsize'] = (6.5, 7.5)  # size in inches
-plt.rcParams['lines.linewidth'] = 1
-plt.rcParams['lines.markersize'] = 4
+plt.rcParams["font.size"] = 11
+plt.rcParams["axes.grid"] = True
+plt.rcParams["axes.grid.axis"] = "both"
+plt.rcParams["axes.grid.which"] = "both"
+plt.rcParams["grid.linestyle"] = "dashed"
+plt.rcParams["grid.linewidth"] = 0.5
+plt.rcParams["grid.color"] = "grey"
+plt.rcParams["grid.alpha"] = 0.8
+plt.rcParams["figure.figsize"] = (6.5, 7.5)  # size in inches
+plt.rcParams["lines.linewidth"] = 1
+plt.rcParams["lines.markersize"] = 4
 
-plt.rcParams['figure.subplot.left'] = 0.125
-plt.rcParams['figure.subplot.right'] = 0.9
-plt.rcParams['figure.subplot.bottom'] = 0.09
-plt.rcParams['figure.subplot.top'] = 0.975
+plt.rcParams["figure.subplot.left"] = 0.125
+plt.rcParams["figure.subplot.right"] = 0.9
+plt.rcParams["figure.subplot.bottom"] = 0.09
+plt.rcParams["figure.subplot.top"] = 0.975
 
-''''''''''''''''''''''''''''''''''''''
+"""""" """""" """""" """""" """""" """""" ""
 
 
-class Labyrinth():  # this is only one geometry
-
-    def __init__(self, bottom_level=None, downstream_water_level=None, discharge=None, labyrinth_width=None,
-                 labyrinth_height=None, labyrinth_length=None, labyrinth_key_angle=None, path='', show_errors=True,
-                 show_geometry=False, show_results=False, D=0.3, t=0.3, skip_zero_check=False):  # instance attribute
+class Labyrinth:  # this is only one geometry
+    def __init__(
+        self,
+        bottom_level=None,
+        downstream_water_level=None,
+        discharge=None,
+        labyrinth_width=None,
+        labyrinth_height=None,
+        labyrinth_length=None,
+        labyrinth_key_angle=None,
+        path="",
+        show_errors=True,
+        show_geometry=False,
+        show_results=False,
+        D=0.3,
+        t=0.3,
+        skip_zero_check=False,
+    ):  # instance attribute
         self.Sh = bottom_level  # Sohlhöhe [m ü. NHN]
         self.UW = downstream_water_level  # Unterwasserstand [m ü. NHN]
         self.Q = discharge  # Abfluss [m3/sec]
@@ -122,7 +136,7 @@ class Labyrinth():  # this is only one geometry
             fehler = []  # Store error messages
 
             if not self.skip_zero_check and eingabe_wert <= 0:
-                if re.search(r'(Unterwasser|SohleHoehe)', eingabe_name):
+                if re.search(r"(Unterwasser|SohleHoehe)", eingabe_name):
                     fehler.append(f"Achtung: {eingabe_name} Wert ist negative.")
                 else:
                     fehler.append(f"{eingabe_name} Wert ist nicht plausibel (sollte größer als 0 sein).")
@@ -163,7 +177,6 @@ class Labyrinth():  # this is only one geometry
 
     # Berechnung der Wehrgeometrie
     def geometrie(self):
-
         self.w = 2 * (self.D + self.B * (math.tan(math.radians(self.alpha))))  # w = Breite der einzelnen Keys
         self.l = self.B / math.cos(math.radians(self.alpha))  # Länge der einzelnen schrägen Seitenwände
         self.N = math.floor(self.W / self.w)  # Anazahl der Keys
@@ -174,14 +187,17 @@ class Labyrinth():  # this is only one geometry
 
     # Abrufen von Konstanten aus Alpha_result, Private method
     def __angle_result(self):
-
-        Angle_kons = np.array([[6, 0.009447, -4.039, 0.3955, 0.187],
-                               [8, 0.017090, -3.497, 0.4048, 0.2286],
-                               [10, 0.029900, -2.978, 0.4107, 0.2520],
-                               [12, 0.030390, -3.102, 0.4393, 0.2912],
-                               [15, 0.031600, -3.270, 0.4849, 0.3349],
-                               [20, 0.033610, -3.500, 0.5536, 0.3923],
-                               [35, 0.018550, -4.904, 0.6697, 0.5062]])
+        Angle_kons = np.array(
+            [
+                [6, 0.009447, -4.039, 0.3955, 0.187],
+                [8, 0.017090, -3.497, 0.4048, 0.2286],
+                [10, 0.029900, -2.978, 0.4107, 0.2520],
+                [12, 0.030390, -3.102, 0.4393, 0.2912],
+                [15, 0.031600, -3.270, 0.4849, 0.3349],
+                [20, 0.033610, -3.500, 0.5536, 0.3923],
+                [35, 0.018550, -4.904, 0.6697, 0.5062],
+            ]
+        )
 
         # Berechnung der Winkelkonstanten
 
@@ -196,7 +212,6 @@ class Labyrinth():  # this is only one geometry
         # Berechnung von Abfluss
 
     def cal_Q(self):
-
         self.__angle_result()
         Cd_alt = 0.1
 
@@ -205,7 +220,6 @@ class Labyrinth():  # this is only one geometry
         n = 0
 
         while n >= 0:
-
             n = n + 1
 
             Hu_alt = pow((1.5 * (self.Q / (Cd_alt * self.L * pow((2 * self.gravity), 0.5)))), (2 / 3))
@@ -231,7 +245,6 @@ class Labyrinth():  # this is only one geometry
 
     # Rückstaueinfluss
     def cal_hd(self):
-
         self.hd = (self.UW - self.Sh) - self.P
         self.vd = self.Q / (self.W * (self.hd + self.P))
         self.Hd = self.hd + ((self.vd * self.vd) / (2 * self.gravity))
@@ -248,7 +261,6 @@ class Labyrinth():  # this is only one geometry
 
     # Berechnung des Oberwasserspiegels bei Rückstaueinflusses
     def cal_ruckstauH(self):
-
         if self.Hu != 0:
             R = self.Hd / self.Hu
         else:
@@ -267,7 +279,6 @@ class Labyrinth():  # this is only one geometry
 
     # Berechnung der Geschwindigkeit
     def cal_v(self):
-
         v_alt = 0.1
         m = 0
 
@@ -285,11 +296,9 @@ class Labyrinth():  # this is only one geometry
         return self.v
 
     def cal_hu(self):
-
         self.hu = self.Hu - pow(self.v, 2) / (2 * self.gravity)
 
     def cal_yu(self):
-
         self.yu = self.Sh + self.P + self.hu
 
     # Druckergebnisse
@@ -297,24 +306,30 @@ class Labyrinth():  # this is only one geometry
         if self.verbose:
             self.show_errors = True
             self.check_for_error()
-            print('Key Laenge = %2.2f [m]' % self.B, '\n'
-                                                     'Key Frontwand =', self.D, '[m]\n'
-                                                                                'Key Winkel =', self.alpha, '[°]\n'
-                                                                                                            'Key Wandstaerke =',
-                  self.t, '[m]\n'
-                          'Key Hoehe = %2.2f' % self.P, '[m]\n'
-                                                        'Key Anzahl =', self.N, '\n'
-                                                                                'Key Weite = %2.2f [m]' % self.w, '\n'
-                                                                                                                  'Keys Weite = %2.2f [m]' % (
-                              self.N * self.w), '\n'
-                                                'Seite Weite[S] = %2.2f [m]' % self.S, '\n'
-                                                                                       'Wehr Weite = %2.2f [m]' % self.W,
-                  '\n'
-                  'L/W = %2.2f [m]' % (self.L / self.W), '\n'
-                                                         'Hu = %2.2f [m]' % self.Hu, '\n',
-                  'hu = %2.2f [m]' % self.hu, '\n',
-                  self.rs, '\n',
-                  self.ce if self.ce != 0 else '')
+            print(
+                "Key Laenge = %2.2f [m]" % self.B,
+                "\nKey Frontwand =",
+                self.D,
+                "[m]\nKey Winkel =",
+                self.alpha,
+                "[°]\nKey Wandstaerke =",
+                self.t,
+                "[m]\nKey Hoehe = %2.2f" % self.P,
+                "[m]\nKey Anzahl =",
+                self.N,
+                "\nKey Weite = %2.2f [m]" % self.w,
+                "\nKeys Weite = %2.2f [m]" % (self.N * self.w),
+                "\nSeite Weite[S] = %2.2f [m]" % self.S,
+                "\nWehr Weite = %2.2f [m]" % self.W,
+                "\nL/W = %2.2f [m]" % (self.L / self.W),
+                "\nHu = %2.2f [m]" % self.Hu,
+                "\n",
+                "hu = %2.2f [m]" % self.hu,
+                "\n",
+                self.rs,
+                "\n",
+                self.ce if self.ce != 0 else "",
+            )
 
     # Grenzen der Variablen
     def check_for_error(self):
@@ -329,14 +344,12 @@ class Labyrinth():  # this is only one geometry
 
     # Plotten Labyrinth-Wehr
     def plot_geometry(self):
-
         # plt.close()
 
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
 
         if self.N > 0:
-
             a = self.D / 2  # Konstanten
             b = self.B * (math.tan(math.radians(self.alpha)))  # Konstanten
 
@@ -361,9 +374,12 @@ class Labyrinth():  # this is only one geometry
 
             Labyrinth_wehr = np.insert(Labyrinth_wehr, 0, np.array((0, 0)), 0)  # Hinzufügung von Origin koordinatoren
 
-            Labyrinth_wehr = np.insert(Labyrinth_wehr, len(Labyrinth_wehr),
-                                       np.array((Labyrinth_wehr[-1, 0] + self.S / 2, 0)),
-                                       0)  # Hinzufügen der letzten Koordinate
+            Labyrinth_wehr = np.insert(
+                Labyrinth_wehr,
+                len(Labyrinth_wehr),
+                np.array((Labyrinth_wehr[-1, 0] + self.S / 2, 0)),
+                0,
+            )  # Hinzufügen der letzten Koordinate
 
             # Plotting
 
@@ -373,40 +389,72 @@ class Labyrinth():  # this is only one geometry
 
             # Plot Angle
             # a = Arc((Labyrinth_wehr[1,0],Labyrinth_wehr[1,1]),1,1,0,0,45,color='red',lw=1)
-            a = Arc((Labyrinth_wehr[1, 0], Labyrinth_wehr[1, 1]), 1, 1, angle=0, theta1=0, theta2=45, color='red', lw=1)
+            a = Arc(
+                (Labyrinth_wehr[1, 0], Labyrinth_wehr[1, 1]),
+                1,
+                1,
+                angle=0,
+                theta1=0,
+                theta2=45,
+                color="red",
+                lw=1,
+            )
             ax.add_patch(a)
 
             # Annotation text
-            ax.text(0.5 * (Labyrinth_wehr[3, 0] + Labyrinth_wehr[4, 0]), self.B + 0.2, 'D', size=14)
-            ax.text(0.5 * Labyrinth_wehr[-1, 0], -0.1, 'W', size=14)
-            ax.text(0, 0.5 * self.B, 'B', size=14)
+            ax.text(0.5 * (Labyrinth_wehr[3, 0] + Labyrinth_wehr[4, 0]), self.B + 0.2, "D", size=14)
+            ax.text(0.5 * Labyrinth_wehr[-1, 0], -0.1, "W", size=14)
+            ax.text(0, 0.5 * self.B, "B", size=14)
             ax.text(Labyrinth_wehr[1, 0] + 0.5, Labyrinth_wehr[1, 1] + 0.2, r"$\alpha$", size=14)
 
             # Annotation arrows
-            ax.annotate('', (Labyrinth_wehr[4, 0] + 0.1, self.B + 0.1), (Labyrinth_wehr[3, 0] - 0.1, self.B + 0.1),
-                        arrowprops=dict(arrowstyle='<->', color='black'))
-            ax.annotate('', (Labyrinth_wehr[-1, 0], -0.25), (Labyrinth_wehr[0, 0], -0.25),
-                        arrowprops=dict(arrowstyle='<->', color='black'))
-            ax.annotate('', (0, self.B), (Labyrinth_wehr[0, 0], 0), arrowprops=dict(arrowstyle='<->', color='black'))
+            ax.annotate(
+                "",
+                (Labyrinth_wehr[4, 0] + 0.1, self.B + 0.1),
+                (Labyrinth_wehr[3, 0] - 0.1, self.B + 0.1),
+                arrowprops=dict(arrowstyle="<->", color="black"),
+            )
+            ax.annotate(
+                "",
+                (Labyrinth_wehr[-1, 0], -0.25),
+                (Labyrinth_wehr[0, 0], -0.25),
+                arrowprops=dict(arrowstyle="<->", color="black"),
+            )
+            ax.annotate(
+                "",
+                (0, self.B),
+                (Labyrinth_wehr[0, 0], 0),
+                arrowprops=dict(arrowstyle="<->", color="black"),
+            )
 
             plt.show()
             # plt.savefig('result-'+str(self.B)+' '+str(self.alpha)+'.jpg')
             # fig,ax = plt.subplots(ncols=2)
 
         else:
-            print('Plotten des Labyrinths ist mit', self.N, 'keys nicht möglich')
+            print("Plotten des Labyrinths ist mit", self.N, "keys nicht möglich")
 
         if self.path:
-            plt.savefig(self.path + '\\Labyrinth-Wehr_plot.svg')
-            plt.savefig(self.path + '\\Labyrinth-Wehr_plot.pdf')
+            plt.savefig(self.path + "\\Labyrinth-Wehr_plot.svg")
+            plt.savefig(self.path + "\\Labyrinth-Wehr_plot.pdf")
         else:
-            plt.savefig('Labyrinth-Wehr_plot.svg')
-            plt.savefig('Labyrinth-Wehr_plot.pdf')
+            plt.savefig("Labyrinth-Wehr_plot.svg")
+            plt.savefig("Labyrinth-Wehr_plot.pdf")
 
 
 # Berechnung einer hydraulisch optimalen Geometrie aus den baulichen Randbedingungen
-def optimize_labyrinth_geometry(labyrinth, sohleHoehe, UW, Q, labyrinthBreite, labyrinthHoehe, labyrinthLaengeMax, path,
-                                show_results=False, show_plot=False):
+def optimize_labyrinth_geometry(
+    labyrinth,
+    sohleHoehe,
+    UW,
+    Q,
+    labyrinthBreite,
+    labyrinthHoehe,
+    labyrinthLaengeMax,
+    path,
+    show_results=False,
+    show_plot=False,
+):
     B_vector = np.arange(1, labyrinthLaengeMax + 0.1, 0.1)
     Angle_vector = np.arange(6, 36, 1)
 
@@ -423,9 +471,7 @@ def optimize_labyrinth_geometry(labyrinth, sohleHoehe, UW, Q, labyrinthBreite, l
     v_result = np.empty([np.size(B_vector), np.size(Angle_vector)])
 
     for i, B in enumerate(B_vector):
-
         for j, alpha in enumerate(Angle_vector):  # float werte --- Table
-
             Lab = labyrinth(sohleHoehe, UW, Q, labyrinthBreite, labyrinthHoehe, B, alpha)
             Lab.update()
             # Lab.plot_geometry()
@@ -446,14 +492,10 @@ def optimize_labyrinth_geometry(labyrinth, sohleHoehe, UW, Q, labyrinthBreite, l
     i = i[0]
     j = j[0]
 
-    Cd_best = Cd_result[i, j]
     Hu_best = Hu_result[i, j]
-    hd_best = hd_result[i, j]
-    v_best = v_result[i, j]
     Angle_best = Angle_vector[j]
     B_best = B_vector[i]
     w_best = w_result[i, j]
-    l_best = l_result[i, j]
     N_best = N_result[i, j]
     S_best = S_result[i, j]
     L_best = L_result[i, j]
@@ -461,39 +503,67 @@ def optimize_labyrinth_geometry(labyrinth, sohleHoehe, UW, Q, labyrinthBreite, l
     bestLab = labyrinth(sohleHoehe, UW, Q, labyrinthBreite, labyrinthHoehe, B_best, Angle_best, path)
 
     if show_results:
-        print('Optimale Geometrie des Wehre ist:', '\n',
-              'Labyrinth Laenge = %2.2f [m]' % B_best, '\n',
-              'Key Frontwand =', Lab.D, '[m]', '\n',
-              'Key Winkel =', Angle_best, '[°]', '\n',
-              'Key Wandstaerke =', Lab.t, ' [m]', '\n',
-              'Labyrinth Hoehe = %2.2f [m]' % Lab.P, '\n',
-              'Keys Anzahl = %2.0f [m]' % N_best, '\n',
-              'Key Breite = %2.2f [m]' % w_best, '\n',
-              'Keys Breite = %2.2f [m]' % (N_best * w_best), '\n',
-              'Seite Breite[S] = %2.2f [m]' % S_best, '\n',
-              'Labyrinth Breite = %2.2f [m]' % labyrinthBreite, '\n',
-              'L/W = %2.2f [m]' % (L_best / labyrinthBreite), '\n',
-              'Hu_min = %2.2f [m]' % Hu_best, '\n',
-              )
+        print(
+            "Optimale Geometrie des Wehre ist:",
+            "\n",
+            "Labyrinth Laenge = %2.2f [m]" % B_best,
+            "\n",
+            "Key Frontwand =",
+            Lab.D,
+            "[m]",
+            "\n",
+            "Key Winkel =",
+            Angle_best,
+            "[°]",
+            "\n",
+            "Key Wandstaerke =",
+            Lab.t,
+            " [m]",
+            "\n",
+            "Labyrinth Hoehe = %2.2f [m]" % Lab.P,
+            "\n",
+            "Keys Anzahl = %2.0f [m]" % N_best,
+            "\n",
+            "Key Breite = %2.2f [m]" % w_best,
+            "\n",
+            "Keys Breite = %2.2f [m]" % (N_best * w_best),
+            "\n",
+            "Seite Breite[S] = %2.2f [m]" % S_best,
+            "\n",
+            "Labyrinth Breite = %2.2f [m]" % labyrinthBreite,
+            "\n",
+            "L/W = %2.2f [m]" % (L_best / labyrinthBreite),
+            "\n",
+            "Hu_min = %2.2f [m]" % Hu_best,
+            "\n",
+        )
 
     if show_plot:
         plt.figure()
         alphai, Bi = np.meshgrid(Angle_vector, B_vector)
-        plt.pcolormesh(alphai, Bi, Hu_result, cmap='rainbow')  # imshow,pcolor options
-        plt.xlabel('alpha [°]')
-        plt.ylabel('B [m]')
+        plt.pcolormesh(alphai, Bi, Hu_result, cmap="rainbow")  # imshow,pcolor options
+        plt.xlabel("alpha [°]")
+        plt.ylabel("B [m]")
         plt.grid()
         plt.colorbar()
         plt.show()
-        plt.title('Original')
+        plt.title("Original")
 
     return bestLab
 
 
-class FlapGate():
-
-    def __init__(self, bottom_level=None, downstream_water_level=None, discharge=None, flap_gate_width=None, flap_gate_height=None, flap_gate_angle=None,
-                 show_errors=0, skip_zero_check=False):  # instance attribute
+class FlapGate:
+    def __init__(
+        self,
+        bottom_level=None,
+        downstream_water_level=None,
+        discharge=None,
+        flap_gate_width=None,
+        flap_gate_height=None,
+        flap_gate_angle=None,
+        show_errors=0,
+        skip_zero_check=False,
+    ):  # instance attribute
         self.Sh = bottom_level  # Sohlhöhe [m ü. NHN]
         self.UW = downstream_water_level  # Unterwasserstand [m ü. NHN]
         self.Q = discharge  # Abfluss [m3/sec]
@@ -537,7 +607,7 @@ class FlapGate():
             fehler = []  # Store error messages
 
             if not self.skip_zero_check and eingabe_wert <= 0:
-                if re.search(r'(Unterwasser|SohleHoehe)', eingabe_name):
+                if re.search(r"(Unterwasser|SohleHoehe)", eingabe_name):
                     fehler.append(f"Achtung: {eingabe_name} Wert ist negative.")
                 else:
                     fehler.append(f"{eingabe_name} Wert ist nicht plausibel (sollte größer als 0 sein).")
@@ -574,86 +644,88 @@ class FlapGate():
             raise EngineerInputError(fehler)
 
     def abflussbeiwert(self):
-
-        self.mu_verhältnis = np.array([[-42.74, 0.9143],
-                                       [-39.05, 0.92],
-                                       [-35.07, 0.9271],
-                                       [-31.1, 0.9343],
-                                       [-27.21, 0.9434],
-                                       [-23.15, 0.9496],
-                                       [-19.17, 0.9571],
-                                       [-15.2, 0.9659],
-                                       [-11.22, 0.9743],
-                                       [-7.24, 0.9831],
-                                       [-3.274, 0.9926],
-                                       [0.6412, 1.002],
-                                       [2.418, 1.009],
-                                       [5.761, 1.015],
-                                       [9.555, 1.025],
-                                       [13.5, 1.034],
-                                       [16.96, 1.046],
-                                       [20.76, 1.055],
-                                       [24.37, 1.065],
-                                       [27.98, 1.074],
-                                       [31.78, 1.084],
-                                       [35.75, 1.094],
-                                       [39.73, 1.104],
-                                       [43.82, 1.11],
-                                       [47.68, 1.118],
-                                       [51.65, 1.124],
-                                       [55.63, 1.128],
-                                       [59.6, 1.131],
-                                       [63.58, 1.13],
-                                       [67.55, 1.127],
-                                       [71.35, 1.119],
-                                       [74.42, 1.109],
-                                       [76.72, 1.098],
-                                       [80.02, 1.079],
-                                       [81.29, 1.069],
-                                       [82.37, 1.058],
-                                       [83.27, 1.051],
-                                       [84.18, 1.038],
-                                       [84.9, 1.03],
-                                       [85.8, 1.015]])
+        self.mu_verhältnis = np.array(
+            [
+                [-42.74, 0.9143],
+                [-39.05, 0.92],
+                [-35.07, 0.9271],
+                [-31.1, 0.9343],
+                [-27.21, 0.9434],
+                [-23.15, 0.9496],
+                [-19.17, 0.9571],
+                [-15.2, 0.9659],
+                [-11.22, 0.9743],
+                [-7.24, 0.9831],
+                [-3.274, 0.9926],
+                [0.6412, 1.002],
+                [2.418, 1.009],
+                [5.761, 1.015],
+                [9.555, 1.025],
+                [13.5, 1.034],
+                [16.96, 1.046],
+                [20.76, 1.055],
+                [24.37, 1.065],
+                [27.98, 1.074],
+                [31.78, 1.084],
+                [35.75, 1.094],
+                [39.73, 1.104],
+                [43.82, 1.11],
+                [47.68, 1.118],
+                [51.65, 1.124],
+                [55.63, 1.128],
+                [59.6, 1.131],
+                [63.58, 1.13],
+                [67.55, 1.127],
+                [71.35, 1.119],
+                [74.42, 1.109],
+                [76.72, 1.098],
+                [80.02, 1.079],
+                [81.29, 1.069],
+                [82.37, 1.058],
+                [83.27, 1.051],
+                [84.18, 1.038],
+                [84.9, 1.03],
+                [85.8, 1.015],
+            ]
+        )
 
         self.mu_ratio = np.interp(self.Kalpha, self.mu_verhältnis[:, 0], self.mu_verhältnis[:, 1])
 
     def abminderung_faktor(self):
-
-        self.Abminderung_fak = np.array([[0.0112, 0.9916],
-                                         [0.0718, 0.9764],
-                                         [0.1610, 0.9473],
-                                         [0.2191, 0.9268],
-                                         [0.2801, 0.9032],
-                                         [0.3396, 0.8775],
-                                         [0.3992, 0.8500],
-                                         [0.4588, 0.8201],
-                                         [0.5184, 0.7877],
-                                         [0.5780, 0.7525],
-                                         [0.6377, 0.7127],
-                                         [0.6976, 0.6707],
-                                         [0.7572, 0.6168],
-                                         [0.8107, 0.5622],
-                                         [0.9055, 0.4440],
-                                         [0.9382, 0.4055],
-                                         [1, 0.3]])
+        self.Abminderung_fak = np.array(
+            [
+                [0.0112, 0.9916],
+                [0.0718, 0.9764],
+                [0.1610, 0.9473],
+                [0.2191, 0.9268],
+                [0.2801, 0.9032],
+                [0.3396, 0.8775],
+                [0.3992, 0.8500],
+                [0.4588, 0.8201],
+                [0.5184, 0.7877],
+                [0.5780, 0.7525],
+                [0.6377, 0.7127],
+                [0.6976, 0.6707],
+                [0.7572, 0.6168],
+                [0.8107, 0.5622],
+                [0.9055, 0.4440],
+                [0.9382, 0.4055],
+                [1, 0.3],
+            ]
+        )
 
     def cal_P_neu(self):
         self.P_neu = self.KP * (math.cos(math.radians(abs(self.Kalpha))))
 
     def cal_Q(self):
-
         mu_alt = 0.1
 
         n = 0
 
         while n >= 0:
+            hu_alt = pow(self.Q / (2.953 * mu_alt * self.KW), 2 / 3)  # Tech. Hydro mechanik 1 - Gleichung 9.2 - Zeite 403
 
-            hu_alt = pow(self.Q / (2.953 * mu_alt * self.KW),
-                         2 / 3)  # Tech. Hydro mechanik 1 - Gleichung 9.2 - Zeite 403
-
-            mu90_neu = 0.615 * (1 + (1 / (1000 * hu_alt + 1.6))) * (1 + (0.5 * pow(hu_alt / (hu_alt + self.P_neu),
-                                                                                   2)))  # Tech. Hydro mechanik 1 - Gleichung 9.16 - Zeite 415
+            mu90_neu = 0.615 * (1 + (1 / (1000 * hu_alt + 1.6))) * (1 + (0.5 * pow(hu_alt / (hu_alt + self.P_neu), 2)))  # Tech. Hydro mechanik 1 - Gleichung 9.16 - Zeite 415
 
             # =============================================================================
             #            Diese Formel gilt für
@@ -691,10 +763,9 @@ class FlapGate():
             # print (self.hd,h[0],self.hd/h[0])
             if h[0] < self.hd:
                 h[0] = self.hd + 0.01
-            return (pow((1 - pow((self.hd / h), 1.15)), 0.37) * 2.953
-                    * 0.615 * (1 + (1 / (1000 * h + 1.6))) * (1 + (0.5 * pow(h / (h + self.P_neu), 2)))
-                    * self.mu_ratio
-                    * self.KW * pow(h, 1.5) - self.Q)
+            return (
+                pow((1 - pow((self.hd / h), 1.15)), 0.37) * 2.953 * 0.615 * (1 + (1 / (1000 * h + 1.6))) * (1 + (0.5 * pow(h / (h + self.P_neu), 2))) * self.mu_ratio * self.KW * pow(h, 1.5) - self.Q
+            )
 
         # def f(h):
         #     return ((np.interp(self.hd/h0,self.Abminderung_fak[:,0],self.Abminderung_fak[:,1]))*2.953
@@ -704,11 +775,9 @@ class FlapGate():
 
         h0 = self.hd + 0.1
 
-        self.hu = fsolve(f, h0)[
-            0]  # Der Rückgabetyp der Funktion fsolve ist array, hier wird array in float umgewandelt
+        self.hu = fsolve(f, h0)[0]  # Der Rückgabetyp der Funktion fsolve ist array, hier wird array in float umgewandelt
 
     def cal_v(self):
-
         if self.hu == 0:
             self.v = np.nan
 
@@ -716,15 +785,12 @@ class FlapGate():
             self.v = self.Q / (self.KW * self.hu)
 
     def cal_yu(self):
-
         self.yu = self.Sh + self.P_neu + self.hu
 
     def cal_vd(self):
-
         self.vd = self.Q / (self.KW * (self.UW - self.Sh))
 
     def FAA_FAbA(self):
-
         self.h_gr = pow((pow(self.Q / self.KW, 2)) / self.g, 0.33)
         self.v_gr = pow((self.g * self.h_gr), 0.5)
         self.beschleunigung = (self.v_gr - self.v) / (self.KP * (math.sin(math.radians(abs(self.Kalpha)))))
@@ -743,25 +809,37 @@ class FlapGate():
     def print_results(self):
         self.show_errors = True
         self.check_for_error()
-        print('Hoehe =', self.KP, '[m]\n',
-              'Breite =', self.KW, '[m]\n',
-              'Winkel zur Vertikalen = %2.2f [°]' % self.Kalpha, '\n',
-              'mu_ratio = %2.2f' % self.mu_ratio, '\n',
-              'mu = %2.2f' % self.mu, '\n',
-              'Oberwasserstand über OK = %2.2f [m]' % self.hu, '\n',
-              'Oberwasserstand = %2.2f [m ü. NHN]' % self.yu, '\n',
-              'Unterwasserstand über OK = %2.2f [m]' % self.hd, '\n',
-              'Unterwasserstand =%2.2f [m ü. NHN]' % self.UW, '\n')
+        print(
+            "Hoehe =",
+            self.KP,
+            "[m]\n",
+            "Breite =",
+            self.KW,
+            "[m]\n",
+            "Winkel zur Vertikalen = %2.2f [°]" % self.Kalpha,
+            "\n",
+            "mu_ratio = %2.2f" % self.mu_ratio,
+            "\n",
+            "mu = %2.2f" % self.mu,
+            "\n",
+            "Oberwasserstand über OK = %2.2f [m]" % self.hu,
+            "\n",
+            "Oberwasserstand = %2.2f [m ü. NHN]" % self.yu,
+            "\n",
+            "Unterwasserstand über OK = %2.2f [m]" % self.hd,
+            "\n",
+            "Unterwasserstand =%2.2f [m ü. NHN]" % self.UW,
+            "\n",
+        )
 
 
 def kopplung(Q, UW, Lab, Kla):  # Funktion zur Optimierung der Entladung zwischen Labyrinth und Klappe
-
     def check_and_exit_on_input_errors():
         def input_plausibilty(eingabe_name, eingabe_wert, max_value=None, min_value=None):
             fehler = []  # Store error messages
 
             if eingabe_wert <= 0:
-                if re.search(r'(Unterwasser|SohleHoehe)', eingabe_name):
+                if re.search(r"(Unterwasser|SohleHoehe)", eingabe_name):
                     fehler.append(f"Achtung: {eingabe_name} Wert ist negative.")
                 else:
                     fehler.append(f"{eingabe_name} Wert ist nicht plausibel (sollte größer als 0 sein).")
@@ -790,7 +868,6 @@ def kopplung(Q, UW, Lab, Kla):  # Funktion zur Optimierung der Entladung zwische
     Kla.UW = UW
 
     def teilung(Q, Lab, Kla):
-
         def Objective_fn(i):
             a = i[0]
             Lab.Q = a * Q
@@ -880,13 +957,13 @@ def kopplung(Q, UW, Lab, Kla):  # Funktion zur Optimierung der Entladung zwische
         return Lab.Q, Kla.Q, Lab.yu, Kla.yu
 
 
-def UW_interpolation(Abfluss, Unterwasser, interpolation, path='', show_plot=False, save_plot=False):
+def UW_interpolation(Abfluss, Unterwasser, interpolation, path="", show_plot=False, save_plot=False):
     def check_and_exit_on_input_errors():
         def input_plausibilty(eingabe_name, eingabe_wert, max_value=None, min_value=None):
             fehler = []  # Store error messages
 
             if eingabe_wert <= 0:
-                if re.search(r'(Unterwasser)', eingabe_name):
+                if re.search(r"(Unterwasser)", eingabe_name):
                     fehler.append(f"Achtung: {eingabe_name} Wert ist negative.")
                 else:
                     fehler.append(f"{eingabe_name} Wert ist nicht plausibel (sollte größer als 0 sein).")
@@ -927,37 +1004,34 @@ def UW_interpolation(Abfluss, Unterwasser, interpolation, path='', show_plot=Fal
         raise EngineerInputError(fehler)
 
     def perform_interpolation(interpolation, Abfluss, Unterwasser, Q_con):
-        if interpolation == 'exponential':
+        if interpolation == "exponential":
+
             def model_f(x, a, b, c):
                 return a * (np.exp(b * x)) + c
 
-            popt, pcov = curve_fit(model_f, Abfluss, Unterwasser, p0=[0., 0.1, 0.1], maxfev=2000)
+            popt, pcov = curve_fit(model_f, Abfluss, Unterwasser, p0=[0.0, 0.1, 0.1], maxfev=2000)
             a_opt, b_opt, c_opt = popt
 
             UW1 = a_opt * (np.exp(b_opt * Abfluss)) + c_opt
             UW2 = a_opt * (np.exp(b_opt * Q_con)) + c_opt
 
-            # Calculate Mean Squared Error
-            MSE = np.mean((Unterwasser - UW1) ** 2)
             # Calculate R-squared
             SSR = np.sum((Unterwasser - UW1) ** 2)
             SST = np.sum((Unterwasser - np.mean(UW1)) ** 2)
             R_squared = 1 - (SSR / SST)
 
-        elif interpolation == 'linear':
+        elif interpolation == "linear":
             coeffs = np.polyfit(Abfluss, Unterwasser, 1)
             p = np.poly1d(coeffs)
 
             UW1 = p(Abfluss)
             UW2 = p(Q_con)
-            # Calculate Mean Squared Error
-            MSE = np.mean((Unterwasser - UW1) ** 2)
             # Calculate R-squared
             SSR = np.sum((Unterwasser - UW1) ** 2)
             SST = np.sum((Unterwasser - np.mean(UW1)) ** 2)
             R_squared = 1 - (SSR / SST)
 
-        elif interpolation == 'quadratic':
+        elif interpolation == "quadratic":
             coeffs = np.polyfit(Abfluss, Unterwasser, 2)
             p = np.poly1d(coeffs)
 
@@ -971,14 +1045,12 @@ def UW_interpolation(Abfluss, Unterwasser, interpolation, path='', show_plot=Fal
             SST = np.sum((Unterwasser - np.mean(UW1)) ** 2)
             R_squared = 1 - (SSR / SST)
 
-        elif interpolation == 'cubic':
+        elif interpolation == "cubic":
             coeffs = np.polyfit(Abfluss, Unterwasser, 3)
             p = np.poly1d(coeffs)
 
             UW1 = p(Abfluss)
             UW2 = p(Q_con)
-            # Calculate Mean Squared Error
-            MSE = np.mean((Unterwasser - UW1) ** 2)
             # Calculate R-squared
             SSR = np.sum((Unterwasser - UW1) ** 2)
             SST = np.sum((Unterwasser - np.mean(UW1)) ** 2)
@@ -990,41 +1062,50 @@ def UW_interpolation(Abfluss, Unterwasser, interpolation, path='', show_plot=Fal
         # plt.close()
         plt.figure()
         plt.plot(Q_con, UW)
-        plt.scatter(Abfluss, Unterwasser, color='red')
-        plt.xlabel('Abfluss [m³/s]')
-        plt.ylabel('UW [m ü. NHN]')
-        plt.text(0.5, 0.9, f'R² ({interpolation}) = {R_squared:.3f}', transform=plt.gca().transAxes)
+        plt.scatter(Abfluss, Unterwasser, color="red")
+        plt.xlabel("Abfluss [m³/s]")
+        plt.ylabel("UW [m ü. NHN]")
+        plt.text(0.5, 0.9, f"R² ({interpolation}) = {R_squared:.3f}", transform=plt.gca().transAxes)
         if save_plot:
-            plt.savefig(path + 'Q_UW_interpolation_{}.svg'.format(interpolation))
-            plt.savefig(path + 'Q_UW_interpolation_{}.pdf'.format(interpolation))
+            plt.savefig(path + f"Q_UW_interpolation_{interpolation}.svg")
+            plt.savefig(path + f"Q_UW_interpolation_{interpolation}.pdf")
         if show_plot:
             plt.show()
 
     Q_con = np.arange(0.1, np.max(Abfluss) + 0.5, 0.5)
-    interpolation_types = ['exponential', 'linear', 'quadratic', 'cubic']
-    plot_colors = ['black', 'green', 'brown', 'blue']
+    interpolation_types = ["exponential", "linear", "quadratic", "cubic"]
+    plot_colors = ["black", "green", "brown", "blue"]
 
     plt.ioff()
 
-    if interpolation == 'all':
+    if interpolation == "all":
         for i, interp_type in enumerate(interpolation_types):
             UW, R_squared = perform_interpolation(interp_type, Abfluss, Unterwasser, Q_con)
             plot_color = plot_colors[i % len(plot_colors)]
             plt.plot(Q_con, UW, color=plot_color)
-            plt.scatter(Abfluss, Unterwasser, color='red')
-            plt.xlabel('Abfluss [m³/s]')
-            plt.ylabel('UW [m ü. NHN]')
-            plt.text(0.5, 0.95 - i * 0.05, f'R² = {R_squared:.3f}', color=plot_color, transform=plt.gca().transAxes)
-            plt.text(0.1, 0.95 - i * 0.05, f'Interpolation: {interp_type}', color=plot_color,
-                     transform=plt.gca().transAxes)
+            plt.scatter(Abfluss, Unterwasser, color="red")
+            plt.xlabel("Abfluss [m³/s]")
+            plt.ylabel("UW [m ü. NHN]")
+            plt.text(
+                0.5,
+                0.95 - i * 0.05,
+                f"R² = {R_squared:.3f}",
+                color=plot_color,
+                transform=plt.gca().transAxes,
+            )
+            plt.text(
+                0.1,
+                0.95 - i * 0.05,
+                f"Interpolation: {interp_type}",
+                color=plot_color,
+                transform=plt.gca().transAxes,
+            )
 
         if save_plot:
-            plt.savefig('Q_UW_interpolation_all.svg')
+            plt.savefig("Q_UW_interpolation_all.svg")
 
         if show_plot:
             plt.show()
-
-
 
     else:
         UW, R_squared = perform_interpolation(interpolation, Abfluss, Unterwasser, Q_con)
@@ -1033,14 +1114,26 @@ def UW_interpolation(Abfluss, Unterwasser, interpolation, path='', show_plot=Fal
     return UW
 
 
-def operational_model(labyrinth_object, discharge_vector, downstream_water_level_vector, upstream_water_level_vector, interpolation_method, flap_gate_opject=None, design_upstream_water_level=None, max_flap_gate_angle=None,
-                      fish_body_height=None, show_plot=False, save_plot=False, path=""):
+def operational_model(
+    labyrinth_object,
+    discharge_vector,
+    downstream_water_level_vector,
+    upstream_water_level_vector,
+    interpolation_method,
+    flap_gate_opject=None,
+    design_upstream_water_level=None,
+    max_flap_gate_angle=None,
+    fish_body_height=None,
+    show_plot=False,
+    save_plot=False,
+    path="",
+):
     def check_and_exit_on_input_errors():
         def input_plausibilty(eingabe_name, eingabe_wert, max_value=None, min_value=None):
             fehler = []  # Store error messages
 
             if eingabe_wert is not None and eingabe_wert <= 0:
-                if re.search(r'(Unterwasser|Oberwasser)', eingabe_name):
+                if re.search(r"(Unterwasser|Oberwasser)", eingabe_name):
                     fehler.append(f"Achtung: {eingabe_name} Wert ist negative.")
                 else:
                     fehler.append(f"{eingabe_name} Wert ist nicht plausibel (sollte größer als 0 sein).")
@@ -1077,15 +1170,8 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             fehler.extend(fehler_oberwasser)
 
         # Ensure that all vectors have the same length (required for element-wise operations)
-        if not (
-            len(discharge_vector)
-            == len(downstream_water_level_vector)
-            == len(upstream_water_level_vector)
-        ):
-            fehler.append(
-                "discharge_vector, downstream_water_level_vector and upstream_water_level_vector "
-                "must have the same length."
-            )
+        if not (len(discharge_vector) == len(downstream_water_level_vector) == len(upstream_water_level_vector)):
+            fehler.append("discharge_vector, downstream_water_level_vector and upstream_water_level_vector must have the same length.")
 
         # Check Stauziel, SohleHoehe, LabyrinthMaxBreite, LabyrinthMaxLaenge, and LabyrinthHoehe
         fehler += input_plausibilty("Stauziel", design_upstream_water_level)
@@ -1110,7 +1196,6 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
         raise EngineerInputError(fehler)
 
     def operational_model_without_flap():
-
         Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
         # In server context we never want to open GUI windows; only save plots if explicitly requested.
         UW_con = UW_interpolation(
@@ -1136,38 +1221,38 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
         def print_results():
             fig, ax = plt.subplots(3, sharex=True)
 
-            ax[0].plot(Q_UW[:, 0], Q_UW[:, 1], color='r')
-            ax[0].set_ylabel('UW [m ü. NHN]')
+            ax[0].plot(Q_UW[:, 0], Q_UW[:, 1], color="r")
+            ax[0].set_ylabel("UW [m ü. NHN]")
             ax[0].scatter(discharge_vector, downstream_water_level_vector)
 
-            ax[1].plot(Q_UW[:, 0], Lab_upstream, label='Mit labyrinth')
-            ax[1].scatter(discharge_vector, upstream_water_level_vector, label='Ohne Labyrinth')
-            ax[1].set_ylabel('OW [m ü. NHN]')
+            ax[1].plot(Q_UW[:, 0], Lab_upstream, label="Mit labyrinth")
+            ax[1].scatter(discharge_vector, upstream_water_level_vector, label="Ohne Labyrinth")
+            ax[1].set_ylabel("OW [m ü. NHN]")
             ax[1].legend()
 
             ax[2].plot(Q_UW[:, 0], Lab_hu)
-            ax[2].set_ylabel('Oberfallhöhe [m]')
-            ax[2].set_xlabel('Abfluss [m³/s]')
+            ax[2].set_ylabel("Oberfallhöhe [m]")
+            ax[2].set_xlabel("Abfluss [m³/s]")
 
             if show_plot:
                 fig.show()
 
             if save_plot:
                 if path:
-                    fig.savefig(path + '\\result.svg')
-                    fig.savefig(path + '\\result.pdf')
-                    fig.savefig(path + '\\result.png')
+                    fig.savefig(path + "\\result.svg")
+                    fig.savefig(path + "\\result.pdf")
+                    fig.savefig(path + "\\result.png")
                 else:
-                    fig.savefig('result.svg')
-                    fig.savefig('result.pdf')
-                    fig.savefig('result.png')
+                    fig.savefig("result.svg")
+                    fig.savefig("result.pdf")
+                    fig.savefig("result.png")
 
         def save_results():
             # save results of all discharge values
             results_arr = np.stack((Q_con, UW_con, Lab_upstream, Lab_hu), axis=1)
 
             results_df = pd.DataFrame(results_arr, index=range(1, len(results_arr) + 1))
-            results_col = ['Abfluss', 'UW', 'OW', 'Oberfallhöhe']
+            results_col = ["Abfluss", "UW", "OW", "Oberfallhöhe"]
             results_df.columns = results_col
 
             results_df = results_df.round(2)
@@ -1175,11 +1260,11 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             # Skip CSV export in server mode
             if os.environ.get("SERVER_MODE") != "1":
                 if path:
-                    results_df.to_csv(path + '\\results.csv', sep=';', float_format='%.2f', header=results_col)
+                    results_df.to_csv(path + "\\results.csv", sep=";", float_format="%.2f", header=results_col)
                 else:
-                    results_df.to_csv('results.csv', sep=';', float_format='%.2f', header=results_col)
+                    results_df.to_csv("results.csv", sep=";", float_format="%.2f", header=results_col)
 
-            '''save the results for specific discahrge events'''
+            """save the results for specific discahrge events"""
 
             # Get the first column (Abfluss values)
             abfluss_values = results_arr[:, 0]
@@ -1191,18 +1276,26 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
                 results_events[:, i] = f(discharge_vector)
 
             results_events_df = pd.DataFrame(results_events, index=range(1, len(results_events) + 1))
-            results_events_col = ['Abfluss', 'UW', 'OW', 'Oberfallhöhe']
+            results_events_col = ["Abfluss", "UW", "OW", "Oberfallhöhe"]
             results_events_df.columns = results_events_col
             results_events_df = results_events_df.round(2)
 
             # Skip CSV export in server mode
             if os.environ.get("SERVER_MODE") != "1":
                 if path:
-                    results_events_df.to_csv(path + '\\results_events.csv', sep=';', float_format='%.2f',
-                                             header=results_events_col)
+                    results_events_df.to_csv(
+                        path + "\\results_events.csv",
+                        sep=";",
+                        float_format="%.2f",
+                        header=results_events_col,
+                    )
                 else:
-                    results_events_df.to_csv('results_events.csv', sep=';', float_format='%.2f',
-                                             header=results_events_col)
+                    results_events_df.to_csv(
+                        "results_events.csv",
+                        sep=";",
+                        float_format="%.2f",
+                        header=results_events_col,
+                    )
 
             return results_df, results_events_df
 
@@ -1268,7 +1361,7 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             Kalpha_min = Klappe_al[i - 1] if i > 0 else 0
 
             # minmize function
-            result = minimize_scalar(Objective_fn, Kalpha0, bounds=(Kalpha_min, Klawinkel_Max), method='bounded')
+            result = minimize_scalar(Objective_fn, Kalpha0, bounds=(Kalpha_min, Klawinkel_Max), method="bounded")
 
             Klappe_al[i] = result.x
             # print(result.x)
@@ -1287,27 +1380,26 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
         # return Q_con, Lab_Q, Kla_Q, Klappe_al, y_upstream
 
         def print_results():
-
             fig, ax = plt.subplots(4, sharex=True)
 
-            ax[0].plot(Q_UW[:, 0], Q_UW[:, 1], color='r')
-            ax[0].set_ylabel('UW [m ü. NHN]')
+            ax[0].plot(Q_UW[:, 0], Q_UW[:, 1], color="r")
+            ax[0].set_ylabel("UW [m ü. NHN]")
             ax[0].scatter(discharge_vector, downstream_water_level_vector)
 
-            ax[1].plot(Q_UW[:, 0], Lab_Q, label='Labyrinth')
-            ax[1].set_ylabel('Q Labyrinth [m³/s]')
-            ax[1].plot(Q_UW[:, 0], Kla_Q, label='Klappe')
+            ax[1].plot(Q_UW[:, 0], Lab_Q, label="Labyrinth")
+            ax[1].set_ylabel("Q Labyrinth [m³/s]")
+            ax[1].plot(Q_UW[:, 0], Kla_Q, label="Klappe")
             ax[1].legend()
-            ax[1].set_ylabel('Q [m³/s]')
+            ax[1].set_ylabel("Q [m³/s]")
 
-            ax[2].plot(Q_UW[:, 0], Lab_upstream, marker='+', label='Labyrinth')
-            ax[2].plot(Q_UW[:, 0], Kla_upstream, label='Klappe', color='c')
-            ax[2].scatter(discharge_vector, upstream_water_level_vector, label='Ist')
+            ax[2].plot(Q_UW[:, 0], Lab_upstream, marker="+", label="Labyrinth")
+            ax[2].plot(Q_UW[:, 0], Kla_upstream, label="Klappe", color="c")
+            ax[2].scatter(discharge_vector, upstream_water_level_vector, label="Ist")
             ax[2].legend()
-            ax[2].set_ylabel('OW [m ü. NHN]')
+            ax[2].set_ylabel("OW [m ü. NHN]")
 
-            ax[3].plot(Q_UW[:, 0], Klappe_al, color='b')
-            ax[3].set_ylabel(r'$\alpha$ [°]')
+            ax[3].plot(Q_UW[:, 0], Klappe_al, color="b")
+            ax[3].set_ylabel(r"$\alpha$ [°]")
 
             # ax[4].plot(Q_UW[:,0],Kla_hu)
             # ax[4].set_ylabel('$h_{u,klappe}$[{\small m}]')
@@ -1315,7 +1407,7 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
 
             # ax[5].plot(Q_UW[:,0],Kla_vd)
             # ax[5].set_ylabel('$v_{d,klappe}$[{\small m²/s}]')
-            # ax[5].set_xlabel('Abfluss [m³/s]') 
+            # ax[5].set_xlabel('Abfluss [m³/s]')
 
             # 3 * H fish text
             # ax[4].text(np.max(Abfluss)/2, 3*H_fische, '3 $\cdot$ $H_{Fisch}$',color='red')
@@ -1324,7 +1416,6 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             kla_upstream = np.round(Kla_upstream, 3)
             constant_range = np.nonzero(kla_upstream <= design_upstream_water_level)
             const_range = constant_range[0]
-            const_range_start = const_range[0]
             const_range_end = const_range[-1]
 
             # ax[2].annotate('', xy=(Q_UW[const_range_start, 0],Kla_upstream[0]+0.05), xytext=(Q_UW[const_range_end, 0],Kla_upstream[0]+0.05),
@@ -1333,28 +1424,27 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             # ax[2].annotate('Stauziel', xy=((Q_UW[const_range_start, 0] + Q_UW[const_range_end, 0])/2,Kla_upstream[0]+0.1), ha='center', va='center')
 
             # Schwarz line
-            ax[1].axvline(x=Q_UW[const_range_end, 0], color='k', linestyle='--')
+            ax[1].axvline(x=Q_UW[const_range_end, 0], color="k", linestyle="--")
 
             if show_plot:
                 fig.show()
 
             if save_plot:
                 if path:
-                    fig.savefig(path + '\\result.svg')
-                    fig.savefig(path + '\\result.pdf')
-                    fig.savefig(path + '\\result.png')
+                    fig.savefig(path + "\\result.svg")
+                    fig.savefig(path + "\\result.pdf")
+                    fig.savefig(path + "\\result.png")
                 else:
-                    fig.savefig('result.svg')
-                    fig.savefig('result.pdf')
-                    fig.savefig('result.png')
+                    fig.savefig("result.svg")
+                    fig.savefig("result.pdf")
+                    fig.savefig("result.png")
 
         def save_results():
-
             # save results of all discharge values
             results_arr = np.stack((Q_con, UW_con, Kla_upstream, Lab_Q, Kla_Q, Klappe_al), axis=1)
 
             results_df = pd.DataFrame(results_arr, index=range(1, len(results_arr) + 1))
-            results_col = ['Abfluss', 'UW', 'OW', 'Labyrinth Q', 'Klappe Q', 'Klappe winkel']
+            results_col = ["Abfluss", "UW", "OW", "Labyrinth Q", "Klappe Q", "Klappe winkel"]
             results_df.columns = results_col
 
             results_df = results_df.round(2)
@@ -1362,11 +1452,11 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
             # Skip CSV export in server mode
             if os.environ.get("SERVER_MODE") != "1":
                 if path:
-                    results_df.to_csv(path + '\\results.csv', sep=';', float_format='%.2f', header=results_col)
+                    results_df.to_csv(path + "\\results.csv", sep=";", float_format="%.2f", header=results_col)
                 else:
-                    results_df.to_csv('results.csv', sep=';', float_format='%.2f', header=results_col)
+                    results_df.to_csv("results.csv", sep=";", float_format="%.2f", header=results_col)
 
-            '''save the results for specific discahrge events'''
+            """save the results for specific discahrge events"""
 
             # Get the first column (Abfluss values)
             abfluss_values = results_arr[:, 0]
@@ -1378,18 +1468,26 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
                 results_events[:, i] = f(discharge_vector)
 
             results_events_df = pd.DataFrame(results_events, index=range(1, len(results_events) + 1))
-            results_events_col = ['Abfluss', 'UW', 'OW', 'Labyrinth Q', 'Klappe Q', 'Klappe winkel']
+            results_events_col = ["Abfluss", "UW", "OW", "Labyrinth Q", "Klappe Q", "Klappe winkel"]
             results_events_df.columns = results_events_col
             results_events_df = results_events_df.round(2)
 
             # Skip CSV export in server mode
             if os.environ.get("SERVER_MODE") != "1":
                 if path:
-                    results_events_df.to_csv(path + '\\results_events.csv', sep=';', float_format='%.2f',
-                                             header=results_events_col)
+                    results_events_df.to_csv(
+                        path + "\\results_events.csv",
+                        sep=";",
+                        float_format="%.2f",
+                        header=results_events_col,
+                    )
                 else:
-                    results_events_df.to_csv('results_events.csv', sep=';', float_format='%.2f',
-                                             header=results_events_col)
+                    results_events_df.to_csv(
+                        "results_events.csv",
+                        sep=";",
+                        float_format="%.2f",
+                        header=results_events_col,
+                    )
 
             return results_df, results_events_df
 
@@ -1406,7 +1504,16 @@ def operational_model(labyrinth_object, discharge_vector, downstream_water_level
     return results, results_events
 
 
-def tosbecken(Lab, Abfluss, Unterwasser, sicherheitsfaktor=25, Lab_Q=None, Kla=None, Kla_Q=None, Klappe_al=None):
+def tosbecken(
+    Lab,
+    Abfluss,
+    Unterwasser,
+    sicherheitsfaktor=25,
+    Lab_Q=None,
+    Kla=None,
+    Kla_Q=None,
+    Klappe_al=None,
+):
     # plt.close()
 
     Q_UW = np.stack((Abfluss, Unterwasser), axis=1)
@@ -1432,8 +1539,7 @@ def tosbecken(Lab, Abfluss, Unterwasser, sicherheitsfaktor=25, Lab_Q=None, Kla=N
     j = 0  # Use 0 for Lab and 1 for Kla
 
     for model in [Lab, Kla]:
-
-        if model == None:
+        if model is None:
             break
 
         if model == Lab:
@@ -1448,7 +1554,6 @@ def tosbecken(Lab, Abfluss, Unterwasser, sicherheitsfaktor=25, Lab_Q=None, Kla=N
         lange_tosbecken_all_model = np.full(np.size(Abfluss), np.nan)
 
         for i, (Q, UW) in enumerate(zip(Q_UW[:, 0], Q_UW[:, 1])):
-
             if Q == 0:  # Skip the loop iteration if Q is zero
                 continue
             model.Q = Q
@@ -1487,8 +1592,7 @@ def tosbecken(Lab, Abfluss, Unterwasser, sicherheitsfaktor=25, Lab_Q=None, Kla=N
 
             sicherheit_initial = 1 + sicherheitfaktor_initial / 100
 
-            delta = (sicherheit_initial * y2) - (model.UW - model.Sh) + (pow(Q / model.W, 2) / (model.g * 2)) * (
-                        (1 / pow(y2, 2)) - (1 / pow(model.UW - model.Sh, 2)))
+            delta = (sicherheit_initial * y2) - (model.UW - model.Sh) + (pow(Q / model.W, 2) / (model.g * 2)) * ((1 / pow(y2, 2)) - (1 / pow(model.UW - model.Sh, 2)))
 
             lange_tosbecken = 7 * (y2 - y1)  # Smetana
 
@@ -1515,9 +1619,11 @@ def tosbecken(Lab, Abfluss, Unterwasser, sicherheitsfaktor=25, Lab_Q=None, Kla=N
             delta_design = np.nanmax(delta_model)
             lange_tosbecken_design = lange_tosbecken_model[delta_model_max_index]
         else:
-            delta_design = (sicherheit * y2_model[delta_model_max_index]) - (hd_model[delta_model_max_index]) + \
-                           ymax_3_model[delta_model_max_index] * ((1 / pow(y2_model[delta_model_max_index], 2)) - (
-                        1 / pow(hd_model[delta_model_max_index], 2)))
+            delta_design = (
+                (sicherheit * y2_model[delta_model_max_index])
+                - (hd_model[delta_model_max_index])
+                + ymax_3_model[delta_model_max_index] * ((1 / pow(y2_model[delta_model_max_index], 2)) - (1 / pow(hd_model[delta_model_max_index], 2)))
+            )
             lange_tosbecken_design = lange_tosbecken_model[delta_model_max_index]
 
     return delta_design, lange_tosbecken_design
@@ -1533,15 +1639,13 @@ def plot_check_FAA_FAbA(Kla, results, results_events, fish_name=None, Bemessungs
             fisch_lange, fisch_hohe, fisch_dicke = fish_arten_DWA[fish_name]
             min_bypass_breite = fish_arten_Ebel[fish_name]
             print(f"Die gewählte Fischart '{fish_name}' ist in der DWA und Ebel(2016) Quelle verfügbar.")
-            print(
-                f"Information von DWA: Fisch Länge = {fisch_lange}, Fisch Höhe = {fisch_hohe}, Fisch Dicke = {fisch_dicke}")
+            print(f"Information von DWA: Fisch Länge = {fisch_lange}, Fisch Höhe = {fisch_hohe}, Fisch Dicke = {fisch_dicke}")
             print(f"Information von Ebel: Minimal Bypass Breite = {min_bypass_breite}")
 
         elif fish_name in fish_arten_DWA:
             fisch_lange, fisch_hohe, fisch_dicke = fish_arten_DWA[fish_name]
             print(f"Die gewählte Fischart '{fish_name}' ist in der DWA Quelle verfügbar aber nicht in Ebel(2016).")
-            print(
-                f"Information von DWA: Fisch Länge = {fisch_lange}, Fisch Höhe = {fisch_hohe}, Fisch Dicke = {fisch_dicke}")
+            print(f"Information von DWA: Fisch Länge = {fisch_lange}, Fisch Höhe = {fisch_hohe}, Fisch Dicke = {fisch_dicke}")
 
         elif fish_name in fish_arten_Ebel:
             min_bypass_breite = fish_arten_Ebel[fish_name]
@@ -1579,7 +1683,7 @@ def plot_check_FAA_FAbA(Kla, results, results_events, fish_name=None, Bemessungs
         "Schleie": (0.6, 0.16, 0.09),
         "Stör": (3.0, 0.51, 0.36),
         "Finte": (0.5, 0.10, 0.05),
-        "Schnäpel": (0.4, 0.08, 0.04)
+        "Schnäpel": (0.4, 0.08, 0.04),
     }
 
     fish_arten_Ebel = {
@@ -1607,7 +1711,7 @@ def plot_check_FAA_FAbA(Kla, results, results_events, fish_name=None, Bemessungs
         "Ukelei": 0.21,
         "Wels": 0.58,
         "Zährte": 0.31,
-        "Zander": 0.39
+        "Zander": 0.39,
     }
 
     # Check if fish_name is in either fish_arten_DWA or fish_arten_Ebel
@@ -1651,7 +1755,7 @@ def plot_check_FAA_FAbA(Kla, results, results_events, fish_name=None, Bemessungs
         3 * fisch_hohe if fisch_hohe is not None else None,
         8,
         delta_h_wasserpolster,
-        Klappe_P
+        Klappe_P,
     ]
 
     ergebniss = [
@@ -1664,26 +1768,26 @@ def plot_check_FAA_FAbA(Kla, results, results_events, fish_name=None, Bemessungs
         results.iloc[:, 1] - Kla.Sh + 0.5,
         results.iloc[:, 1] - Kla.Sh,
         v_FAA,
-        v_FAbA
+        v_FAbA,
     ]
 
     # Labels for subplots
     y_labels = [
-        'Beschleunigung [m/s pro m]',
-        'Breite der Klappe [m]',
-        '$h_{u,klappe}$[{\small m}]',
-        'Eintauchgeschwindigkeit [m/s]',
-        '$h_{uw}$[{\small m}]',
-        'KlappenOberkante [m]'
+        "Beschleunigung [m/s pro m]",
+        "Breite der Klappe [m]",
+        r"$h_{u,klappe}$[{\small m}]",
+        "Eintauchgeschwindigkeit [m/s]",
+        r"$h_{uw}$[{\small m}]",
+        "KlappenOberkante [m]",
     ]
 
     subplot_titles = [
-        'Geschwindigkeitsänderung über die Klappenlänge',
-        'Mindestbreite der Klappe',
-        'Überfallhöhe an der Klappe',
-        'Eintauchgeschwindigkeit',
-        'Anforderungen an das Wasserpolster im UW',
-        'Einleitung des Wassers am Ende des Kanals '
+        "Geschwindigkeitsänderung über die Klappenlänge",
+        "Mindestbreite der Klappe",
+        "Überfallhöhe an der Klappe",
+        "Eintauchgeschwindigkeit",
+        "Anforderungen an das Wasserpolster im UW",
+        "Einleitung des Wassers am Ende des Kanals ",
     ]
     # Event_lables = ["Q5", "Q30", "MQ", "Q330", "MHQ", "Q360", "HQ5", "HQ10", "HQ20", "HQ50", "HQ100"]
     Event_lables = ["Q5", "Q30", "MQ", "Q330"]
@@ -1693,83 +1797,101 @@ def plot_check_FAA_FAbA(Kla, results, results_events, fish_name=None, Bemessungs
 
     # Plot for the second subplot (results.iloc[:, 0] vs ergebniss[0])
     ax[0].plot(results.iloc[:, 0], ergebniss[0])
-    ax[0].axhline(y=anforderungen[0], color='r', linestyle='--')
+    ax[0].axhline(y=anforderungen[0], color="r", linestyle="--")
     ax[0].set_ylabel(y_labels[0])
     ax[0].set_title(subplot_titles[0])
 
     # Plot for the first subplot (ergebniss[1] vs anforderungen[1])
     if anforderungen[1] is not None:
-        ax[1].axhline(y=anforderungen[1], color='r', linestyle='--')
+        ax[1].axhline(y=anforderungen[1], color="r", linestyle="--")
         # Ebel (2016)
-        ax[1].text(results.iloc[:, 0].max() / 2, anforderungen[1], 'Ebel (2016)', color='red')
+        ax[1].text(results.iloc[:, 0].max() / 2, anforderungen[1], "Ebel (2016)", color="red")
     else:
-        ax[1].text(results.iloc[:, 0].max() / 2, anforderungen[2] / 2 + 1,
-                   'Die gewählte Fischart ist nicht verfügbar im Ebel (2016)', color='red')
+        ax[1].text(
+            results.iloc[:, 0].max() / 2,
+            anforderungen[2] / 2 + 1,
+            "Die gewählte Fischart ist nicht verfügbar im Ebel (2016)",
+            color="red",
+        )
 
     if anforderungen[2] is not None:
-        ax[1].axhline(y=anforderungen[2], color='r', linestyle='--')
+        ax[1].axhline(y=anforderungen[2], color="r", linestyle="--")
         # 9 * H fish text
-        ax[1].text(results.iloc[:, 0].max() / 2, anforderungen[2], '9 $\cdot$ $D_{Fisch}$', color='red')
+        ax[1].text(results.iloc[:, 0].max() / 2, anforderungen[2], r"9 $\cdot$ $D_{Fisch}$", color="red")
     else:
-        ax[1].text(results.iloc[:, 0].max() / 2, ergebniss[2] / 2,
-                   'Die gewählte Fischart ist nicht verfügbar im DWA (2014)', color='red')
+        ax[1].text(
+            results.iloc[:, 0].max() / 2,
+            ergebniss[2] / 2,
+            "Die gewählte Fischart ist nicht verfügbar im DWA (2014)",
+            color="red",
+        )
 
-    ax[1].axhline(y=ergebniss[2], xmin=0, xmax=results.iloc[:, 0].max(), linestyle='-')
+    ax[1].axhline(y=ergebniss[2], xmin=0, xmax=results.iloc[:, 0].max(), linestyle="-")
     ax[1].set_ylabel(y_labels[1])
     ax[1].set_xlim([0, results.iloc[:, 0].max()])
-    ax[1].set_title('Klappenbreite')
+    ax[1].set_title("Klappenbreite")
 
     ax[2].plot(results.iloc[:, 0], ergebniss[3])
     if anforderungen[2] is not None:
-        ax[2].axhline(y=anforderungen[3], color='red', linestyle='--')
+        ax[2].axhline(y=anforderungen[3], color="red", linestyle="--")
         # 3 * H fish text
-        ax[2].text(results.iloc[:, 0].max() / 2, anforderungen[3], '3 $\cdot$ $H_{Fisch}$', color='red')
+        ax[2].text(results.iloc[:, 0].max() / 2, anforderungen[3], r"3 $\cdot$ $H_{Fisch}$", color="red")
     else:
-        ax[2].text(results.iloc[:, 0].max() / 2, ax[2].get_ylim()[1] / 2,
-                   'Die gewählte Fischart ist nicht verfügbar im DWA (2014)', color='red')
+        ax[2].text(
+            results.iloc[:, 0].max() / 2,
+            ax[2].get_ylim()[1] / 2,
+            "Die gewählte Fischart ist nicht verfügbar im DWA (2014)",
+            color="red",
+        )
 
     ax[2].set_ylabel(y_labels[2])
     ax[2].set_title(subplot_titles[2])
 
     ax[3].plot(results.iloc[:, 0], ergebniss[4])
-    ax[3].axhline(y=anforderungen[4], color='red', linestyle='--')
+    ax[3].axhline(y=anforderungen[4], color="red", linestyle="--")
     ax[3].set_ylabel(y_labels[3])
     ax[3].set_title(subplot_titles[3])
 
-    ax[4].plot(results.iloc[:, 0], ergebniss[5], label='$h_{uw}$')
-    ax[4].plot(results.iloc[:, 0], anforderungen[5], label='max(0.25 $\cdot$ Fallhöhe, 1.2)', color='r', linestyle='--')
+    ax[4].plot(results.iloc[:, 0], ergebniss[5], label="$h_{uw}$")
+    ax[4].plot(
+        results.iloc[:, 0],
+        anforderungen[5],
+        label=r"max(0.25 $\cdot$ Fallhöhe, 1.2)",
+        color="r",
+        linestyle="--",
+    )
     ax[4].set_ylabel(y_labels[4])
     ax[4].set_title(subplot_titles[4])
-    ax[4].legend(loc='upper right')
+    ax[4].legend(loc="upper right")
 
-    ax[5].plot(results.iloc[:, 0], ergebniss[6], label='$h_{uw}$+ 0.5[m]')
-    ax[5].plot(results.iloc[:, 0], ergebniss[5], label='$h_{uw}$')
-    ax[5].plot(results.iloc[:, 0], anforderungen[6], label='Oberkante der Klappe über der Sohle')
+    ax[5].plot(results.iloc[:, 0], ergebniss[6], label="$h_{uw}$+ 0.5[m]")
+    ax[5].plot(results.iloc[:, 0], ergebniss[5], label="$h_{uw}$")
+    ax[5].plot(results.iloc[:, 0], anforderungen[6], label="Oberkante der Klappe über der Sohle")
     ax[5].set_ylabel(y_labels[5])
     ax[5].set_title(subplot_titles[5])
-    ax[5].legend(loc='upper right')
+    ax[5].legend(loc="upper right")
 
-    ax[6].plot(results.iloc[:, 0], ergebniss[8], label='$v_{FAA}$')
-    ax[6].plot(results.iloc[:, 0], ergebniss[9], label='$v_{FAbA}$')
-    ax[6].set_xlabel('Abfluss [m³/s]')
-    ax[6].set_ylabel('Geschwindigkeit [m/s]')
-    ax[6].legend(loc='upper right')
-    ax[6].set_title('Fließgeschwindigkeiten am Einsteig der FAA bzw. im Unterwasser der FAbA')
+    ax[6].plot(results.iloc[:, 0], ergebniss[8], label="$v_{FAA}$")
+    ax[6].plot(results.iloc[:, 0], ergebniss[9], label="$v_{FAbA}$")
+    ax[6].set_xlabel("Abfluss [m³/s]")
+    ax[6].set_ylabel("Geschwindigkeit [m/s]")
+    ax[6].legend(loc="upper right")
+    ax[6].set_title("Fließgeschwindigkeiten am Einsteig der FAA bzw. im Unterwasser der FAbA")
 
     # Add a secondary x-axis on the top
-    secax = ax[0].secondary_xaxis('top')
+    secax = ax[0].secondary_xaxis("top")
     secax.set_xticks(results_events.iloc[:4, 0])
-    secax.set_xticklabels(Event_lables, rotation=90, color='red')
-    secax.tick_params(axis='x', labelsize=8)
+    secax.set_xticklabels(Event_lables, rotation=90, color="red")
+    secax.tick_params(axis="x", labelsize=8)
 
     # Adjust the position of the secondary axis
-    secax.spines['bottom'].set_position(('outward', 10))
+    secax.spines["bottom"].set_position(("outward", 10))
 
-    fig.suptitle('Anforderungen an den Bypass aus Sicht des Abstiegs und des Aufstiegs', fontsize=16)
+    fig.suptitle("Anforderungen an den Bypass aus Sicht des Abstiegs und des Aufstiegs", fontsize=16)
 
     for event in results_events.iloc[:4, 0]:
         for axs in ax:
-            axs.axvline(x=event, color='b', linestyle='--', alpha=0.3)
+            axs.axvline(x=event, color="b", linestyle="--", alpha=0.3)
 
     for axs in ax:
         axs.set_xlim(left=0)
@@ -1780,7 +1902,7 @@ def plot_check_FAA_FAbA(Kla, results, results_events, fish_name=None, Bemessungs
     plt.subplots_adjust(top=0.93)
     plt.grid(True)  # Add grid if needed
     plt.show()
-    plt.savefig('check_FAbA_FAA.png')
+    plt.savefig("check_FAbA_FAA.png")
 
 
 # Export Geometry Parameters according to Pralong et al. 2011 or Tullis 20XX
@@ -1797,7 +1919,7 @@ def write_lab_excel(lab):
         "N": lab.N,  # number of keys
         "D": lab.D,  # front wall length
         "w": lab.w,  # key width
-        "S": lab.S  # overall additional wall width
+        "S": lab.S,  # overall additional wall width
     }
 
     columns = list(data.keys())
@@ -1816,11 +1938,7 @@ def write_lab_excel(lab):
 
 
 def write_flap_excel(flap):
-    data = {
-        'width': flap.KW,
-        'height': flap.KP,
-        'angle': flap.Kalpha
-    }
+    data = {"width": flap.KW, "height": flap.KP, "angle": flap.Kalpha}
 
     columns = list(data.keys())
     values = list(data.values())
