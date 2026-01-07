@@ -1,5 +1,6 @@
-import io
 import contextlib
+import io
+
 from fastapi import APIRouter, HTTPException
 
 from engineer import EngineerInputError, Labyrinth, optimize_labyrinth_geometry

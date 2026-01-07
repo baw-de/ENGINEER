@@ -1,6 +1,6 @@
 import os
+
 import pytest
-from unittest.mock import patch
 from fastapi.testclient import TestClient
 
 os.environ["SERVER_MODE"] = "1"

@@ -1,5 +1,6 @@
-import io
 import contextlib
+import io
+
 import numpy as np
 from fastapi import APIRouter, HTTPException
 

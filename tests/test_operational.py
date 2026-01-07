@@ -1,4 +1,5 @@
 import os
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -224,15 +225,13 @@ class TestOperationalAPI:
         }
 
         response = client.post("/operational", json=request_data)
-        assert response.status_code == 422  
+        assert response.status_code == 422
 
         data = response.json()
         assert "detail" in data
         assert "message" in data["detail"]
         assert "errors" in data["detail"]
         assert any("same length" in str(error).lower() or "length" in str(error).lower() for error in data["detail"]["errors"])
-
-
 
     def test_compute_operational_endpoint_different_interpolation_methods(self, client):
         """Test different interpolation methods"""
