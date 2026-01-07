@@ -36,3 +36,10 @@ ignore = [
 [tool.ruff.lint.isort]
 known-first-party = ["engineer"]
 split-on-trailing-comma = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --tb=short"
