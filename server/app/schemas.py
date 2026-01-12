@@ -2,13 +2,13 @@ from pydantic import BaseModel, Field, confloat
 
 
 class LabyrinthRequest(BaseModel):
-    bottom_level: float = Field(0.1, description="Bottom height [m] (bed level can be negative)")
-    downstream_water_level: float = Field(1.09, description="Downstream water level [m]")
-    discharge: confloat(gt=0) = Field(10.0, description="Discharge [m³/s]")
-    labyrinth_width: confloat(gt=0) = Field(15.0, description="Labyrinth weir width [m]")
-    labyrinth_height: confloat(gt=0) = Field(2.2, description="Labyrinth weir height [m]")
-    labyrinth_length: confloat(gt=0) = Field(8.0, description="Labyrinth weir length in flow direction [m]")
-    labyrinth_key_angle: confloat(gt=0) = Field(8.0, description="Key angle [degree]")
+    bottom_level: float = Field(..., description="Bottom height [m] (bed level can be negative)")
+    downstream_water_level: float = Field(..., description="Downstream water level [m]")
+    discharge: confloat(gt=0) = Field(..., description="Discharge [m³/s]")
+    labyrinth_width: confloat(gt=0) = Field(..., description="Labyrinth weir width [m]")
+    labyrinth_height: confloat(gt=0) = Field(..., description="Labyrinth weir height [m]")
+    labyrinth_length: confloat(gt=0) = Field(..., description="Labyrinth weir length in flow direction [m]")
+    labyrinth_key_angle: confloat(gt=0) = Field(..., description="Key angle [degree]")
     D: float | None = Field(0.5, description="Front wall width [m]")
     t: float | None = Field(0.3, description="Key wall thickness [m]")
 
@@ -30,12 +30,12 @@ class LabyrinthRequest(BaseModel):
 
 
 class LabyrinthOptimizeRequest(BaseModel):
-    bottom_level: float = Field(0.1, description="Bottom height [m]")
-    downstream_water_level: float = Field(1.8, description="Downstream water level at design discharge [m]")
-    discharge: confloat(gt=0) = Field(20.0, description="Design discharge [m³/s]")
-    labyrinth_width: confloat(gt=0) = Field(10.0, description="Available width for the labyrinth weir [m]")
-    labyrinth_height: confloat(gt=0) = Field(2.2, description="Available crest height (design upstream level) [m]")
-    labyrinth_length_max: confloat(gt=0) = Field(8.0, description="Available length in flow direction [m]")
+    bottom_level: float = Field(..., description="Bottom height [m]")
+    downstream_water_level: float = Field(..., description="Downstream water level at design discharge [m]")
+    discharge: confloat(gt=0) = Field(..., description="Design discharge [m³/s]")
+    labyrinth_width: confloat(gt=0) = Field(..., description="Available width for the labyrinth weir [m]")
+    labyrinth_height: confloat(gt=0) = Field(..., description="Available crest height (design upstream level) [m]")
+    labyrinth_length_max: confloat(gt=0) = Field(..., description="Available length in flow direction [m]")
 
     class Config:
         # prefill the example with the default values
@@ -52,12 +52,12 @@ class LabyrinthOptimizeRequest(BaseModel):
 
 
 class FlapGateRequest(BaseModel):
-    bottom_level: float = Field(0.1, description="Bottom height at flap gate [m]")
-    downstream_water_level: float = Field(1.09, description="Downstream water level [m]")
-    discharge: confloat(gt=0) = Field(10.0, description="Discharge through flap gate [m³/s]")
-    flap_gate_width: confloat(gt=0) = Field(1.4, description="Flap width [m]")
-    flap_gate_height: confloat(gt=0) = Field(2.35, description="Flap height [m]")
-    flap_gate_angle: float = Field(74.0, description="Flap angle [degree]")
+    bottom_level: float = Field(..., description="Bottom height at flap gate [m]")
+    downstream_water_level: float = Field(..., description="Downstream water level [m]")
+    discharge: confloat(gt=0) = Field(..., description="Discharge through flap gate [m³/s]")
+    flap_gate_width: confloat(gt=0) = Field(..., description="Flap width [m]")
+    flap_gate_height: confloat(gt=0) = Field(..., description="Flap height [m]")
+    flap_gate_angle: float = Field(..., description="Flap angle [degree]")
 
     class Config:
         # prefill the example with the default values
@@ -154,6 +154,7 @@ class LabyrinthOptimizeResult(BaseModel):
     Hu_best: float = Field(..., description="Minimum upstream head Hu_min [m]")
     Cd_best: float = Field(..., description="Optimal discharge coefficient Cd")
     v_best: float = Field(..., description="Optimal velocity v [m/s]")
+    warnings: list[str] | None = Field(None, description="List of warnings generated during optimization")
 
 
 class FlapGateResult(BaseModel):
@@ -174,6 +175,7 @@ class FlapGateResult(BaseModel):
 class OperationalModelResult(BaseModel):
     results: list["OperationalPoint"] = Field(..., description="Computed series over full discharge range.")
     results_events: list["OperationalPoint"] = Field(..., description="Interpolated results for the input discharge events.")
+    warnings: list[str] | None = Field(None, description="Warnings generated during computation")
 
 
 class OperationalPoint(BaseModel):
