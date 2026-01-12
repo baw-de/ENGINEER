@@ -27,7 +27,6 @@ ignore = [
     "B008", # do not perform function calls in argument defaults
     "C901", # too complex
     "UP031", # percent format
-    "UP045", # allow Optional[T] instead of T | None
     "B023", # function uses loop variable - sometimes necessary
     "B905", # zip() without an explicit strict= parameter - Python < 3.10 compatibility
     "C408", # dict() calls - sometimes clearer

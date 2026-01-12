@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel, Field, confloat
 
 
@@ -11,8 +9,8 @@ class LabyrinthRequest(BaseModel):
     labyrinth_height: confloat(gt=0) = Field(2.2, description="Labyrinth weir height [m]")
     labyrinth_length: confloat(gt=0) = Field(8.0, description="Labyrinth weir length in flow direction [m]")
     labyrinth_key_angle: confloat(gt=0) = Field(8.0, description="Key angle [degree]")
-    D: Optional[float] = Field(0.5, description="Front wall width [m]")
-    t: Optional[float] = Field(0.3, description="Key wall thickness [m]")
+    D: float | None = Field(0.5, description="Front wall width [m]")
+    t: float | None = Field(0.3, description="Key wall thickness [m]")
 
     class Config:
         # prefill the example with the default values
@@ -182,7 +180,7 @@ class OperationalPoint(BaseModel):
     discharge: float = Field(..., description="Discharge Q [m³/s]")
     downstream_water_level: float = Field(..., description="Downstream water level UW [m]")
     upstream_water_level: float = Field(..., description="Upstream water level OW [m]")
-    head_over_crest: Optional[float] = Field(None, description="Head over crest / upstream head above crest [m] (if available).")
+    head_over_crest: float | None = Field(None, description="Head over crest / upstream head above crest [m] (if available).")
     labyrinth_discharge: float = Field(..., description="Labyrinth discharge share [m³/s].")
     flap_gate_discharge: float = Field(..., description="Flap gate discharge share [m³/s].")
     flap_gate_angle: float = Field(..., description="Flap gate angle alpha [degree] for this discharge.")

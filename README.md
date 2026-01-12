@@ -45,6 +45,28 @@ Alternatively, you can install the libraries manually:
 
 **Note:** The libraries `os`, `shutil`, `math`, `re`, `sys` are part of Python's standard library and don't need to be installed separately.
 
+### Pre-commit Hooks
+
+This project uses pre-commit hooks to ensure code quality and consistency. The hooks run automatically before each commit and include:
+
+- **Ruff** for linting and code formatting
+- Essential checks (trailing whitespace, end-of-file fixes, YAML/JSON/TOML validation, etc.)
+
+To set up pre-commit hooks:
+
+```bash
+# Install pre-commit (included in requirements.txt)
+pip install -r requirements.txt
+
+# Install the git hooks
+pre-commit install
+
+# Optional: Run hooks on all files to fix existing issues
+pre-commit run --all-files
+```
+
+After installation, the hooks will run automatically on every `git commit`. If any hook fails, the commit will be blocked until the issues are resolved.
+
 ## Hydraulic Design
 
 ![](assets/pictures/dimensions.svg)
@@ -79,20 +101,20 @@ Furthermore, you can output a summary of the input and output parameters of the 
 The output looks similar to:
 
 <pre>
-  Key Laenge = 8.00 [m] 
+  Key Laenge = 8.00 [m]
   Key Frontwand = 0.5 [m]
   Key Winkel = 8 [°]
   Key Wandstaerke = 0.3 [m]
   Key Hoehe = 2.20 [m]
-  Key Anzahl = 4 
-  Key Weite = 3.25 [m] 
-  Keys Weite = 12.99 [m] 
-  Seite Weite[S] = 2.01 [m] 
-  Wehr Weite = 15.00 [m] 
-  L/W = 4.71 [m] 
-  Hu = 0.18 [m] 
-  hu = 0.17 [m] 
-  Kein Rückstaueinfluss! 
+  Key Anzahl = 4
+  Key Weite = 3.25 [m]
+  Keys Weite = 12.99 [m]
+  Seite Weite[S] = 2.01 [m]
+  Wehr Weite = 15.00 [m]
+  L/W = 4.71 [m]
+  Hu = 0.18 [m]
+  hu = 0.17 [m]
+  Kein Rückstaueinfluss!
 </pre>
 
 ### Case 2: You know how large your construction site is, how high the weir should be and the design discharge. Let ENGINEER design the labyrinth itself.

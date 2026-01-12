@@ -1,0 +1,23 @@
+repos:
+  # Ruff für Linting und Formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.5
+    hooks:
+      # Ruff Linting
+      - id: ruff
+        args: [--fix]
+      # Ruff Formatting
+      - id: ruff-format
+
+  # essential Pre-commit Checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: check-merge-conflict
