@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, Field, confloat
 
@@ -15,7 +15,7 @@ class LabyrinthRequest(BaseModel):
     t: Optional[float] = Field(0.3, description="Key wall thickness [m]")
 
     class Config:
-        #prefill the example with the default values
+        # prefill the example with the default values
         json_schema_extra = {
             "example": {
                 "bottom_level": 0.1,
@@ -40,7 +40,7 @@ class LabyrinthOptimizeRequest(BaseModel):
     labyrinth_length_max: confloat(gt=0) = Field(8.0, description="Available length in flow direction [m]")
 
     class Config:
-        #prefill the example with the default values
+        # prefill the example with the default values
         json_schema_extra = {
             "example": {
                 "bottom_level": 0.1,
@@ -62,7 +62,7 @@ class FlapGateRequest(BaseModel):
     flap_gate_angle: float = Field(74.0, description="Flap angle [degree]")
 
     class Config:
-        #prefill the example with the default values
+        # prefill the example with the default values
         json_schema_extra = {
             "example": {
                 "bottom_level": 0.1,
@@ -83,9 +83,9 @@ class OperationalModelRequest(BaseModel):
     labyrinth_height: confloat(gt=0) = Field(..., description="Labyrinth weir height [m]")
     labyrinth_length: confloat(gt=0) = Field(..., description="Labyrinth weir length in flow direction [m]")
     labyrinth_key_angle: confloat(gt=0) = Field(..., description="Key angle [degree]")
-    discharge_vector: List[confloat(gt=0)] = Field(..., description="Discharge vector [m³/s]")
-    downstream_water_level_vector: List[float] = Field(..., description="Downstream water level vector [m]")
-    upstream_water_level_vector: List[float] = Field(..., description="Upstream water level vector [m]")
+    discharge_vector: list[confloat(gt=0)] = Field(..., description="Discharge vector [m³/s]")
+    downstream_water_level_vector: list[float] = Field(..., description="Downstream water level vector [m]")
+    upstream_water_level_vector: list[float] = Field(..., description="Upstream water level vector [m]")
     interpolation_method: str = Field(
         "exponential",
         description="Interpolation method for hydrograph data ('exponential', 'linear', 'quadratic', 'cubic')",
@@ -101,7 +101,7 @@ class OperationalModelRequest(BaseModel):
     fish_body_height: float = Field(..., description="Fish body height for bypass design [m]")
 
     class Config:
-        #prefill the example with the default values
+        # prefill the example with the default values
         json_schema_extra = {
             "example": {
                 "bottom_level": 0.1,
@@ -142,7 +142,7 @@ class LabyrinthResult(BaseModel):
     hd: float = Field(..., description="Tailwater above crest hd [m]")
     Hd: float = Field(..., description="Specific energy in tailwater Hd [m]")
     rs: str = Field(..., description="Backwater status message")
-    warnings: Optional[List[str]] = Field(None, description="Warnings, if any")
+    warnings: list[str] | None = Field(None, description="Warnings, if any")
 
 
 class LabyrinthOptimizeResult(BaseModel):
@@ -170,23 +170,19 @@ class FlapGateResult(BaseModel):
     beschleunigung: float = Field(..., description="Acceleration along the gate [m/(s·m)]")
     h_gr: float = Field(..., description="Critical depth h_gr [m]")
     v_gr: float = Field(..., description="Critical velocity v_gr [m/s]")
-    warnings: Optional[List[str]] = Field(None, description="Warnings, if any")
+    warnings: list[str] | None = Field(None, description="Warnings, if any")
 
 
 class OperationalModelResult(BaseModel):
-    results: List["OperationalPoint"] = Field(..., description="Computed series over full discharge range.")
-    results_events: List["OperationalPoint"] = Field(..., description="Interpolated results for the input discharge events.")
+    results: list["OperationalPoint"] = Field(..., description="Computed series over full discharge range.")
+    results_events: list["OperationalPoint"] = Field(..., description="Interpolated results for the input discharge events.")
 
 
 class OperationalPoint(BaseModel):
     discharge: float = Field(..., description="Discharge Q [m³/s]")
     downstream_water_level: float = Field(..., description="Downstream water level UW [m]")
     upstream_water_level: float = Field(..., description="Upstream water level OW [m]")
-    head_over_crest: Optional[float] = Field(
-        None, description="Head over crest / upstream head above crest [m] (if available)."
-    )
+    head_over_crest: Optional[float] = Field(None, description="Head over crest / upstream head above crest [m] (if available).")
     labyrinth_discharge: float = Field(..., description="Labyrinth discharge share [m³/s].")
     flap_gate_discharge: float = Field(..., description="Flap gate discharge share [m³/s].")
     flap_gate_angle: float = Field(..., description="Flap gate angle alpha [degree] for this discharge.")
-
-

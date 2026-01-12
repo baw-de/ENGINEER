@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException
 import numpy as np
+from fastapi import APIRouter, HTTPException
 
 from engineer import EngineerInputError, FlapGate, Labyrinth, operational_model
+
 from ..schemas import OperationalModelRequest, OperationalModelResult, OperationalPoint
 
 router = APIRouter()
@@ -9,7 +10,6 @@ router = APIRouter()
 
 @router.post("", response_model=OperationalModelResult)
 def compute_operational_model(req: OperationalModelRequest) -> OperationalModelResult:
-
     try:
         # Create base labyrinth object
         labyrinth = Labyrinth(
@@ -64,7 +64,6 @@ def compute_operational_model(req: OperationalModelRequest) -> OperationalModelR
             detail={"message": "Operational model input is invalid.", "errors": exc.messages},
         ) from exc
 
-
     def df_to_points(df):
         points = []
         for row in df.to_dict(orient="records"):
@@ -80,8 +79,4 @@ def compute_operational_model(req: OperationalModelRequest) -> OperationalModelR
             points.append(point)
         return points
 
-    return OperationalModelResult(
-        results=df_to_points(results_df),
-        results_events=df_to_points(results_events_df),
-    )
-
+    return OperationalModelResult(results=df_to_points(results_df), results_events=df_to_points(results_events_df))

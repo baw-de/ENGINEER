@@ -1,0 +1,39 @@
+[tool.ruff]
+line-length = 200
+target-version = "py313"
+
+[tool.ruff.format]
+# Very minimal formatting settings - minimize line breaking
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+# Disable aggressive formatting
+docstring-code-format = false
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501", # line too long, handled by formatter
+    "B008", # do not perform function calls in argument defaults
+    "C901", # too complex
+    "UP031", # percent format
+    "UP045", # allow Optional[T] instead of T | None
+    "B023", # function uses loop variable - sometimes necessary
+    "B905", # zip() without an explicit strict= parameter - Python < 3.10 compatibility
+    "C408", # dict() calls - sometimes clearer
+    "E741", # ambiguous variable name - allow single letters in math code
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["engineer"]
+split-on-trailing-comma = false

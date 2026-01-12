@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from engineer import EngineerInputError, FlapGate
+
 from ..schemas import FlapGateRequest, FlapGateResult
 
 router = APIRouter()
@@ -47,4 +48,3 @@ def compute_flap_gate(req: FlapGateRequest) -> FlapGateResult:
         v_gr=flap_gate.v_gr,
         warnings=warnings,
     )
-
