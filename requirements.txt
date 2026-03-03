@@ -9,6 +9,6 @@ matplotlib==3.10.7
 openpyxl==3.1.5
 
 pydantic==2.12.5
-python-multipart==0.0.20
+python-multipart==0.0.22
 
 pre-commit==4.0.1
