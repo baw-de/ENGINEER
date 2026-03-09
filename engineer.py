@@ -1119,7 +1119,6 @@ def operational_model(
     labyrinth_object,
     discharge_vector,
     downstream_water_level_vector,
-    upstream_water_level_vector,
     interpolation_method,
     flap_gate_opject=None,
     design_upstream_water_level=None,
@@ -1154,8 +1153,7 @@ def operational_model(
             fehler.append("discharge_vector must not be empty.")
         if len(downstream_water_level_vector) == 0:
             fehler.append("downstream_water_level_vector must not be empty.")
-        if len(upstream_water_level_vector) == 0:
-            fehler.append("upstream_water_level_vector must not be empty.")
+
 
         # Check Abfluss values
         for i, abfluss_wert in enumerate(discharge_vector):
@@ -1166,13 +1164,13 @@ def operational_model(
             fehler_unterwasser = input_plausibilty("Unterwasser " + str(downstream_water_level_vector[i]), unterwasser_wert)
             fehler.extend(fehler_unterwasser)
 
-        for i, oberwasser_wert in enumerate(upstream_water_level_vector):
-            fehler_oberwasser = input_plausibilty("Oberwasser " + str(upstream_water_level_vector[i]), oberwasser_wert)
-            fehler.extend(fehler_oberwasser)
+        # for i, oberwasser_wert in enumerate(upstream_water_level_vector):
+        #     fehler_oberwasser = input_plausibilty("Oberwasser " + str(upstream_water_level_vector[i]), oberwasser_wert)
+        #     fehler.extend(fehler_oberwasser)
 
         # Ensure that all vectors have the same length (required for element-wise operations)
-        if not (len(discharge_vector) == len(downstream_water_level_vector) == len(upstream_water_level_vector)):
-            fehler.append("discharge_vector, downstream_water_level_vector and upstream_water_level_vector must have the same length.")
+        if not (len(discharge_vector) == len(downstream_water_level_vector)):
+            fehler.append("discharge_vector and downstream_water_level_vector must have the same length.")
 
         # Check Stauziel, SohleHoehe, LabyrinthMaxBreite, LabyrinthMaxLaenge, and LabyrinthHoehe
         fehler += input_plausibilty("Stauziel", design_upstream_water_level)
@@ -1227,7 +1225,7 @@ def operational_model(
             ax[0].scatter(discharge_vector, downstream_water_level_vector)
 
             ax[1].plot(Q_UW[:, 0], Lab_upstream, label="Mit labyrinth")
-            ax[1].scatter(discharge_vector, upstream_water_level_vector, label="Ohne Labyrinth")
+            # ax[1].scatter(discharge_vector, upstream_water_level_vector, label="Ohne Labyrinth")
             ax[1].set_ylabel("OW [m ü. NHN]")
             ax[1].legend()
 
@@ -1395,7 +1393,6 @@ def operational_model(
 
             ax[2].plot(Q_UW[:, 0], Lab_upstream, marker="+", label="Labyrinth")
             ax[2].plot(Q_UW[:, 0], Kla_upstream, label="Klappe", color="c")
-            ax[2].scatter(discharge_vector, upstream_water_level_vector, label="Ist")
             ax[2].legend()
             ax[2].set_ylabel("OW [m ü. NHN]")
 
