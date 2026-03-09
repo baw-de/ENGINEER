@@ -42,7 +42,7 @@ labyrinth_weir = Labyrinth(
     labyrinth_height=2.2,  # labyrinth weir height [m]
     labyrinth_length=8,  # labyrinth weir length in flow direction [m]
     labyrinth_key_angle=8,  # key angle [degree]
-    D=0.5,
+    D=1,
 )  # front wall width [m]
 
 # Adjust parameters
@@ -81,7 +81,7 @@ labyrinth_crest_height = 2.2  # crest height of labyrinth weir [m]
 
 # Optimization: the return value is a labyrinth-object
 optimized_labyrinth = optimize_labyrinth_geometry(
-    Labyrinth, bottom_level, design_downstream_water_level, design_discharge, labyrinth_width, labyrinth_crest_height - bottom_level + 0, labyrinth_length, path="", show_plot=False
+    Labyrinth, bottom_level, design_downstream_water_level, design_discharge, labyrinth_width, labyrinth_crest_height - bottom_level + 0, labyrinth_length, D=1, path="", show_plot=False
 )
 
 # Postprozess

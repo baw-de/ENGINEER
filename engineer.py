@@ -85,11 +85,11 @@ class Labyrinth:  # this is only one geometry
         labyrinth_height=None,
         labyrinth_length=None,
         labyrinth_key_angle=None,
+        D=None,
         path="",
         show_errors=True,
         show_geometry=False,
         show_results=False,
-        D=0.3,
         t=0.3,
         skip_zero_check=False,
     ):  # instance attribute
@@ -108,7 +108,7 @@ class Labyrinth:  # this is only one geometry
         self.show_geometry = show_geometry
         self.path = path
         self.skip_zero_check = skip_zero_check
-
+        
         if all(var is not None for var in (self.Sh, self.Q, self.UW, self.W, self.B, self.P, self.alpha)):
             self.check_and_exit_on_input_errors()
             self.geometrie()
@@ -443,7 +443,7 @@ class Labyrinth:  # this is only one geometry
 
 
 # Berechnung einer hydraulisch optimalen Geometrie aus den baulichen Randbedingungen
-def optimize_labyrinth_geometry(
+def optimize_labyrinth_geometry( # TODO
     labyrinth,
     sohleHoehe,
     UW,
@@ -451,6 +451,7 @@ def optimize_labyrinth_geometry(
     labyrinthBreite,
     labyrinthHoehe,
     labyrinthLaengeMax,
+    D,
     path,
     show_results=False,
     show_plot=False,
@@ -472,7 +473,7 @@ def optimize_labyrinth_geometry(
 
     for i, B in enumerate(B_vector):
         for j, alpha in enumerate(Angle_vector):  # float werte --- Table
-            Lab = labyrinth(sohleHoehe, UW, Q, labyrinthBreite, labyrinthHoehe, B, alpha)
+            Lab = labyrinth(sohleHoehe, UW, Q, labyrinthBreite, labyrinthHoehe, B, alpha, D)
             Lab.update()
             # Lab.plot_geometry()
             w_result[i, j] = Lab.w
@@ -500,7 +501,7 @@ def optimize_labyrinth_geometry(
     S_best = S_result[i, j]
     L_best = L_result[i, j]
 
-    bestLab = labyrinth(sohleHoehe, UW, Q, labyrinthBreite, labyrinthHoehe, B_best, Angle_best, path)
+    bestLab = labyrinth(sohleHoehe, UW, Q, labyrinthBreite, labyrinthHoehe, B_best, Angle_best, D, path)
 
     if show_results:
         print(
