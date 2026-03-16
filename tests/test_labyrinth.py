@@ -73,6 +73,7 @@ class TestLabyrinthOptimization:
             labyrinthBreite=10.0,
             labyrinthHoehe=2.2,
             labyrinthLaengeMax=8.0,
+            D=0.5,
             path="",
             show_results=False,
             show_plot=False,

@@ -241,7 +241,6 @@ To use the `operational_model` the following steps are required:
                                                flap_gate_opject=flap_gate,
                                                discharge_vector=discharge,
                                                downstream_water_level_vector=downstream_water_level,
-                                               upstream_water_level_vector=upstream_water_level_today,
                                                design_upstream_water_level=design_upstream_water_level,
                                                max_flap_gate_angle=max_flap_gate_angle,
                                                fish_body_height=fish_body_height,

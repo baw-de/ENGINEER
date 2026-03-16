@@ -9,8 +9,8 @@ class LabyrinthRequest(BaseModel):
     labyrinth_height: confloat(gt=0) = Field(..., description="Labyrinth weir height [m]")
     labyrinth_length: confloat(gt=0) = Field(..., description="Labyrinth weir length in flow direction [m]")
     labyrinth_key_angle: confloat(gt=0) = Field(..., description="Key angle [degree]")
-    D: float | None = Field(0.5, description="Front wall width [m]")
-    t: float | None = Field(0.3, description="Key wall thickness [m]")
+    D: float = Field(0.5, description="Front wall width [m]")
+    t: float = Field(0.3, description="Key wall thickness [m]")
 
     class Config:
         # prefill the example with the default values
@@ -36,6 +36,7 @@ class LabyrinthOptimizeRequest(BaseModel):
     labyrinth_width: confloat(gt=0) = Field(..., description="Available width for the labyrinth weir [m]")
     labyrinth_height: confloat(gt=0) = Field(..., description="Available crest height (design upstream level) [m]")
     labyrinth_length_max: confloat(gt=0) = Field(..., description="Available length in flow direction [m]")
+    D: float = Field(0.5, description="Front wall width used for optimization [m]")
 
     class Config:
         # prefill the example with the default values
@@ -47,6 +48,7 @@ class LabyrinthOptimizeRequest(BaseModel):
                 "labyrinth_width": 10.0,
                 "labyrinth_height": 2.2,
                 "labyrinth_length_max": 8.0,
+                "D": 0.5,
             }
         }
 
@@ -81,9 +83,9 @@ class OperationalModelRequest(BaseModel):
     labyrinth_height: confloat(gt=0) = Field(..., description="Labyrinth weir height [m]")
     labyrinth_length: confloat(gt=0) = Field(..., description="Labyrinth weir length in flow direction [m]")
     labyrinth_key_angle: confloat(gt=0) = Field(..., description="Key angle [degree]")
+    D: float = Field(0.5, description="Front wall width [m]")
     discharge_vector: list[confloat(gt=0)] = Field(..., description="Discharge vector [m³/s]")
     downstream_water_level_vector: list[float] = Field(..., description="Downstream water level vector [m]")
-    upstream_water_level_vector: list[float] = Field(..., description="Upstream water level vector [m]")
     interpolation_method: str = Field(
         "exponential",
         description="Interpolation method for hydrograph data ('exponential', 'linear', 'quadratic', 'cubic')",
@@ -109,9 +111,9 @@ class OperationalModelRequest(BaseModel):
                 "labyrinth_height": 2.1,
                 "labyrinth_length": 7.7,
                 "labyrinth_key_angle": 7.0,
+                "D": 0.5,
                 "discharge_vector": [2.09, 2.79, 6.01, 11.9, 13.9, 16.3, 16.5, 18.6, 20.5, 22.9, 24.5],
                 "downstream_water_level_vector": [1.07, 1.15, 1.19, 1.25, 1.38, 1.39, 1.74, 1.74, 1.94, 2.67, 2.67],
-                "upstream_water_level_vector": [2.03, 2.15, 2.16, 2.19, 2.22, 2.21, 2.33, 2.33, 2.47, 2.47, 2.47],
                 "interpolation_method": "exponential",
                 "flap_gate_bottom_level": 0.1,
                 "flap_gate_downstream_water_level": 1.09,

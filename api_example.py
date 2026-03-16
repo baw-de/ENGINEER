@@ -83,7 +83,6 @@ data = {
     "labyrinth_key_angle": 8,
     "discharge_vector": [2.09, 2.79, 6.01, 11.9],
     "downstream_water_level_vector": [1.07, 1.15, 1.19, 1.25],
-    "upstream_water_level_vector": [2.03, 2.15, 2.16, 2.19],
     "interpolation_method": "exponential",
     "flap_gate_bottom_level": 0.1,
     "flap_gate_downstream_water_level": 1.09,

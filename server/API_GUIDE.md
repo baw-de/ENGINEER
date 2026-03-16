@@ -115,14 +115,15 @@ Finds the optimal geometry of a labyrinth weir for maximum hydraulic capacity un
 
 #### Request Schema (Input)
 
-| Field                    | Type       | Description              | Unit     | Required |
-| ------------------------ | ---------- | ------------------------ | -------- | -------- |
-| `bottom_level`           | float      | Bottom height            | m a.s.l. | ✓        |
-| `downstream_water_level` | float      | Downstream water level   | m a.s.l. | ✓        |
-| `discharge`              | float (>0) | Design discharge         | m³/s     | ✓        |
-| `labyrinth_width`        | float (>0) | Available width          | m        | ✓        |
-| `labyrinth_height`       | float (>0) | Available height         | m        | ✓        |
-| `labyrinth_length_max`   | float (>0) | Maximum available length | m        | ✓        |
+| Field                    | Type       | Description                           | Unit     | Required |
+| ------------------------ | ---------- | ------------------------------------- | -------- | -------- |
+| `bottom_level`           | float      | Bottom height                         | m a.s.l. | ✓        |
+| `downstream_water_level` | float      | Downstream water level                | m a.s.l. | ✓        |
+| `discharge`              | float (>0) | Design discharge                       | m³/s     | ✓        |
+| `labyrinth_width`        | float (>0) | Available width                       | m        | ✓        |
+| `labyrinth_height`       | float (>0) | Available height                      | m        | ✓        |
+| `labyrinth_length_max`   | float (>0) | Maximum available length              | m        | ✓        |
+| `D`                      | float      | Front wall width used in optimization | m        | ✗ (default 0.5) |
 
 #### Response Schema (Output)
 
@@ -150,7 +151,8 @@ Finds the optimal geometry of a labyrinth weir for maximum hydraulic capacity un
   "discharge": 20,
   "labyrinth_width": 10,
   "labyrinth_height": 2.2,
-  "labyrinth_length_max": 8
+  "labyrinth_length_max": 8,
+  "D": 0.5
 }
 ```
 
@@ -218,13 +220,12 @@ Simulates the operational behavior of a labyrinth weir (optionally with flap gat
 **Labyrinth Parameters:**
 
 - `bottom_level`, `downstream_water_level`, `discharge` (as above)
-- `labyrinth_width`, `labyrinth_height`, `labyrinth_length`, `labyrinth_key_angle`
+- `labyrinth_width`, `labyrinth_height`, `labyrinth_length`, `labyrinth_key_angle`, `D`
 
 **Discharge and Water Level Curves:**
 
 - `discharge_vector`: List of discharge values [m³/s]
 - `downstream_water_level_vector`: List of downstream water levels [m a.s.l.]
-- `upstream_water_level_vector`: List of actual upstream water levels [m a.s.l.]
 
 **Interpolation:**
 
@@ -261,9 +262,9 @@ _Note: Full implementation follows._
   "labyrinth_height": 2.2,
   "labyrinth_length": 8,
   "labyrinth_key_angle": 8,
+  "D": 0.5,
   "discharge_vector": [2.09, 2.79, 6.01, 11.9],
   "downstream_water_level_vector": [1.07, 1.15, 1.19, 1.25],
-  "upstream_water_level_vector": [2.03, 2.15, 2.16, 2.19],
   "interpolation_method": "exponential",
   "flap_gate_bottom_level": 0.1,
   "flap_gate_downstream_water_level": 1.09,

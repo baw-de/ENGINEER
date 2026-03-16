@@ -92,6 +92,7 @@ def optimize_labyrinth(req: LabyrinthOptimizeRequest) -> LabyrinthOptimizeResult
                 labyrinthBreite=req.labyrinth_width,
                 labyrinthHoehe=req.labyrinth_height,
                 labyrinthLaengeMax=req.labyrinth_length_max,
+                D=req.D,
                 path="",
                 show_results=False,
                 show_plot=False,

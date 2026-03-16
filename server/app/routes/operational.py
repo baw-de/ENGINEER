@@ -27,6 +27,7 @@ def compute_operational_model(req: OperationalModelRequest) -> OperationalModelR
                 labyrinth_height=req.labyrinth_height,
                 labyrinth_length=req.labyrinth_length,
                 labyrinth_key_angle=req.labyrinth_key_angle,
+                D=req.D,
                 show_errors=True,  # Enable warnings to be captured
                 show_geometry=False,
                 show_results=False,
@@ -47,14 +48,12 @@ def compute_operational_model(req: OperationalModelRequest) -> OperationalModelR
             # Convert vectors to NumPy arrays to match the expectations of the core ENGINEER library
             discharge_vector = np.array(req.discharge_vector, dtype=float)
             downstream_water_level_vector = np.array(req.downstream_water_level_vector, dtype=float)
-            upstream_water_level_vector = np.array(req.upstream_water_level_vector, dtype=float)
 
             # Run the operational model with labyrinth and flap gate objects + input parameters (vector, interpolation method, etc.)
             results_df, results_events_df = operational_model(
                 labyrinth_object=labyrinth,
                 discharge_vector=discharge_vector,
                 downstream_water_level_vector=downstream_water_level_vector,
-                upstream_water_level_vector=upstream_water_level_vector,
                 interpolation_method=req.interpolation_method,
                 flap_gate_opject=flap_gate,
                 design_upstream_water_level=req.design_upstream_water_level,
