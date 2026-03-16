@@ -42,7 +42,7 @@ labyrinth_weir = Labyrinth(
     labyrinth_height=2.2,  # labyrinth weir height [m]
     labyrinth_length=8,  # labyrinth weir length in flow direction [m]
     labyrinth_key_angle=8,  # key angle [degree]
-    D=0.5,
+    D=1,
 )  # front wall width [m]
 
 # Adjust parameters
@@ -81,7 +81,7 @@ labyrinth_crest_height = 2.2  # crest height of labyrinth weir [m]
 
 # Optimization: the return value is a labyrinth-object
 optimized_labyrinth = optimize_labyrinth_geometry(
-    Labyrinth, bottom_level, design_downstream_water_level, design_discharge, labyrinth_width, labyrinth_crest_height - bottom_level + 0, labyrinth_length, path="", show_plot=False
+    Labyrinth, bottom_level, design_downstream_water_level, design_discharge, labyrinth_width, labyrinth_crest_height - bottom_level + 0, labyrinth_length, D=1, path="", show_plot=False
 )
 
 # Postprozess
@@ -103,7 +103,7 @@ discharge = np.array([2.09, 2.79, 6.01, 11.90, 13.90, 16.30, 16.50, 18.60, 20.50
 downstream_water_level = np.array([1.07, 1.15, 1.19, 1.25, 1.38, 1.39, 1.74, 1.74, 1.94, 2.67, 2.67])
 
 # This is the current water level. This is used to compare the hydraulic effect of the labyrinth weir system with the current situation.
-upstream_water_level_today = np.array([2.03, 2.15, 2.16, 2.19, 2.22, 2.21, 2.33, 2.33, 2.47, 2.47, 2.47])
+# upstream_water_level_today = np.array([2.03, 2.15, 2.16, 2.19, 2.22, 2.21, 2.33, 2.33, 2.47, 2.47, 2.47])
 
 # UW_interpolation(Abfluss,Unterwasser,interpolation='all',show_plot=True, save_plot=True)
 
@@ -112,12 +112,11 @@ results, results_events = operational_model(
     flap_gate_opject=flap_gate,
     discharge_vector=discharge,
     downstream_water_level_vector=downstream_water_level,
-    upstream_water_level_vector=upstream_water_level_today,
     design_upstream_water_level=design_upstream_water_level,
     max_flap_gate_angle=max_flap_gate_angle,
     fish_body_height=fish_body_height,
     interpolation_method="exponential",
-    show_plot=False,
+    show_plot=True,
     save_plot=False,
 )
 
