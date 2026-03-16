@@ -108,7 +108,7 @@ class Labyrinth:  # this is only one geometry
         self.show_geometry = show_geometry
         self.path = path
         self.skip_zero_check = skip_zero_check
-        
+
         if all(var is not None for var in (self.Sh, self.Q, self.UW, self.W, self.B, self.P, self.alpha)):
             self.check_and_exit_on_input_errors()
             self.geometrie()
@@ -443,7 +443,7 @@ class Labyrinth:  # this is only one geometry
 
 
 # Berechnung einer hydraulisch optimalen Geometrie aus den baulichen Randbedingungen
-def optimize_labyrinth_geometry( # TODO
+def optimize_labyrinth_geometry(  # TODO
     labyrinth,
     sohleHoehe,
     UW,
@@ -1153,7 +1153,6 @@ def operational_model(
             fehler.append("discharge_vector must not be empty.")
         if len(downstream_water_level_vector) == 0:
             fehler.append("downstream_water_level_vector must not be empty.")
-
 
         # Check Abfluss values
         for i, abfluss_wert in enumerate(discharge_vector):
