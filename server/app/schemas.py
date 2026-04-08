@@ -1,4 +1,9 @@
+from typing import Annotated
+
+from fastapi import Path
 from pydantic import BaseModel, Field, confloat
+
+PlotId = Annotated[str, Path(description="Plot identifier (e.g. 'labyrinth' or 'optimize-abc123')")]
 
 
 class LabyrinthRequest(BaseModel):
