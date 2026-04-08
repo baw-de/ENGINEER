@@ -5,6 +5,12 @@ from fastapi import APIRouter, HTTPException
 
 from engineer import EngineerInputError, Labyrinth, optimize_labyrinth_geometry
 
+try:
+    # Works when imported as server.app.routes.*
+    from server.app.routes.utils.plot_helpers import store_plot_source
+except ModuleNotFoundError:
+    # Fallback for flatter package layouts.
+    from .utils.plot_helpers import store_plot_source
 from ..schemas import LabyrinthOptimizeRequest, LabyrinthOptimizeResult, LabyrinthRequest, LabyrinthResult
 
 router = APIRouter()
@@ -55,6 +61,9 @@ def compute_labyrinth(req: LabyrinthRequest) -> LabyrinthResult:
         warnings.append(ce_value)
 
     warnings = warnings or None
+
+    # Keep latest computed labyrinth object for /plots/labyrinth rendering.
+    store_plot_source("labyrinth", labyrinth)
 
     return LabyrinthResult(
         N=labyrinth.N,
@@ -120,6 +129,9 @@ def optimize_labyrinth(req: LabyrinthOptimizeRequest) -> LabyrinthOptimizeResult
         warnings.append(ce_value)
 
     warnings = warnings or None
+
+    # Keep latest optimized labyrinth object for /plots/optimize rendering.
+    store_plot_source("optimize", best_labyrinth)
 
     return LabyrinthOptimizeResult(
         B_best=best_labyrinth.B,
