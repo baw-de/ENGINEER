@@ -3,9 +3,16 @@ import io
 
 import numpy as np
 from fastapi import APIRouter, HTTPException
+from matplotlib import pyplot as plt
 
 from engineer import EngineerInputError, FlapGate, Labyrinth, operational_model
 
+try:
+    # Works when imported as server.app.routes.*
+    from server.app.routes.utils.plot_helpers import capture_current_figure_svg_bytes, store_plot_svg_bytes
+except ModuleNotFoundError:
+    # Fallback for flatter package layouts.
+    from .utils.plot_helpers import capture_current_figure_svg_bytes, store_plot_svg_bytes
 from ..schemas import OperationalModelRequest, OperationalModelResult, OperationalPoint
 
 router = APIRouter()
@@ -63,18 +70,24 @@ def compute_operational_model(req: OperationalModelRequest) -> OperationalModelR
                 save_plot=False,
                 path="",
             )
+
+            # Keep latest operational plot so frontend can request it via /api/plots/operational.
+            store_plot_svg_bytes("operational", capture_current_figure_svg_bytes())
     except EngineerInputError as exc:
         # Explicitly surface detailed validation messages coming from the ENGINEER core
         raise HTTPException(
             status_code=422,
             detail={"message": "Operational model input is invalid.", "errors": exc.messages},
         ) from exc
+    finally:
+        plt.close("all")
 
     # Parse captured warnings (only unique warnings)
     warnings = []
     for line in captured_output.getvalue().strip().split("\n"):
-        if line.startswith("[Labyrinth]") or line.startswith("[FlapGate]"):
-            warnings.append(line.split(": ", 1)[1])
+        if line.startswith("[Labyrinth]") or line.startswith("[FlapGate]") or line.startswith("[UW_interpolation]") or line.startswith("[Operational]"):
+            warning_message = line.split(": ", 1)[1] if ": " in line else line
+            warnings.append(warning_message)
 
     # Remove duplicates
     warnings = list(set(warnings))
