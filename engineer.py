@@ -21,6 +21,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import io
 import math
 import os
 import re
@@ -345,6 +346,7 @@ class Labyrinth:  # this is only one geometry
     # Plotten Labyrinth-Wehr
     def plot_geometry(self):
         # plt.close()
+        self._last_geometry_svg_bytes = None
 
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
@@ -427,12 +429,20 @@ class Labyrinth:  # this is only one geometry
                 arrowprops=dict(arrowstyle="<->", color="black"),
             )
 
-            plt.show()
+            if os.environ.get("SERVER_MODE") != "1":
+                plt.show()
             # plt.savefig('result-'+str(self.B)+' '+str(self.alpha)+'.jpg')
             # fig,ax = plt.subplots(ncols=2)
 
         else:
             print("Plotten des Labyrinths ist mit", self.N, "keys nicht möglich")
+
+        try:
+            svg_buf = io.BytesIO()
+            plt.savefig(svg_buf, format="svg")
+            self._last_geometry_svg_bytes = svg_buf.getvalue()
+        except Exception:
+            self._last_geometry_svg_bytes = None
 
         if self.path:
             plt.savefig(self.path + "\\Labyrinth-Wehr_plot.svg")
@@ -1010,7 +1020,15 @@ def UW_interpolation(Abfluss, Unterwasser, interpolation, path="", show_plot=Fal
             def model_f(x, a, b, c):
                 return a * (np.exp(b * x)) + c
 
-            popt, pcov = curve_fit(model_f, Abfluss, Unterwasser, p0=[0.0, 0.1, 0.1], maxfev=2000)
+            try:
+                popt, _ = curve_fit(model_f, Abfluss, Unterwasser, p0=[0.0, 0.1, 0.1], maxfev=2000)
+            except RuntimeError as exc:
+                raise EngineerInputError(
+                    [
+                        "Exponentielle Interpolation konnte nicht bestimmt werden.",
+                        "Bitte andere Stützstellen prüfen oder eine andere Interpolationsmethode wählen.",
+                    ]
+                ) from exc
             a_opt, b_opt, c_opt = popt
 
             UW1 = a_opt * (np.exp(b_opt * Abfluss)) + c_opt
@@ -1413,7 +1431,7 @@ def operational_model(
             kla_upstream = np.round(Kla_upstream, 3)
             constant_range = np.nonzero(kla_upstream <= design_upstream_water_level)
             const_range = constant_range[0]
-            const_range_end = const_range[-1]
+            const_range_end = const_range[-1] if const_range.size > 0 else None
 
             # ax[2].annotate('', xy=(Q_UW[const_range_start, 0],Kla_upstream[0]+0.05), xytext=(Q_UW[const_range_end, 0],Kla_upstream[0]+0.05),
             # xycoords='data', textcoords='data',arrowprops={'arrowstyle': '|-|'})
@@ -1421,7 +1439,10 @@ def operational_model(
             # ax[2].annotate('Stauziel', xy=((Q_UW[const_range_start, 0] + Q_UW[const_range_end, 0])/2,Kla_upstream[0]+0.1), ha='center', va='center')
 
             # Schwarz line
-            ax[1].axvline(x=Q_UW[const_range_end, 0], color="k", linestyle="--")
+            if const_range_end is not None:
+                ax[1].axvline(x=Q_UW[const_range_end, 0], color="k", linestyle="--")
+            else:
+                print("[Operational] Achtung: Stauziel im berechneten Bereich nicht erreicht.")
 
             if show_plot:
                 fig.show()
