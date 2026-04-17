@@ -135,6 +135,7 @@ def optimize_labyrinth(req: LabyrinthOptimizeRequest) -> LabyrinthOptimizeResult
 
     return LabyrinthOptimizeResult(
         B_best=best_labyrinth.B,
+        D_best=best_labyrinth.D,
         Angle_best=best_labyrinth.alpha,
         N_best=best_labyrinth.N,
         w_best=best_labyrinth.w,

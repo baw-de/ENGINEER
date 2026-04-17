@@ -192,7 +192,7 @@ class TestLabyrinthAPI:
         assert response.status_code == 200
 
         data = response.json()
-        expected_fields = ["B_best", "Angle_best", "N_best", "w_best", "l_best", "S_best", "L_best", "Hu_best", "Cd_best", "v_best"]
+        expected_fields = ["B_best", "D_best", "Angle_best", "N_best", "w_best", "l_best", "S_best", "L_best", "Hu_best", "Cd_best", "v_best"]
 
         for field in expected_fields:
             assert field in data

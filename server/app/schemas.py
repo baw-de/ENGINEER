@@ -152,6 +152,7 @@ class LabyrinthResult(BaseModel):
 
 class LabyrinthOptimizeResult(BaseModel):
     B_best: float = Field(..., description="Optimal key length B [m]")
+    D_best: float = Field(..., description="Optimal front wall width D [m]")
     Angle_best: float = Field(..., description="Optimal key angle alpha [°]")
     N_best: int = Field(..., description="Optimal number of keys")
     w_best: float = Field(..., description="Optimal key width w [m]")
