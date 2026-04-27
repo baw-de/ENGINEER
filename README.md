@@ -179,6 +179,7 @@ print(flap_gate.hu)
 
 <img src="assets/codeblocks/codeblock_operational_model.png" width="50%" height="50%"><br>
 The labyrinth weir and the flap gate are coupled via the common upstream water level. The discharge is distributed depending on the capacity of the two parts. This coupling is automatically done in the code with the function `coupling`. As the total discharge increases, the valve is opened further and further to ensure that the legally required design water level is maintained. As soon as the flap is fully lowered, the water begins to flow over the labyrinth weir. This is implemented by the `operational_model` function.<br><br>
+![Operational model workflow](assets/pictures/operational_model.webp)<br>
 To use the `operational_model` the following steps are required:
 
 1. The discharge and the downstream rating curve must be defined. Both must be defined as a numpy array.
