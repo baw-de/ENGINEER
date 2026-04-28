@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Fri Apr 10 12:14:14 2026
 
@@ -12,12 +11,13 @@ parameters and writes a watertight binary STL mesh ready for download.
 """
 
 import struct
-import numpy as np
 
+import numpy as np
 
 # ---------------------------------------------------------------------------
 # Helper functions
 # ---------------------------------------------------------------------------
+
 
 def _offset_polyline(x, y, d):
     """
@@ -37,7 +37,7 @@ def _offset_polyline(x, y, d):
     normals = np.column_stack([-e_u[:, 1], e_u[:, 0]])
 
     # End points: offset perpendicular to the adjacent segment
-    out[0]  = pts[0]  + d * normals[0]
+    out[0] = pts[0] + d * normals[0]
     out[-1] = pts[-1] + d * normals[-1]
 
     # Interior vertices: miter join
@@ -75,13 +75,10 @@ def _build_polyline(D, W, alpha, B):
     n_exact = W / w_cycle
     n_teeth = int(np.floor(n_exact))
     if n_teeth < 1:
-        raise ValueError(
-            f"W={W} is too small for a single tooth (w_cycle={w_cycle:.4f}, "
-            f"n_exact={n_exact:.3f}). Reduce D, B or alpha, or increase W."
-        )
+        raise ValueError(f"W={W} is too small for a single tooth (w_cycle={w_cycle:.4f}, n_exact={n_exact:.3f}). Reduce D, B or alpha, or increase W.")
 
-    W_lab = n_teeth * w_cycle - D        # width occupied by the symmetric teeth
-    pad = (W - W_lab) / 2.0              # straight extension on each side
+    W_lab = n_teeth * w_cycle - D  # width occupied by the symmetric teeth
+    pad = (W - W_lab) / 2.0  # straight extension on each side
 
     xs, ys = [0.0], [0.0]
     x = 0.0
@@ -89,24 +86,40 @@ def _build_polyline(D, W, alpha, B):
     # Left straight extension
     if pad > 0:
         x += pad
-        xs.append(x); ys.append(0.0)
+        xs.append(x)
+        ys.append(0.0)
 
     # First tooth: upstream slope + back wall + downstream slope (no leading front wall)
-    x += proj; xs.append(x); ys.append(B)
-    x += D;    xs.append(x); ys.append(B)
-    x += proj; xs.append(x); ys.append(0.0)
+    x += proj
+    xs.append(x)
+    ys.append(B)
+    x += D
+    xs.append(x)
+    ys.append(B)
+    x += proj
+    xs.append(x)
+    ys.append(0.0)
 
     # Remaining teeth: front wall + upstream slope + back wall + downstream slope
     for _ in range(n_teeth - 1):
-        x += D;    xs.append(x); ys.append(0.0)
-        x += proj; xs.append(x); ys.append(B)
-        x += D;    xs.append(x); ys.append(B)
-        x += proj; xs.append(x); ys.append(0.0)
+        x += D
+        xs.append(x)
+        ys.append(0.0)
+        x += proj
+        xs.append(x)
+        ys.append(B)
+        x += D
+        xs.append(x)
+        ys.append(B)
+        x += proj
+        xs.append(x)
+        ys.append(0.0)
 
     # Right straight extension
     if pad > 0:
         x += pad
-        xs.append(x); ys.append(0.0)
+        xs.append(x)
+        ys.append(0.0)
 
     L_total = n_teeth * L_cycle - D + 2 * pad
 
@@ -158,8 +171,8 @@ def _cap_rings(x, y, xL, yL, P, r, n_theta=14):
 # Main entry point
 # ---------------------------------------------------------------------------
 
-def generate_labyrinth_geometry(D, W, alpha, B, t=0.01, P=0.253,
-                                filename="labyrinth_weir.stl", n_theta=14):
+
+def generate_labyrinth_geometry(D, W, alpha, B, t=0.01, P=0.253, filename="labyrinth_weir.stl", n_theta=14):
     """
     Generate a trapezoidal labyrinth weir as a watertight binary STL mesh.
 
@@ -210,24 +223,24 @@ def generate_labyrinth_geometry(D, W, alpha, B, t=0.01, P=0.253,
     for i in range(n - 1):
         # Outer left face (normal pointing outward on the left side)
         quad_to_tris(
-            (xL[i],     yL[i],     0.0),
-            (xL[i],     yL[i],     z_body),
+            (xL[i], yL[i], 0.0),
+            (xL[i], yL[i], z_body),
             (xL[i + 1], yL[i + 1], z_body),
             (xL[i + 1], yL[i + 1], 0.0),
         )
         # Outer right face
         quad_to_tris(
-            (xR[i],     yR[i],     0.0),
+            (xR[i], yR[i], 0.0),
             (xR[i + 1], yR[i + 1], 0.0),
             (xR[i + 1], yR[i + 1], z_body),
-            (xR[i],     yR[i],     z_body),
+            (xR[i], yR[i], z_body),
         )
         # Bottom cap (z = 0, normal pointing downward)
         quad_to_tris(
-            (xL[i],     yL[i],     0.0),
+            (xL[i], yL[i], 0.0),
             (xL[i + 1], yL[i + 1], 0.0),
             (xR[i + 1], yR[i + 1], 0.0),
-            (xR[i],     yR[i],     0.0),
+            (xR[i], yR[i], 0.0),
         )
 
     # --- Dome: strip of quads between consecutive rings ---
@@ -238,10 +251,10 @@ def generate_labyrinth_geometry(D, W, alpha, B, t=0.01, P=0.253,
         for i in range(n - 1):
             # Winding so the normal points outward from the dome
             quad_to_tris(
-                (cxA[i],     cyA[i],     czA[i]),
+                (cxA[i], cyA[i], czA[i]),
                 (cxA[i + 1], cyA[i + 1], czA[i + 1]),
                 (cxB[i + 1], cyB[i + 1], czB[i + 1]),
-                (cxB[i],     cyB[i],     czB[i]),
+                (cxB[i], cyB[i], czB[i]),
             )
 
     # --- End caps: rectangle (0..z_body) + half-disk (fan) ---
@@ -266,12 +279,8 @@ def generate_labyrinth_geometry(D, W, alpha, B, t=0.01, P=0.253,
         cx0, cy0 = float(x[i_end]), float(y[i_end])
         center = (cx0, cy0, z_body)
         for j in range(len(rings) - 1):
-            ax_, ay_, az_ = (float(rings[j][0][i_end]),
-                             float(rings[j][1][i_end]),
-                             float(rings[j][2][i_end]))
-            bx_, by_, bz_ = (float(rings[j + 1][0][i_end]),
-                             float(rings[j + 1][1][i_end]),
-                             float(rings[j + 1][2][i_end]))
+            ax_, ay_, az_ = (float(rings[j][0][i_end]), float(rings[j][1][i_end]), float(rings[j][2][i_end]))
+            bx_, by_, bz_ = (float(rings[j + 1][0][i_end]), float(rings[j + 1][1][i_end]), float(rings[j + 1][2][i_end]))
             if sign < 0:
                 triangles.append((center, (ax_, ay_, az_), (bx_, by_, bz_)))
             else:
@@ -279,7 +288,9 @@ def generate_labyrinth_geometry(D, W, alpha, B, t=0.01, P=0.253,
 
     # 3) Compute normals and write binary STL
     def normal(a, b, c):
-        ax, ay, az = a; bx, by, bz = b; cx, cy, cz = c
+        ax, ay, az = a
+        bx, by, bz = b
+        cx, cy, cz = c
         ux, uy, uz = bx - ax, by - ay, bz - az
         vx, vy, vz = cx - ax, cy - ay, cz - az
         nx, ny, nz = uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx
@@ -289,16 +300,11 @@ def generate_labyrinth_geometry(D, W, alpha, B, t=0.01, P=0.253,
         return nx / L, ny / L, nz / L
 
     with open(filename, "wb") as f:
-        f.write(b"\0" * 80)                          # 80-byte header
-        f.write(struct.pack("<I", len(triangles)))   # number of triangles
+        f.write(b"\0" * 80)  # 80-byte header
+        f.write(struct.pack("<I", len(triangles)))  # number of triangles
         for a, b, c in triangles:
             nx, ny, nz = normal(a, b, c)
-            f.write(struct.pack("<12fH",
-                                nx, ny, nz,
-                                a[0], a[1], a[2],
-                                b[0], b[1], b[2],
-                                c[0], c[1], c[2],
-                                0))
+            f.write(struct.pack("<12fH", nx, ny, nz, a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2], 0))
 
     info["filename"] = filename
     info["n_triangles"] = len(triangles)
@@ -309,17 +315,15 @@ def generate_labyrinth_geometry(D, W, alpha, B, t=0.01, P=0.253,
 # Standalone test run
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    # Trapezoidal labyrinth weir parameters 
-    D     = 0.04     # front/back wall width [m]
-    W     = 1.25     # total channel width [m]
-    alpha = 8.32     # sidewall angle [deg]
-    B     = 0.59     # depth in flow direction [m]
-    t     = 0.01     # wall thickness [m]
-    P     = 0.253    # weir height [m]
+    # Trapezoidal labyrinth weir parameters
+    D = 0.04  # front/back wall width [m]
+    W = 1.25  # total channel width [m]
+    alpha = 8.32  # sidewall angle [deg]
+    B = 0.59  # depth in flow direction [m]
+    t = 0.01  # wall thickness [m]
+    P = 0.253  # weir height [m]
 
-    fname, info = generate_labyrinth_geometry(
-        D, W, alpha, B, t=t, P=P, filename="labyrinth_weir.stl"
-    )
+    fname, info = generate_labyrinth_geometry(D, W, alpha, B, t=t, P=P, filename="labyrinth_weir.stl")
 
     print("=" * 50)
     print("  TRAPEZOIDAL LABYRINTH WEIR GEOMETRY")
@@ -338,7 +342,7 @@ if __name__ == "__main__":
     print(f"  exact n_cycles        = {info['n_exact']:.3f}")
     print(f"  drawn teeth           = {info['n_teeth']}")
     print(f"  width used by lab.    = {info['W_lab']:.4f} m")
-    print(f"  straight pad/side     = {info['pad']:.4f} m  ({info['pad']*1000:.2f} mm)")
+    print(f"  straight pad/side     = {info['pad']:.4f} m  ({info['pad'] * 1000:.2f} mm)")
     print(f"  total crest L         = {info['L_total']:.4f} m")
     print(f"  L / W                 = {info['L_over_W']:.3f}")
     print("=" * 50)

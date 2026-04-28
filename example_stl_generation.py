@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Mon Apr 13 08:49:15 2026
 
@@ -15,6 +14,6 @@ B = 10
 B -= t
 P = 6
 
-filename = 'labyrinth_stl.stl'
+filename = "labyrinth_stl.stl"
 
 STL_function.generate_labyrinth_geometry(D, W, alpha, B, t, P, filename)
