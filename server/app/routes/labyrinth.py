@@ -1,8 +1,12 @@
 import contextlib
 import io
+import os
+import tempfile
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, BackgroundTasks, HTTPException
+from starlette.responses import FileResponse
 
+import STL_function
 from engineer import EngineerInputError, Labyrinth, optimize_labyrinth_geometry
 
 try:
@@ -12,6 +16,14 @@ except ModuleNotFoundError:
     # Fallback for flatter package layouts.
     from .utils.plot_helpers import store_plot_source
 from ..schemas import LabyrinthOptimizeRequest, LabyrinthOptimizeResult, LabyrinthRequest, LabyrinthResult
+
+
+def _remove_file(path: str) -> None:
+    try:
+        os.remove(path)
+    except OSError:
+        pass
+
 
 router = APIRouter()
 
@@ -80,6 +92,37 @@ def compute_labyrinth(req: LabyrinthRequest) -> LabyrinthResult:
         Hd=labyrinth.Hd,
         rs=labyrinth.rs,
         warnings=warnings,
+    )
+
+
+@router.post("/stl")
+def download_labyrinth_stl(req: LabyrinthRequest, background_tasks: BackgroundTasks) -> FileResponse:
+    """
+    Generate the labyrinth STL with the provided parameters and stream it back as a download.
+    """
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".stl")
+    temp_file.close()
+
+    try:
+        STL_function.generate_labyrinth_geometry(
+            D=req.D,
+            W=req.labyrinth_width,
+            alpha=req.labyrinth_key_angle,
+            B=req.labyrinth_length,
+            t=req.t,
+            P=req.labyrinth_height,
+            filename=temp_file.name,
+        )
+    except Exception as exc:
+        _remove_file(temp_file.name)
+        message = str(exc).strip() or "STL generation failed with the provided labyrinth parameters."
+        raise HTTPException(status_code=422, detail=message) from exc
+
+    background_tasks.add_task(_remove_file, temp_file.name)
+    return FileResponse(
+        path=temp_file.name,
+        filename="labyrinth_weir.stl",
+        media_type="application/octet-stream",
     )
 
 

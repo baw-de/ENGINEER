@@ -20,10 +20,12 @@ Currently the code is written in "Denglish" which is a mixture of German and Eng
 
 This code can be used to design labyrinth weir structures consisting of a labyrinth weir and a parrallel flap gate. Furthermore, it is possible to estimate the hydraulic effect of the system over a given discharge range. You can find more information about labyrinth weirs in the BAWMitteilungen Nr. 105[^fn1]. The hydraulic calculation is based on the formulas published by Crookston & Tullis (2013)[^fn2] and Tullis et al. (2007)[^fn3].
 
-This repository consists mainly of two Python files:
+This repository consists mainly of four Python files:
 
 - <pre>engineer.py</pre> This ist the brain. You should not modify this file unless you find an bug or want to develop the project further.<br><br>
 - <pre>example.py</pre> This is an application example. Feel free to adapt this file according to your wishes and your project. You will find all the code snippets from this README.md in example.py.
+- <pre>STL_function.py</pre> Single entry point `generate_labyrinth_geometry(...)` builds a trapezoidal labyrinth weir and writes a watertight binary STL mesh that you can download or hand to a slicer.
+- <pre>example_stl_generation.py</pre> Demonstrates how to call `generate_labyrinth_geometry` with typical dimensions and write the resulting STL to disk.
 
 **REST API:** All functionality is also available via a REST API. See the [API Guide](server/API_GUIDE.md) for detailed documentation.
 
@@ -256,6 +258,29 @@ To use the `operational_model` the following steps are required:
    - In addition, a figure is displayed that contains the following representations (from top to bottom): downstream water level grid points and interpolation curve, fractions of discharge over labyrinth weir and flap gate, upstream water level in the design and actual state, flap angle. The x-axis of all plots indicates the total discharge through the system.<br>
      <img src="assets/pictures/results_plot.png" width="50%" height="50%"><br>
 
+## STL Export
+
+If you need a geometry file for CAD/3D printing or downstream workflows, `STL_function.generate_labyrinth_geometry(...)` builds a trapezoidal labyrinth weir from the same dimensional parameters used in the hydraulic calculations and writes it as a binary STL mesh. The function returns the written `filename` and an `info` dictionary with derived geometry metrics (cycle widths, crest length, number of teeth, triangle count, etc.).
+
+The helper script `example_stl_generation.py` shows a minimal invocation:
+
+```python
+from STL_function import generate_labyrinth_geometry
+
+D = 0.5       # front/back wall width [m]
+W = 4         # total channel width [m]
+alpha = 8     # key angle [°]
+available_length = 10   # available length in flow direction [m]
+t = 0.7                 # wall thickness [m]
+B = available_length - t
+P = 6                   # crest height [m]
+
+filename, info = generate_labyrinth_geometry(D, W, alpha, B, t=t, P=P, filename="labyrinth_stl.stl")
+print(f"STL written to {filename} ({info['n_triangles']} triangles)")
+```
+
+Adjust the parameters to match your site and download the generated `labyrinth_stl.stl` for visualization or fabrication.
+
 ## REST API
 
 ENGINEER provides a REST API for programmatic access to all hydraulic calculations. For complete API documentation, including endpoints, request/response schemas, examples, and error handling, see the [API Guide](server/API_GUIDE.md).
@@ -263,9 +288,11 @@ ENGINEER provides a REST API for programmatic access to all hydraulic calculatio
 # Literature
 
 [^fn1]: Bundesanstalt für Wasserbau (Hg.) (2020): Feste Wehre an Bundeswasserstraßen: Untersuchungen zur Machbarkeit sowie Empfehlungen zur Umsetzung. Karlsruhe: Bundesanstalt für Wasserbau (BAWMitteilungen, 105). [https://hdl.handle.net/20.500.11970/107132](https://hdl.handle.net/20.500.11970/107132)
+
 [^fn2]:
     Crookston, B. M.; Tullis, B. P. (2013): Hydraulic Design and Analysis of Labyrinth Weirs. I: Discharge Relationships. In: Journal of Irrigation and Drainage Engineering
     139 (5), S. 363–370. [https://doi.org/10.1061/(ASCE)IR.1943-4774.0000558](<https://doi.org/10.1061/(ASCE)IR.1943-4774.0000558>)
 
 [^fn3]: Tullis, B. P.; Young, J. C.; Chandler, M. A. (2007): Head-Discharge Relationships for Submerged Labyrinth Weirs. In: J. Hydraul. Eng. 133 (3), S. 248–254. [https://doi.org/10.1061/(ASCE)0733-9429(2007)133:3(248)](<https://doi.org/10.1061/(ASCE)0733-9429(2007)133:3(248)>)
+
 [^fn4]: Bollrich, Gerhard (2019): Technische Hydromechanik 1. Grundlagen. Berlin: Beuth Verlag GmbH.

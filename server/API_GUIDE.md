@@ -158,7 +158,55 @@ Finds the optimal geometry of a labyrinth weir for maximum hydraulic capacity un
 
 ---
 
-### 3. Calculate Flap Gate
+### 3. Download Labyrinth STL
+
+**POST** `/labyrinth/stl`
+
+Generates a watertight STL mesh of the labyrinth geometry based on the provided dimensions and streams it back as a file download.
+
+#### Request Schema (Input)
+
+Same as `/labyrinth/compute`:
+
+| Field                    | Type             | Description                       | Unit     | Required       |
+| ------------------------ | ---------------- | --------------------------------- | -------- | -------------- |
+| `bottom_level`           | float            | Bottom height                     | m a.s.l. | ✓              |
+| `downstream_water_level` | float            | Downstream water level            | m a.s.l. | ✓              |
+| `discharge`              | float (>0)       | Discharge                         | m³/s     | ✓              |
+| `labyrinth_width`        | float (>0)       | Total width of labyrinth weir     | m        | ✓              |
+| `labyrinth_height`       | float (>0)       | Height of labyrinth weir          | m        | ✓              |
+| `labyrinth_length`       | float (>0)       | Length of a key in flow direction | m        | ✓              |
+| `labyrinth_key_angle`    | float (>0)       | Angle of inclined side walls      | °        | ✓              |
+| `D`                      | float (optional) | Front wall thickness              | m        | (Default: 0.5) |
+| `t`                      | float (optional) | Wall thickness of keys            | m        | (Default: 0.3) |
+
+#### Response Schema (Output)
+
+| Field       | Type   | Description                                         |
+| ----------- | ------ | --------------------------------------------------- |
+| `file`      | binary | Binary STL payload (`Content-Disposition: attachment`) |
+
+The endpoint returns `200 OK` with a binary stream. Invalid geometries produce `422 Unprocessable Entity` with the domain validation message.
+
+#### Example Request
+
+```json
+{
+  "bottom_level": 0.1,
+  "downstream_water_level": 1.09,
+  "discharge": 10,
+  "labyrinth_width": 15,
+  "labyrinth_height": 2.2,
+  "labyrinth_length": 8,
+  "labyrinth_key_angle": 8,
+  "D": 0.5,
+  "t": 0.3
+}
+```
+
+---
+
+### 4. Calculate Flap Gate
 
 **POST** `/flap/compute`
 
@@ -209,7 +257,7 @@ Calculates the hydraulic parameters for a flap gate (fish-belly flap).
 
 ---
 
-### 4. Simulate Operational Model
+### 5. Simulate Operational Model
 
 **POST** `/operational`
 
@@ -276,6 +324,34 @@ _Note: Full implementation follows._
   "max_flap_gate_angle": 90,
   "fish_body_height": 0.4
 }
+```
+
+---
+
+### 6. Retrieve Geometry Plot
+
+**GET** `/plots/{plot_id}`
+
+Returns the cached SVG plot for the requested `plot_id` (e.g., `labyrinth` or `optimize-abc123`). Successful responses include caching headers and inline filename hints.
+
+#### Path Parameters
+
+| Field     | Type   | Description                                 |
+| --------- | ------ | ------------------------------------------- |
+| `plot_id`  | string | Plot identifier (must match a stored plot)  |
+
+#### Responses
+
+| Status | Description                                  | Content Type     |
+| ------ | -------------------------------------------- | ---------------- |
+| 200    | SVG plot image                               | `image/svg+xml`  |
+| 404    | Plot is missing or expired                    | `application/json` |
+| 500    | Server error during plot generation           | `application/json` |
+
+Example:
+
+```
+GET /plots/labyrinth
 ```
 
 ---
