@@ -178,6 +178,45 @@ class TestLabyrinthAPI:
         assert "detail" in data
         assert any("bottom_level" in str(error) and "missing" in str(error).lower() for error in data["detail"])
 
+    def test_download_labyrinth_stl_endpoint(self, client):
+        request_data = {
+            "bottom_level": 0.1,
+            "downstream_water_level": 1.09,
+            "discharge": 10.0,
+            "labyrinth_width": 15.0,
+            "labyrinth_height": 2.2,
+            "labyrinth_length": 8.0,
+            "labyrinth_key_angle": 8.0,
+            "D": 0.5,
+            "t": 0.3,
+        }
+
+        response = client.post("/labyrinth/stl", json=request_data)
+        assert response.status_code == 200
+        assert response.headers["content-type"].startswith("application/octet-stream")
+        assert "attachment;" in response.headers["content-disposition"]
+        assert len(response.content) > 0
+
+    def test_download_labyrinth_stl_endpoint_invalid_input(self, client):
+        request_data = {
+            "bottom_level": 0.1,
+            "downstream_water_level": 1.09,
+            "discharge": 10.0,
+            "labyrinth_width": 2.0,
+            "labyrinth_height": 2.2,
+            "labyrinth_length": 8.0,
+            "labyrinth_key_angle": 8.0,
+            "D": 0.5,
+            "t": 0.3,
+        }
+
+        response = client.post("/labyrinth/stl", json=request_data)
+        assert response.status_code == 422
+
+        data = response.json()
+        assert "detail" in data
+        assert "too small" in data["detail"].lower()
+
     def test_optimize_labyrinth_endpoint(self, client):
         request_data = {
             "bottom_level": 0.1,
