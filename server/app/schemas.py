@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import Path
-from pydantic import BaseModel, Field, confloat
+from pydantic import BaseModel, Field, confloat, field_validator
 
 PlotId = Annotated[str, Path(description="Plot identifier (e.g. 'labyrinth' or 'optimize-abc123')")]
 
@@ -79,6 +79,12 @@ class FlapGateRequest(BaseModel):
             }
         }
 
+    @field_validator("flap_gate_angle")
+    def flap_gate_angle_range(cls, value):
+        if not 0 <= value <= 90:
+            raise ValueError("Klappenwinkel β muss im Bereich 0° ≤ β ≤ 90° liegen.")
+        return value
+
 
 class OperationalModelRequest(BaseModel):
     bottom_level: float = Field(..., description="Bottom height [m]")
@@ -131,6 +137,14 @@ class OperationalModelRequest(BaseModel):
                 "fish_body_height": 0.4,
             }
         }
+
+    @field_validator("flap_gate_angle", "max_flap_gate_angle")
+    def flap_gate_angles_range(cls, value, info):
+        if not 0 <= value <= 90:
+            if info.field_name == "flap_gate_angle":
+                raise ValueError("Klappenwinkel β muss im Bereich 0° ≤ β ≤ 90° liegen.")
+            raise ValueError("Maximaler Klappenwinkel (β) muss im Bereich 0° ≤ β ≤ 90° liegen.")
+        return value
 
 
 class LabyrinthResult(BaseModel):

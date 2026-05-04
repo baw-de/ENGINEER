@@ -170,6 +170,68 @@ class TestOperationalAPI:
         assert "detail" in data
         assert any("bottom_level" in str(error) and "missing" in str(error).lower() for error in data["detail"])
 
+    def test_compute_operational_endpoint_flap_angle_range(self, client):
+        request_data = {
+            "bottom_level": 0.1,
+            "downstream_water_level": 1.8,
+            "discharge": 20.0,
+            "labyrinth_width": 10.0,
+            "labyrinth_height": 2.1,
+            "labyrinth_length": 7.7,
+            "labyrinth_key_angle": 7.0,
+            "D": 0.5,
+            "discharge_vector": [2.09, 2.79, 6.01],
+            "downstream_water_level_vector": [1.07, 1.15, 1.19],
+            "interpolation_method": "exponential",
+            "flap_gate_bottom_level": 0.1,
+            "flap_gate_downstream_water_level": 1.09,
+            "flap_gate_discharge": 10.0,
+            "flap_gate_width": 1.4,
+            "flap_gate_height": 2.35,
+            "flap_gate_angle": -5.0,
+            "design_upstream_water_level": 2.2,
+            "max_flap_gate_angle": 90.0,
+            "fish_body_height": 0.4,
+        }
+
+        response = client.post("/operational", json=request_data)
+        assert response.status_code == 422
+
+        data = response.json()
+        errors = data["detail"]["errors"]
+        assert any("Klappenwinkel β" in error.get("msg", "") for error in errors)
+
+    def test_compute_operational_endpoint_max_flap_angle_range(self, client):
+        request_data = {
+            "bottom_level": 0.1,
+            "downstream_water_level": 1.8,
+            "discharge": 20.0,
+            "labyrinth_width": 10.0,
+            "labyrinth_height": 2.1,
+            "labyrinth_length": 7.7,
+            "labyrinth_key_angle": 7.0,
+            "D": 0.5,
+            "discharge_vector": [2.09, 2.79, 6.01],
+            "downstream_water_level_vector": [1.07, 1.15, 1.19],
+            "interpolation_method": "exponential",
+            "flap_gate_bottom_level": 0.1,
+            "flap_gate_downstream_water_level": 1.09,
+            "flap_gate_discharge": 10.0,
+            "flap_gate_width": 1.4,
+            "flap_gate_height": 2.35,
+            "flap_gate_angle": 74.0,
+            "design_upstream_water_level": 2.2,
+            "max_flap_gate_angle": 120.0,
+            "fish_body_height": 0.4,
+        }
+
+        response = client.post("/operational", json=request_data)
+        assert response.status_code == 422
+
+        data = response.json()
+        errors = data["detail"]["errors"]
+        assert any("Maximaler Klappenwinkel" in error.get("msg", "") for error in errors)
+
     def test_compute_operational_endpoint_empty_vectors(self, client):
         request_data = {
             "bottom_level": 0.1,

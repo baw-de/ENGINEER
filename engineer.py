@@ -638,7 +638,9 @@ class FlapGate:
         fehler += input_plausibilty("Abfluss", self.Q)
         fehler += input_plausibilty("Klappe Breite", self.KW)
         fehler += input_plausibilty("Klappe Hoehe", self.KP)
-        fehler += input_plausibilty("Klappe Winkel", self.Kalpha)
+
+        if self.Kalpha is None or not (0 <= self.Kalpha <= 90):
+            fehler.append("Klappenwinkel β muss zwischen 0° und 90° liegen.")
 
         # additional combined plausibility checks that depend on multiple parameters
         # ensure that downstream water level is above the bottom level to avoid zero water depth
@@ -1191,7 +1193,8 @@ def operational_model(
 
         # Check Stauziel, SohleHoehe, LabyrinthMaxBreite, LabyrinthMaxLaenge, and LabyrinthHoehe
         fehler += input_plausibilty("Stauziel", design_upstream_water_level)
-        fehler += input_plausibilty("Klappe Winkel max", max_flap_gate_angle)
+        if max_flap_gate_angle is None or not (0 <= max_flap_gate_angle <= 90):
+            fehler.append("Maximaler Klappenwinkel muss zwischen 0° und 90° liegen.")
         fehler += input_plausibilty("Fishe Hoehe", fish_body_height)
 
         valid_interpolations = ["exponential", "linear", "quadratic", "cubic"]
