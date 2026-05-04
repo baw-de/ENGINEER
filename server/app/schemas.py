@@ -191,6 +191,8 @@ class OperationalPoint(BaseModel):
     downstream_water_level: float = Field(..., description="Downstream water level UW [m]")
     upstream_water_level: float = Field(..., description="Upstream water level OW [m]")
     head_over_crest: float | None = Field(None, description="Head over crest / upstream head above crest [m] (if available).")
+    labyrinth_head_over_crest: float | None = Field(None, description="Labyrinth-specific head over crest (if available)")
+    flap_gate_head_over_crest: float | None = Field(None, description="Flap gate-specific head over crest (if available)")
     labyrinth_discharge: float = Field(..., description="Labyrinth discharge share [m³/s].")
     flap_gate_discharge: float = Field(..., description="Flap gate discharge share [m³/s].")
     flap_gate_angle: float = Field(..., description="Flap gate angle alpha [degree] for this discharge.")

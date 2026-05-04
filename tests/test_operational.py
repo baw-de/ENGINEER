@@ -60,10 +60,15 @@ class TestOperationalAPI:
             "labyrinth_discharge",
             "flap_gate_discharge",
             "flap_gate_angle",
+            "labyrinth_head_over_crest",
+            "flap_gate_head_over_crest",
         ]
 
         for field in expected_fields:
             assert field in first_result
+
+        assert first_result["head_over_crest"] is not None
+        assert first_result["labyrinth_head_over_crest"] is not None
 
         # Basic sanity checks
         assert first_result["discharge"] > 0

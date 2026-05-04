@@ -96,11 +96,17 @@ def compute_operational_model(req: OperationalModelRequest) -> OperationalModelR
     def df_to_points(df):
         points = []
         for row in df.to_dict(orient="records"):
+            labyrinth_head = row.get("hu_labyrinth") if row.get("hu_labyrinth") is not None else row.get("Oberfallhöhe")
+            flap_gate_head = row.get("hu_klappe")
+            head_over_crest = labyrinth_head if labyrinth_head is not None else flap_gate_head
+
             point = OperationalPoint(
                 discharge=row.get("Abfluss"),
                 downstream_water_level=row.get("UW"),
                 upstream_water_level=row.get("OW"),
-                head_over_crest=None,
+                head_over_crest=head_over_crest,
+                labyrinth_head_over_crest=labyrinth_head,
+                flap_gate_head_over_crest=flap_gate_head,
                 labyrinth_discharge=row.get("Labyrinth Q"),
                 flap_gate_discharge=row.get("Klappe Q"),
                 flap_gate_angle=row.get("Klappe winkel"),

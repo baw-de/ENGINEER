@@ -1280,6 +1280,9 @@ def operational_model(
                 else:
                     results_df.to_csv("results.csv", sep=";", float_format="%.2f", header=results_col)
 
+            results_df["hu_labyrinth"] = results_df["Oberfallhöhe"]
+            results_df["hu_klappe"] = None
+
             """save the results for specific discahrge events"""
 
             # Get the first column (Abfluss values)
@@ -1313,6 +1316,9 @@ def operational_model(
                         header=results_events_col,
                     )
 
+            results_events_df["hu_labyrinth"] = results_events_df["Oberfallhöhe"]
+            results_events_df["hu_klappe"] = None
+
             return results_df, results_events_df
 
         results, results_events = save_results()
@@ -1333,6 +1339,7 @@ def operational_model(
         Kla_upstream = np.zeros(np.size(Q_con))
 
         Kla_hu = np.zeros(np.size(Q_con))
+        Lab_hu = np.zeros(np.size(Q_con))
         Kla_vd = np.zeros(np.size(Q_con))
 
         P_new = np.zeros(np.size(Q_con))
@@ -1388,6 +1395,7 @@ def operational_model(
             Kla_vd[i] = flap_gate_opject.vd
 
             Lab_upstream[i] = labyrinth_object.yu
+            Lab_hu[i] = labyrinth_object.hu
             Abfluss_R[i] = labyrinth_object.Q / flap_gate_opject.Q
             Lab_Q[i] = labyrinth_object.Q
             Kla_Q[i] = flap_gate_opject.Q
@@ -1474,6 +1482,9 @@ def operational_model(
                 else:
                     results_df.to_csv("results.csv", sep=";", float_format="%.2f", header=results_col)
 
+            results_df["hu_labyrinth"] = Lab_hu
+            results_df["hu_klappe"] = Kla_hu
+
             """save the results for specific discahrge events"""
 
             # Get the first column (Abfluss values)
@@ -1489,6 +1500,8 @@ def operational_model(
             results_events_col = ["Abfluss", "UW", "OW", "Labyrinth Q", "Klappe Q", "Klappe winkel"]
             results_events_df.columns = results_events_col
             results_events_df = results_events_df.round(2)
+            results_events_lab_hu = interp1d(abfluss_values, Lab_hu)(discharge_vector)
+            results_events_kla_hu = interp1d(abfluss_values, Kla_hu)(discharge_vector)
 
             # Skip CSV export in server mode
             if os.environ.get("SERVER_MODE") != "1":
@@ -1506,6 +1519,9 @@ def operational_model(
                         float_format="%.2f",
                         header=results_events_col,
                     )
+
+            results_events_df["hu_labyrinth"] = results_events_lab_hu
+            results_events_df["hu_klappe"] = results_events_kla_hu
 
             return results_df, results_events_df
 
