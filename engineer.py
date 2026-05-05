@@ -1425,7 +1425,7 @@ def operational_model(
             ax[2].set_ylabel("OW [m ü. NHN]")
 
             ax[3].plot(Q_UW[:, 0], Klappe_al, color="b")
-            ax[3].set_ylabel(r"$\alpha$ [°]")
+            ax[3].set_ylabel(r"$\beta$ [°]")
 
             # ax[4].plot(Q_UW[:,0],Kla_hu)
             # ax[4].set_ylabel('$h_{u,klappe}$[{\small m}]')
