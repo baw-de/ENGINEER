@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import Path
-from pydantic import BaseModel, Field, confloat, field_validator
+from pydantic import BaseModel, Field, confloat, field_validator, model_validator
 
 PlotId = Annotated[str, Path(description="Plot identifier (e.g. 'labyrinth' or 'optimize-abc123')")]
 
@@ -101,15 +101,25 @@ class OperationalModelRequest(BaseModel):
         "exponential",
         description="Interpolation method for hydrograph data ('exponential', 'linear', 'quadratic', 'cubic')",
     )
-    flap_gate_bottom_level: float = Field(..., description="Bottom height at flap gate [m]")
-    flap_gate_downstream_water_level: float = Field(..., description="Downstream water level at flap gate [m]")
-    flap_gate_discharge: confloat(gt=0) = Field(..., description="Discharge through flap gate [m³/s]")
-    flap_gate_width: confloat(gt=0) = Field(..., description="Flap gate width [m]")
-    flap_gate_height: confloat(gt=0) = Field(..., description="Flap gate height [m]")
-    flap_gate_angle: float = Field(..., description="Flap gate angle [degree]")
+    flap_gate_bottom_level: float | None = Field(None, description="Bottom height at flap gate [m]")
+    flap_gate_downstream_water_level: float | None = Field(
+        None,
+        description="Downstream water level at flap gate [m]",
+    )
+    flap_gate_discharge: confloat(gt=0) | None = Field(None, description="Discharge through flap gate [m³/s]")
+    flap_gate_width: confloat(gt=0) | None = Field(None, description="Flap gate width [m]")
+    flap_gate_height: confloat(gt=0) | None = Field(None, description="Flap gate height [m]")
+    flap_gate_angle: float | None = Field(None, description="Flap gate angle [degree]")
     design_upstream_water_level: float = Field(..., description="Design upstream water level [m]")
-    max_flap_gate_angle: float = Field(..., description="Maximum flap gate angle [degree]")
+    max_flap_gate_angle: float | None = Field(
+        None,
+        description="Maximum flap gate angle [degree]",
+    )
     fish_body_height: float = Field(..., description="Fish body height for bypass design [m]")
+    include_flap_gate: bool = Field(
+        ...,
+        description="Whether the operational model should account for the flap gate.",
+    )
 
     class Config:
         # prefill the example with the default values
@@ -132,6 +142,7 @@ class OperationalModelRequest(BaseModel):
                 "flap_gate_width": 1.4,
                 "flap_gate_height": 2.35,
                 "flap_gate_angle": 74.0,
+                "include_flap_gate": True,
                 "design_upstream_water_level": 2.2,
                 "max_flap_gate_angle": 90.0,
                 "fish_body_height": 0.4,
@@ -140,11 +151,32 @@ class OperationalModelRequest(BaseModel):
 
     @field_validator("flap_gate_angle", "max_flap_gate_angle")
     def flap_gate_angles_range(cls, value, info):
+        if value is None:
+            return value
         if not 0 <= value <= 90:
             if info.field_name == "flap_gate_angle":
                 raise ValueError("Klappenwinkel β muss im Bereich 0° ≤ β ≤ 90° liegen.")
             raise ValueError("Maximaler Klappenwinkel (β) muss im Bereich 0° ≤ β ≤ 90° liegen.")
         return value
+
+    @model_validator(mode="after")
+    def flap_gate_values_presence(cls, values):
+        include_flap_gate = getattr(values, "include_flap_gate", True)
+        if not include_flap_gate:
+            return values
+        mandatory_fields = [
+            "flap_gate_bottom_level",
+            "flap_gate_downstream_water_level",
+            "flap_gate_discharge",
+            "flap_gate_width",
+            "flap_gate_height",
+            "flap_gate_angle",
+            "max_flap_gate_angle",
+        ]
+        missing = [name for name in mandatory_fields if getattr(values, name) is None]
+        if missing:
+            raise ValueError(f"Flap gate fields required when include_flap_gate is true: {missing}")
+        return values
 
 
 class LabyrinthResult(BaseModel):
@@ -207,5 +239,8 @@ class OperationalPoint(BaseModel):
     labyrinth_head_over_crest: float | None = Field(None, description="Labyrinth-specific head over crest (if available)")
     flap_gate_head_over_crest: float | None = Field(None, description="Flap gate-specific head over crest (if available)")
     labyrinth_discharge: float = Field(..., description="Labyrinth discharge share [m³/s].")
-    flap_gate_discharge: float = Field(..., description="Flap gate discharge share [m³/s].")
-    flap_gate_angle: float = Field(..., description="Flap gate angle alpha [degree] for this discharge.")
+    flap_gate_discharge: float | None = Field(None, description="Flap gate discharge share [m³/s].")
+    flap_gate_angle: float | None = Field(
+        None,
+        description="Flap gate angle alpha [degree] for this discharge.",
+    )
