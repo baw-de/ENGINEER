@@ -1147,6 +1147,7 @@ def operational_model(
     show_plot=False,
     save_plot=False,
     path="",
+    include_flap_gate=True,
 ):
     def check_and_exit_on_input_errors():
         def input_plausibilty(eingabe_name, eingabe_wert, max_value=None, min_value=None):
@@ -1193,8 +1194,9 @@ def operational_model(
 
         # Check Stauziel, SohleHoehe, LabyrinthMaxBreite, LabyrinthMaxLaenge, and LabyrinthHoehe
         fehler += input_plausibilty("Stauziel", design_upstream_water_level)
-        if max_flap_gate_angle is None or not (0 <= max_flap_gate_angle <= 90):
-            fehler.append("Maximaler Klappenwinkel muss zwischen 0° und 90° liegen.")
+        if include_flap_gate:
+            if max_flap_gate_angle is None or not (0 <= max_flap_gate_angle <= 90):
+                fehler.append("Maximaler Klappenwinkel muss zwischen 0° und 90° liegen.")
         fehler += input_plausibilty("Fishe Hoehe", fish_body_height)
 
         valid_interpolations = ["exponential", "linear", "quadratic", "cubic"]

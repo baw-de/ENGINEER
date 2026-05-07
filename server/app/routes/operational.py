@@ -41,16 +41,18 @@ def compute_operational_model(req: OperationalModelRequest) -> OperationalModelR
                 path="",
             )
 
-            # Flap gate object
-            flap_gate = FlapGate(
-                bottom_level=req.flap_gate_bottom_level,
-                downstream_water_level=req.flap_gate_downstream_water_level,
-                discharge=req.flap_gate_discharge,
-                flap_gate_width=req.flap_gate_width,
-                flap_gate_height=req.flap_gate_height,
-                flap_gate_angle=req.flap_gate_angle,
-                show_errors=True,  # Enable warnings to be captured
-            )
+            # Flap gate object (optional)
+            flap_gate = None
+            if req.include_flap_gate:
+                flap_gate = FlapGate(
+                    bottom_level=req.flap_gate_bottom_level,
+                    downstream_water_level=req.flap_gate_downstream_water_level,
+                    discharge=req.flap_gate_discharge,
+                    flap_gate_width=req.flap_gate_width,
+                    flap_gate_height=req.flap_gate_height,
+                    flap_gate_angle=req.flap_gate_angle,
+                    show_errors=True,  # Enable warnings to be captured
+                )
 
             # Convert vectors to NumPy arrays to match the expectations of the core ENGINEER library
             discharge_vector = np.array(req.discharge_vector, dtype=float)
@@ -69,6 +71,7 @@ def compute_operational_model(req: OperationalModelRequest) -> OperationalModelR
                 show_plot=False,
                 save_plot=False,
                 path="",
+                include_flap_gate=req.include_flap_gate,
             )
 
             # Keep latest operational plot so frontend can request it via /api/plots/operational.
@@ -105,7 +108,7 @@ def compute_operational_model(req: OperationalModelRequest) -> OperationalModelR
                 upstream_water_level=row.get("OW"),
                 labyrinth_head_over_crest=labyrinth_head,
                 flap_gate_head_over_crest=flap_gate_head,
-                labyrinth_discharge=row.get("Labyrinth Q"),
+                labyrinth_discharge=row.get("Labyrinth Q") if row.get("Labyrinth Q") is not None else row.get("Abfluss"),
                 flap_gate_discharge=row.get("Klappe Q"),
                 flap_gate_angle=row.get("Klappe winkel"),
             )

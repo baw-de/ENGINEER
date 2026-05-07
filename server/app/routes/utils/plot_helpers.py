@@ -1,11 +1,23 @@
 import contextlib
 import io
+import os
+from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
 
 _PLOT_OBJECTS: dict[str, Any] = {}
 _PLOT_SVG_BYTES: dict[str, bytes] = {}
+
+_SHARED_PLOT_DIR = Path(os.environ.get("PLOT_CACHE_DIR", "/tmp/labyrinth-plots")).expanduser()
+try:
+    _SHARED_PLOT_DIR.mkdir(parents=True, exist_ok=True)
+except OSError:
+    pass
+
+
+def _shared_plot_path(plot_id: str) -> Path:
+    return _SHARED_PLOT_DIR / f"{plot_id}.svg"
 
 
 def store_plot_source(plot_id: str, obj: Any) -> None:
@@ -17,8 +29,16 @@ def store_plot_svg_bytes(plot_id: str, svg_bytes: bytes | None) -> None:
     # Stores rendered SVG bytes for plot IDs that are not object-based.
     if svg_bytes:
         _PLOT_SVG_BYTES[plot_id] = svg_bytes
+        try:
+            _shared_plot_path(plot_id).write_bytes(svg_bytes)
+        except OSError:
+            pass
     else:
         _PLOT_SVG_BYTES.pop(plot_id, None)
+        try:
+            _shared_plot_path(plot_id).unlink()
+        except OSError:
+            pass
 
 
 def capture_current_figure_svg_bytes() -> bytes | None:
@@ -49,6 +69,13 @@ def generate_geometry_plot_svg(plot_id: str = "default") -> bytes | None:
             svg_bytes = getattr(cached_obj, "_last_geometry_svg_bytes", None)
             if svg_bytes:
                 return svg_bytes
+
+        file_path = _shared_plot_path(plot_id)
+        if file_path.is_file():
+            try:
+                return file_path.read_bytes()
+            except OSError:
+                pass
 
         return None
     except Exception:
