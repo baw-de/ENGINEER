@@ -970,7 +970,15 @@ def kopplung(Q, UW, Lab, Kla):  # Funktion zur Optimierung der Entladung zwische
         return Lab.Q, Kla.Q, Lab.yu, Kla.yu
 
 
-def UW_interpolation(Abfluss, Unterwasser, interpolation, path="", show_plot=False, save_plot=False):
+def UW_interpolation(
+    Abfluss,
+    Unterwasser,
+    interpolation,
+    Q_con=None,
+    path="",
+    show_plot=False,
+    save_plot=False,
+):
     def check_and_exit_on_input_errors():
         def input_plausibilty(eingabe_name, eingabe_wert, max_value=None, min_value=None):
             fehler = []  # Store error messages
@@ -1093,7 +1101,8 @@ def UW_interpolation(Abfluss, Unterwasser, interpolation, path="", show_plot=Fal
         if show_plot:
             plt.show()
 
-    Q_con = np.arange(0.1, np.max(Abfluss) + 0.5, 0.5)
+    if Q_con is None:
+        Q_con = np.arange(0.1, np.max(Abfluss) + 0.5, 0.5)
     interpolation_types = ["exponential", "linear", "quadratic", "cubic"]
     plot_colors = ["black", "green", "brown", "blue"]
 
@@ -1140,6 +1149,7 @@ def operational_model(
     discharge_vector,
     downstream_water_level_vector,
     interpolation_method,
+    interpolation_stepsize=1,
     flap_gate_opject=None,
     design_upstream_water_level=None,
     max_flap_gate_angle=None,
@@ -1217,12 +1227,13 @@ def operational_model(
         raise EngineerInputError(fehler)
 
     def operational_model_without_flap():
-        Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
+        Q_con = np.arange(0.1, np.max(discharge_vector) + interpolation_stepsize, interpolation_stepsize)
         # In server context we never want to open GUI windows; only save plots if explicitly requested.
         UW_con = UW_interpolation(
             discharge_vector,
             downstream_water_level_vector,
             interpolation_method,
+            Q_con=Q_con,
             path=path,
             show_plot=show_plot,
             save_plot=save_plot,
@@ -1332,7 +1343,7 @@ def operational_model(
         return results, results_events
 
     def operational_model_with_flap():
-        Q_con = np.arange(0.1, np.max(discharge_vector) + 0.5, 0.5)
+        Q_con = np.arange(0.1, np.max(discharge_vector) + interpolation_stepsize, interpolation_stepsize)
         SZ = design_upstream_water_level
         Klawinkel_Max = max_flap_gate_angle
 
@@ -1355,6 +1366,7 @@ def operational_model(
             discharge_vector,
             downstream_water_level_vector,
             interpolation_method,
+            Q_con=Q_con,
             path=path,
             show_plot=show_plot,
             save_plot=save_plot,

@@ -64,6 +64,7 @@ def compute_operational_model(req: OperationalModelRequest) -> OperationalModelR
                 discharge_vector=discharge_vector,
                 downstream_water_level_vector=downstream_water_level_vector,
                 interpolation_method=req.interpolation_method,
+                interpolation_stepsize=req.interpolation_stepsize,
                 flap_gate_opject=flap_gate,
                 design_upstream_water_level=req.design_upstream_water_level,
                 max_flap_gate_angle=req.max_flap_gate_angle,

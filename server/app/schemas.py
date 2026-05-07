@@ -101,6 +101,11 @@ class OperationalModelRequest(BaseModel):
         "exponential",
         description="Interpolation method for hydrograph data ('exponential', 'linear', 'quadratic', 'cubic')",
     )
+    interpolation_stepsize: float = Field(
+        1,
+        gt=0,
+        description="Step size for interpolating discharge range [m³/s].",
+    )
     flap_gate_bottom_level: float | None = Field(None, description="Bottom height at flap gate [m]")
     flap_gate_downstream_water_level: float | None = Field(
         None,
@@ -143,6 +148,7 @@ class OperationalModelRequest(BaseModel):
                 "flap_gate_height": 2.35,
                 "flap_gate_angle": 74.0,
                 "include_flap_gate": True,
+                "interpolation_stepsize": 1,
                 "design_upstream_water_level": 2.2,
                 "max_flap_gate_angle": 90.0,
                 "fish_body_height": 0.4,
