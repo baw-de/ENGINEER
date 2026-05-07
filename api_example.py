@@ -81,9 +81,10 @@ data = {
     "labyrinth_height": 2.2,
     "labyrinth_length": 8,
     "labyrinth_key_angle": 8,
-    "discharge_vector": [2.09, 2.79, 6.01, 11.9],
-    "downstream_water_level_vector": [1.07, 1.15, 1.19, 1.25],
+    "discharge_vector": [2.09, 2.79, 6.01, 11.9, 13.9, 16.3, 16.5, 18.6, 20.5, 22.9, 24.5],
+    "downstream_water_level_vector": [1.07, 1.15, 1.19, 1.25, 1.38, 1.39, 1.74, 1.74, 1.94, 2.67, 2.67],
     "interpolation_method": "exponential",
+    "interpolation_stepsize": 1,
     "flap_gate_bottom_level": 0.1,
     "flap_gate_downstream_water_level": 1.09,
     "flap_gate_discharge": 10,
@@ -93,6 +94,7 @@ data = {
     "design_upstream_water_level": 2.2,
     "max_flap_gate_angle": 90,
     "fish_body_height": 0.4,
+    "include_flap_gate": True,
 }
 
 response = requests.post(url, json=data)
