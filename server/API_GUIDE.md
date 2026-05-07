@@ -261,43 +261,57 @@ Calculates the hydraulic parameters for a flap gate (fish-belly flap).
 
 **POST** `/operational`
 
-Simulates the operational behavior of a labyrinth weir (optionally with flap gate) over an entire discharge curve.
+Simulates the operational behavior of a labyrinth weir (optionally including a flap gate) over a discharge curve and returns both the interpolated curve and the event-based points that were provided.
 
 #### Request Schema (Input)
 
-**Labyrinth Parameters:**
+| Field                             | Type                | Description                                                                 | Unit     | Required |
+| --------------------------------- | ------------------- | --------------------------------------------------------------------------- | -------- | -------- |
+| `bottom_level`                    | float               | Bottom height                                                               | m a.s.l. | ✓        |
+| `downstream_water_level`          | float               | Downstream water level                                                      | m a.s.l. | ✓        |
+| `discharge`                       | float (>0)          | Reference discharge                                                         | m³/s     | ✓        |
+| `labyrinth_width`                 | float (>0)          | Total width of the labyrinth weir                                           | m        | ✓        |
+| `labyrinth_height`                | float (>0)          | Height of the labyrinth weir                                                | m        | ✓        |
+| `labyrinth_length`                | float (>0)          | Length of the labyrinth key in flow direction                               | m        | ✓        |
+| `labyrinth_key_angle`             | float (>0)          | Key angle of the labyrinth weir                                             | °        | ✓        |
+| `D`                               | float               | Front wall thickness (same meaning as other labyrinth endpoints)           | m        | ✗ (default: 0.5) |
+| `discharge_vector`                | List[float (>0)]    | Discharge curve that will be interpolated                                   | m³/s     | ✓        |
+| `downstream_water_level_vector`   | List[float]         | Water level history that matches the discharge vector                       | m a.s.l. | ✓        |
+| `interpolation_method`            | string              | Interpolation method for the hydrograph (`exponential`, `linear`, `quadratic`, `cubic`) | -      | ✗ (default: `"exponential"`) |
+| `interpolation_stepsize`          | float (>0)          | Discharge stepsize used when filling the computed curve                     | m³/s     | ✗ (default: 1) |
+| `include_flap_gate`               | bool                | Whether to include the flap gate hydraulics in the simulation               | -        | ✓        |
+| `flap_gate_bottom_level`          | float               | Flap gate sill bottom level (required if `include_flap_gate` is `true`)     | m        | conditional |
+| `flap_gate_downstream_water_level` | float               | Flap gate downstream water level (required if `include_flap_gate` is `true`) | m        | conditional |
+| `flap_gate_discharge`             | float (>0)          | Discharge through the flap gate (required if `include_flap_gate` is `true`)  | m³/s     | conditional |
+| `flap_gate_width`                 | float (>0)          | Flap gate width (required if `include_flap_gate` is `true`)                 | m        | conditional |
+| `flap_gate_height`                | float (>0)          | Flap gate height (required if `include_flap_gate` is `true`)                | m        | conditional |
+| `flap_gate_angle`                 | float               | Flap gate angle (required if `include_flap_gate` is `true`)                 | °        | conditional |
+| `design_upstream_water_level`     | float               | Design upstream water level for flap gate control                          | m a.s.l. | ✓        |
+| `max_flap_gate_angle`             | float               | Maximum allowed flap gate angle                                            | °        | ✓        |
+| `fish_body_height`                | float               | Height of the fish body used for bypass flow design                         | m        | ✓        |
 
-- `bottom_level`, `downstream_water_level`, `discharge` (as above)
-- `labyrinth_width`, `labyrinth_height`, `labyrinth_length`, `labyrinth_key_angle`, `D`
-
-**Discharge and Water Level Curves:**
-
-- `discharge_vector`: List of discharge values [m³/s]
-- `downstream_water_level_vector`: List of downstream water levels [m a.s.l.]
-
-**Interpolation:**
-
-- `interpolation_method`: "exponential", "linear", "quadratic", "cubic" (Default: "exponential")
-
-**Optional Flap Gate Parameters:**
-
-- `flap_gate_bottom_level`, `flap_gate_downstream_water_level`, `flap_gate_discharge`
-- `flap_gate_width`, `flap_gate_height`, `flap_gate_angle`
-
-**Design Parameters (required for flap gate):**
-
-- `design_upstream_water_level`: Design water level [m a.s.l.]
-- `max_flap_gate_angle`: Maximum flap gate angle [°]
-- `fish_body_height`: Fish body height for bypass design [m]
+> **Note:** When `include_flap_gate` is `false`, the flap gate-specific fields may be omitted; when it is `true`, they are required and the `max_flap_gate_angle` / `design_upstream_water_level` / `fish_body_height` fields must also be supplied.
 
 #### Response Schema (Output)
 
-| Field     | Type   | Description    |
-| --------- | ------ | -------------- |
-| `message` | string | Status message |
-| `status`  | string | Status         |
+| Field          | Type                     | Description                                                        |
+| -------------- | ------------------------ | ------------------------------------------------------------------ |
+| `results`      | List[`OperationalPoint`] | Full interpolated discharge curve over the range defined by `discharge_vector` |
+| `results_events` | List[`OperationalPoint`] | Interpolated points that correspond to the original discharge events |
+| `warnings`     | List[string] \| `null`   | Optional validation or domain warnings                              |
 
-_Note: Full implementation follows._
+**OperationalPoint**
+
+| Field                       | Type     | Description                                                  |
+| --------------------------- | -------- | ------------------------------------------------------------ |
+| `discharge`                 | float    | Discharge at this point                                       |
+| `downstream_water_level`    | float    | Downstream water level at the same point                      |
+| `upstream_water_level`      | float    | Upstream water level computed for this discharge             |
+| `labyrinth_head_over_crest` | float \| `null` | Computed head above crest for the labyrinth curve             |
+| `flap_gate_head_over_crest`  | float \| `null` | Computed head above crest for the flap gate (if present)     |
+| `labyrinth_discharge`       | float    | Portion of discharge through the labyrinth (plain result for `results_events`) |
+| `flap_gate_discharge`       | float \| `null` | Portion of discharge passing through the flap gate             |
+| `flap_gate_angle`           | float \| `null` | Flap gate angle at this discharge (if flap gate is included) |
 
 #### Example Request
 
@@ -311,9 +325,11 @@ _Note: Full implementation follows._
   "labyrinth_length": 8,
   "labyrinth_key_angle": 8,
   "D": 0.5,
-  "discharge_vector": [2.09, 2.79, 6.01, 11.9],
-  "downstream_water_level_vector": [1.07, 1.15, 1.19, 1.25],
+  "discharge_vector": [2.09, 2.79, 6.01, 11.9, 13.9, 16.3, 16.5, 18.6, 20.5, 22.9, 24.5],
+  "downstream_water_level_vector": [1.07, 1.15, 1.19, 1.25, 1.38, 1.39, 1.74, 1.74, 1.94, 2.67, 2.67],
   "interpolation_method": "exponential",
+  "interpolation_stepsize": 1,
+  "include_flap_gate": true,
   "flap_gate_bottom_level": 0.1,
   "flap_gate_downstream_water_level": 1.09,
   "flap_gate_discharge": 10,
