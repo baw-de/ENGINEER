@@ -235,7 +235,8 @@ class Labyrinth:  # this is only one geometry
             #     break
 
             if abs(Q_neu - self.Q) < 0.01: # !!! hier prüfen
-
+                break
+            
             Cd_alt = Cd_neu
 
         self.Cd = Cd_neu
