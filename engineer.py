@@ -138,7 +138,7 @@ class Labyrinth:  # this is only one geometry
 
             if not self.skip_zero_check and eingabe_wert <= 0:
                 if re.search(r"(Unterwasser|SohleHoehe)", eingabe_name):
-                    fehler.append(f"Achtung: {eingabe_name} Wert ist negative.")
+                    fehler.append(f"Achtung: {eingabe_name} Wert ist negativ.")
                 else:
                     fehler.append(f"{eingabe_name} Wert ist nicht plausibel (sollte größer als 0 sein).")
 
@@ -162,7 +162,7 @@ class Labyrinth:  # this is only one geometry
         fehler += input_plausibilty("D", self.D)
         fehler += input_plausibilty("t", self.t)
 
-        # additional combined plausibility checks that depend on multiple parameters
+        # additional combined plausibility checks that depend on multiple parameters # !!!
         # ensure that downstream water level is above the bottom level to avoid zero water depth
         if not self.skip_zero_check and self.UW - self.Sh <= 0:
             fehler.append("Unterwasser muss über der Sohle liegen (UW - SohleHoehe > 0).")
@@ -234,8 +234,7 @@ class Labyrinth:  # this is only one geometry
             #     print('Number  of iterations for Cd: ' + str(n))
             #     break
 
-            if abs(Q_neu - self.Q) < 0.01:
-                break
+            if abs(Q_neu - self.Q) < 0.01: # !!! hier prüfen
 
             Cd_alt = Cd_neu
 
@@ -580,6 +579,7 @@ class FlapGate:
         self.Q = discharge  # Abfluss [m3/sec]
         self.KW = flap_gate_width  # Breite des Klappe [m]
         self.KP = flap_gate_height
+        self._Kalpha_intern = None
         self.Kalpha = flap_gate_angle
         self.g = 9.81  # g = Erdbeschleunigung [m2/sec]
         self.show_errors = show_errors
@@ -612,6 +612,20 @@ class FlapGate:
         self.check_for_error()
         self.FAA_FAbA()
         # self.print_results()
+
+    @property
+    def Kalpha(self):
+        """Klappenneigung zur Horizontalen [°]: 0 = gelegt, 90 = aufgestellt."""
+        if self._Kalpha_intern is None:
+            return None
+        return 90 - self._Kalpha_intern
+
+    @Kalpha.setter
+    def Kalpha(self, value):
+        if value is None:
+            self._Kalpha_intern = None
+        else:
+            self._Kalpha_intern = 90 - value
 
     def check_and_exit_on_input_errors(self):
         def input_plausibilty(eingabe_name, eingabe_wert, max_value=None, min_value=None):
@@ -702,7 +716,7 @@ class FlapGate:
             ]
         )
 
-        self.mu_ratio = np.interp(self.Kalpha, self.mu_verhältnis[:, 0], self.mu_verhältnis[:, 1])
+        self.mu_ratio = np.interp(self._Kalpha_intern, self.mu_verhältnis[:, 0], self.mu_verhältnis[:, 1])
 
     def abminderung_faktor(self):
         self.Abminderung_fak = np.array(
@@ -728,7 +742,7 @@ class FlapGate:
         )
 
     def cal_P_neu(self):
-        self.P_neu = self.KP * (math.cos(math.radians(abs(self.Kalpha))))
+        self.P_neu = self.KP * (math.cos(math.radians(abs(self._Kalpha_intern))))
 
     def cal_Q(self):
         mu_alt = 0.1
@@ -806,7 +820,7 @@ class FlapGate:
     def FAA_FAbA(self):
         self.h_gr = pow((pow(self.Q / self.KW, 2)) / self.g, 0.33)
         self.v_gr = pow((self.g * self.h_gr), 0.5)
-        self.beschleunigung = (self.v_gr - self.v) / (self.KP * (math.sin(math.radians(abs(self.Kalpha)))))
+        self.beschleunigung = (self.v_gr - self.v) / (self.KP * (math.sin(math.radians(abs(self._Kalpha_intern)))))
 
     # Grenzen der Variablen
     def check_for_error(self):
@@ -829,7 +843,7 @@ class FlapGate:
             "Breite =",
             self.KW,
             "[m]\n",
-            "Winkel zur Vertikalen = %2.2f [°]" % self.Kalpha,
+            "Klappenneigung zur Sohle = %2.2f [°]" % self.Kalpha,
             "\n",
             "mu_ratio = %2.2f" % self.mu_ratio,
             "\n",
@@ -1345,7 +1359,7 @@ def operational_model(
     def operational_model_with_flap():
         Q_con = np.arange(0.1, np.max(discharge_vector) + interpolation_stepsize, interpolation_stepsize)
         SZ = design_upstream_water_level
-        Klawinkel_Max = max_flap_gate_angle
+        # Klawinkel_Max = max_flap_gate_angle # Legacy, ersetzt durch Kalpha_max
 
         Klappe_al = np.zeros(np.size(Q_con))
         Abfluss_R = np.zeros(np.size(Q_con))
@@ -1360,7 +1374,7 @@ def operational_model(
 
         P_new = np.zeros(np.size(Q_con))
 
-        flap_gate_opject.Kalpha = 0
+        flap_gate_opject.Kalpha = max_flap_gate_angle
 
         UW_con = UW_interpolation(
             discharge_vector,
@@ -1397,11 +1411,12 @@ def operational_model(
                 return abs(flap_gate_opject.yu - SZ)
 
             # initial values
-            Kalpha0 = Klappe_al[i - 1] if i > 0 else [10]
-            Kalpha_min = Klappe_al[i - 1] if i > 0 else 0
+            Kalpha0    = Klappe_al[i - 1] if i > 0 else max_flap_gate_angle
+            Kalpha_max = Klappe_al[i - 1] if i > 0 else max_flap_gate_angle
+            Kalpha_min = 0
 
             # minmize function
-            result = minimize_scalar(Objective_fn, Kalpha0, bounds=(Kalpha_min, Klawinkel_Max), method="bounded")
+            result = minimize_scalar(Objective_fn, Kalpha0, bounds=(Kalpha_min, Kalpha_max), method="bounded")
 
             Klappe_al[i] = result.x
             # print(result.x)

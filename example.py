@@ -117,7 +117,7 @@ results, results_events = operational_model(
     fish_body_height=fish_body_height,
     interpolation_method="exponential",
     show_plot=True,
-    save_plot=False,
+    save_plot=True,
 )
 
 write_lab_excel(labyrinth_weir)
