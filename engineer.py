@@ -162,11 +162,6 @@ class Labyrinth:  # this is only one geometry
         fehler += input_plausibilty("D", self.D)
         fehler += input_plausibilty("t", self.t)
 
-        # additional combined plausibility checks that depend on multiple parameters # !!!
-        # ensure that downstream water level is above the bottom level to avoid zero water depth
-        if not self.skip_zero_check and self.UW - self.Sh <= 0:
-            fehler.append("Unterwasser muss über der Sohle liegen (UW - SohleHoehe > 0).")
-
         if all(fehler_message.startswith("Achtung:") for fehler_message in fehler):
             # Only warnings -> optionally print to console, but allow computation to continue
             for i, fehler_message in enumerate(fehler, start=1):
@@ -247,7 +242,7 @@ class Labyrinth:  # this is only one geometry
     # Rückstaueinfluss
     def cal_hd(self):
         self.hd = (self.UW - self.Sh) - self.P
-        self.vd = self.Q / (self.W * (self.hd + self.P))
+        self.vd = self.Q / (self.W * (self.hd + self.P)) if self.hd > 0 else 0.0
         self.Hd = self.hd + ((self.vd * self.vd) / (2 * self.gravity))
         self.rs = "Kein Rückstaueinfluss!"
 
@@ -657,11 +652,6 @@ class FlapGate:
         if self.Kalpha is None or not (0 <= self.Kalpha <= 90):
             fehler.append("Klappenwinkel β muss zwischen 0° und 90° liegen.")
 
-        # additional combined plausibility checks that depend on multiple parameters
-        # ensure that downstream water level is above the bottom level to avoid zero water depth
-        if not self.skip_zero_check and self.UW - self.Sh <= 0:
-            fehler.append("Unterwasser (FlapGate) must be above the bottom level (UW - SohleHoehe > 0).")
-
         if all(message.startswith("Achtung:") for message in fehler):
             # Only warnings -> optionally print to console, but allow computation to continue
             for i, fehler_message in enumerate(fehler, start=1):
@@ -816,7 +806,7 @@ class FlapGate:
         self.yu = self.Sh + self.P_neu + self.hu
 
     def cal_vd(self):
-        self.vd = self.Q / (self.KW * (self.UW - self.Sh))
+        self.vd = self.Q / (self.KW * (self.UW - self.Sh)) if self.hd > 0 else 0.0
 
     def FAA_FAbA(self):
         self.h_gr = pow((pow(self.Q / self.KW, 2)) / self.g, 0.33)
