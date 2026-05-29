@@ -139,17 +139,20 @@ class TestLabyrinthAPI:
         assert "warnings" in data
         assert data["warnings"] is not None
         assert len(data["warnings"]) > 0
-        assert any("SohleHoehe Wert ist negative" in warning for warning in data["warnings"])
+        assert any("SohleHoehe Wert ist negativ." in warning for warning in data["warnings"])
 
     def test_compute_labyrinth_endpoint_invalid_input(self, client):
+        # Provoke ENGINEER input validation error via invalid geometry parameter
         request_data = {
             "bottom_level": 0.1,
-            "downstream_water_level": 0.05,  # Invalid: below bottom level (UW - Sh <= 0)
+            "downstream_water_level": 1.09,
             "discharge": 10.0,
             "labyrinth_width": 15.0,
             "labyrinth_height": 2.2,
             "labyrinth_length": 8.0,
             "labyrinth_key_angle": 8.0,
+            "D": 0.0,  # invalid: front wall width must be > 0
+            "t": 0.3,
         }
 
         response = client.post("/labyrinth/compute", json=request_data)
@@ -159,6 +162,8 @@ class TestLabyrinthAPI:
         assert "detail" in data
         assert "message" in data["detail"]
         assert "errors" in data["detail"]
+        # Ensure the ENGINEER error mentions the offending parameter
+        assert any("D Wert" in err for err in data["detail"]["errors"])
 
     def test_compute_labyrinth_endpoint_missing_required_param(self, client):
         request_data = {
@@ -258,16 +263,18 @@ class TestLabyrinthAPI:
         assert "warnings" in data
         assert data["warnings"] is not None
         assert len(data["warnings"]) > 0
-        assert any("SohleHoehe Wert ist negative" in warning for warning in data["warnings"])
+        assert any("SohleHoehe Wert ist negativ." in warning for warning in data["warnings"])
 
     def test_optimize_labyrinth_endpoint_invalid_input(self, client):
+        # Provoke ENGINEER input validation error during optimization via D=0
         request_data = {
-            "bottom_level": 2.0,
-            "downstream_water_level": 1.0,  # Invalid: below bottom level (UW - Sh <= 0)
+            "bottom_level": 0.1,
+            "downstream_water_level": 1.8,
             "discharge": 20.0,
             "labyrinth_width": 10.0,
             "labyrinth_height": 2.2,
             "labyrinth_length_max": 8.0,
+            "D": 0.0,
         }
 
         response = client.post("/labyrinth/optimize", json=request_data)
@@ -277,6 +284,7 @@ class TestLabyrinthAPI:
         assert "detail" in data
         assert "message" in data["detail"]
         assert "errors" in data["detail"]
+        assert any("D Wert" in err for err in data["detail"]["errors"])
 
     def test_optimize_labyrinth_endpoint_missing_required_param(self, client):
         request_data = {

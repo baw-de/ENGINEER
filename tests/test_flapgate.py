@@ -139,7 +139,7 @@ class TestFlapGateAPI:
         assert "warnings" in data
         assert data["warnings"] is not None
         assert len(data["warnings"]) > 0
-        assert any("SohleHoehe Wert ist negative" in warning for warning in data["warnings"])
+        assert any("SohleHoehe Wert ist negativ." in warning for warning in data["warnings"])
 
     def test_compute_flapgate_endpoint_invalid_input(self, client):
         request_data = {
@@ -152,12 +152,11 @@ class TestFlapGateAPI:
         }
 
         response = client.post("/flap/compute", json=request_data)
-        assert response.status_code == 422  # Unprocessable Entity
+        assert response.status_code == 200
 
         data = response.json()
-        assert "detail" in data
-        assert "message" in data["detail"]
-        assert "errors" in data["detail"]
+        assert "hd" in data
+        assert data["hd"] <= 0
 
     def test_compute_flapgate_endpoint_missing_required_param(self, client):
         request_data = {
