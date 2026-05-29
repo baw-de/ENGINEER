@@ -229,9 +229,9 @@ class Labyrinth:  # this is only one geometry
             #     print('Number  of iterations for Cd: ' + str(n))
             #     break
 
-            if abs(Q_neu - self.Q) < 0.01: # !!! hier prüfen
+            if abs(Q_neu - self.Q) < 0.01:  # !!! hier prüfen
                 break
-            
+
             Cd_alt = Cd_neu
 
         self.Cd = Cd_neu
@@ -629,7 +629,7 @@ class FlapGate:
 
             if not self.skip_zero_check and eingabe_wert <= 0:
                 if re.search(r"(Unterwasser|SohleHoehe)", eingabe_name):
-                    fehler.append(f"Achtung: {eingabe_name} Wert ist negative.")
+                    fehler.append(f"Achtung: {eingabe_name} Wert ist negativ.")
                 else:
                     fehler.append(f"{eingabe_name} Wert ist nicht plausibel (sollte größer als 0 sein).")
 
@@ -858,7 +858,7 @@ def kopplung(Q, UW, Lab, Kla):  # Funktion zur Optimierung der Entladung zwische
 
             if eingabe_wert <= 0:
                 if re.search(r"(Unterwasser|SohleHoehe)", eingabe_name):
-                    fehler.append(f"Achtung: {eingabe_name} Wert ist negative.")
+                    fehler.append(f"Achtung: {eingabe_name} Wert ist negativ.")
                 else:
                     fehler.append(f"{eingabe_name} Wert ist nicht plausibel (sollte größer als 0 sein).")
 
@@ -990,7 +990,7 @@ def UW_interpolation(
 
             if eingabe_wert <= 0:
                 if re.search(r"(Unterwasser)", eingabe_name):
-                    fehler.append(f"Achtung: {eingabe_name} Wert ist negative.")
+                    fehler.append(f"Achtung: {eingabe_name} Wert ist negativ.")
                 else:
                     fehler.append(f"{eingabe_name} Wert ist nicht plausibel (sollte größer als 0 sein).")
 
@@ -1170,7 +1170,7 @@ def operational_model(
 
             if eingabe_wert is not None and eingabe_wert <= 0:
                 if re.search(r"(Unterwasser|Oberwasser)", eingabe_name):
-                    fehler.append(f"Achtung: {eingabe_name} Wert ist negative.")
+                    fehler.append(f"Achtung: {eingabe_name} Wert ist negativ.")
                 else:
                     fehler.append(f"{eingabe_name} Wert ist nicht plausibel (sollte größer als 0 sein).")
 
@@ -1402,7 +1402,7 @@ def operational_model(
                 return abs(flap_gate_opject.yu - SZ)
 
             # initial values
-            Kalpha0    = Klappe_al[i - 1] if i > 0 else max_flap_gate_angle
+            Kalpha0 = Klappe_al[i - 1] if i > 0 else max_flap_gate_angle
             Kalpha_max = Klappe_al[i - 1] if i > 0 else max_flap_gate_angle
             Kalpha_min = 0
 
