@@ -42,6 +42,10 @@ class LabyrinthOptimizeRequest(BaseModel):
     labyrinth_height: confloat(gt=0) = Field(..., description="Available crest height (design upstream level) [m]")
     labyrinth_length_max: confloat(gt=0) = Field(..., description="Available length in flow direction [m]")
     D: float = Field(0.5, description="Front wall width used for optimization [m]")
+    t: float = Field(
+        0.3,
+        description=("Optional: T is not a parameter for the optimization itself but is required for generating an output geometry (STL). "),
+    )
 
     class Config:
         # prefill the example with the default values
@@ -54,6 +58,7 @@ class LabyrinthOptimizeRequest(BaseModel):
                 "labyrinth_height": 2.2,
                 "labyrinth_length_max": 8.0,
                 "D": 0.5,
+                "t": 0.3,
             }
         }
 

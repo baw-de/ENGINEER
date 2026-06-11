@@ -302,3 +302,37 @@ class TestLabyrinthAPI:
         data = response.json()
         assert "detail" in data
         assert any("bottom_level" in str(error) and "missing" in str(error).lower() for error in data["detail"])
+
+    def test_download_optimized_labyrinth_stl_endpoint(self, client):
+        request_data = {
+            "bottom_level": 0.1,
+            "downstream_water_level": 1.8,
+            "discharge": 20.0,
+            "labyrinth_width": 10.0,
+            "labyrinth_height": 2.2,
+            "labyrinth_length_max": 8.0,
+            "D": 0.5,
+            "t": 0.3,
+        }
+
+        response = client.post("/labyrinth/optimize/stl", json=request_data)
+        assert response.status_code == 200
+        assert response.headers["content-type"].startswith("application/octet-stream")
+        assert "attachment;" in response.headers["content-disposition"]
+        assert len(response.content) > 0
+
+    def test_download_optimized_labyrinth_stl_endpoint_uses_default_t(self, client):
+        request_data = {
+            "bottom_level": 0.1,
+            "downstream_water_level": 1.8,
+            "discharge": 20.0,
+            "labyrinth_width": 10.0,
+            "labyrinth_height": 2.2,
+            "labyrinth_length_max": 8.0,
+            "D": 0.5,
+        }
+
+        response = client.post("/labyrinth/optimize/stl", json=request_data)
+        assert response.status_code == 200
+        assert response.headers["content-type"].startswith("application/octet-stream")
+        assert len(response.content) > 0
