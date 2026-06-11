@@ -126,6 +126,63 @@ def download_labyrinth_stl(req: LabyrinthRequest, background_tasks: BackgroundTa
     )
 
 
+@router.post("/optimize/stl")
+def download_optimized_labyrinth_stl(req: LabyrinthOptimizeRequest, background_tasks: BackgroundTasks) -> FileResponse:
+    """
+    Optimize the labyrinth geometry and stream the resulting STL back as a download.
+    """
+    captured_output = io.StringIO()
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".stl")
+    temp_file.close()
+
+    try:
+        with contextlib.redirect_stdout(captured_output):
+            best_labyrinth = optimize_labyrinth_geometry(
+                labyrinth=Labyrinth,
+                sohleHoehe=req.bottom_level,
+                UW=req.downstream_water_level,
+                Q=req.discharge,
+                labyrinthBreite=req.labyrinth_width,
+                labyrinthHoehe=req.labyrinth_height,
+                labyrinthLaengeMax=req.labyrinth_length_max,
+                D=req.D,
+                path="",
+                show_results=False,
+                show_plot=False,
+            )
+
+        # Generate STL with optimized geometry values
+        STL_function.generate_labyrinth_geometry(
+            D=best_labyrinth.D,
+            W=best_labyrinth.W,
+            alpha=best_labyrinth.alpha,
+            B=best_labyrinth.B,
+            t=req.t,
+            P=best_labyrinth.P,
+            filename=temp_file.name,
+        )
+    except EngineerInputError as exc:
+        _remove_file(temp_file.name)
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "message": "Optimization failed due to invalid inputs.",
+                "errors": exc.messages,
+            },
+        ) from exc
+    except Exception as exc:
+        _remove_file(temp_file.name)
+        message = str(exc).strip() or "STL generation failed for the optimized labyrinth geometry."
+        raise HTTPException(status_code=422, detail=message) from exc
+
+    background_tasks.add_task(_remove_file, temp_file.name)
+    return FileResponse(
+        path=temp_file.name,
+        filename="labyrinth_weir_optimized.stl",
+        media_type="application/octet-stream",
+    )
+
+
 @router.post("/optimize", response_model=LabyrinthOptimizeResult)
 def optimize_labyrinth(req: LabyrinthOptimizeRequest) -> LabyrinthOptimizeResult:
     """

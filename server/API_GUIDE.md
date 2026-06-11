@@ -124,6 +124,7 @@ Finds the optimal geometry of a labyrinth weir for maximum hydraulic capacity un
 | `labyrinth_height`       | float (>0) | Available height                      | m        | ✓        |
 | `labyrinth_length_max`   | float (>0) | Maximum available length              | m        | ✓        |
 | `D`                      | float      | Front wall width used in optimization | m        | ✗ (default 0.5) |
+| `t`                      | float      | Wall thickness for STL generation     | m        | ✗ (default 0.3) |
 
 #### Response Schema (Output)
 
@@ -152,13 +153,49 @@ Finds the optimal geometry of a labyrinth weir for maximum hydraulic capacity un
   "labyrinth_width": 10,
   "labyrinth_height": 2.2,
   "labyrinth_length_max": 8,
-  "D": 0.5
+  "D": 0.5,
+  "t": 0.3
 }
 ```
 
 ---
 
-### 3. Download Labyrinth STL
+### 3. Download Optimized Labyrinth STL
+
+**POST** `/labyrinth/optimize/stl`
+
+Optimizes the labyrinth geometry for the given boundary conditions and streams back an STL generated from the optimized geometry.
+
+#### Request Schema (Input)
+
+Same as `/labyrinth/optimize`, plus the STL-specific wall thickness parameter `t`.
+
+#### Response Schema (Output)
+
+| Field       | Type   | Description                                         |
+| ----------- | ------ | --------------------------------------------------- |
+| `file`      | binary | Binary STL payload (`Content-Disposition: attachment`) |
+
+The endpoint returns `200 OK` with a binary stream. Invalid geometries produce `422 Unprocessable Entity` with the domain validation message.
+
+#### Example Request
+
+```json
+{
+  "bottom_level": 0.1,
+  "downstream_water_level": 1.8,
+  "discharge": 20,
+  "labyrinth_width": 10,
+  "labyrinth_height": 2.2,
+  "labyrinth_length_max": 8,
+  "D": 0.5,
+  "t": 0.3
+}
+```
+
+---
+
+### 4. Download Labyrinth STL
 
 **POST** `/labyrinth/stl`
 
