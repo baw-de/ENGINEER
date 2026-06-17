@@ -48,6 +48,28 @@ The LABYRINTH API is a REST API for hydraulic calculations of labyrinth weirs an
 
 ## Endpoints
 
+### 0. Health Check
+
+**GET** `/health`
+
+Returns the system status. Useful for automated monitoring and uptime checks.
+
+#### Response Schema (Output)
+
+| Field    | Type   | Description            |
+| -------- | ------ | ---------------------- |
+| `status` | string | Returns `"ok"`         |
+
+#### Example Request
+
+```json
+{
+  "status": "ok"
+}
+```
+
+---
+
 ### 1. Calculate Labyrinth Weir
 
 **POST** `/labyrinth/compute`
@@ -312,10 +334,10 @@ Simulates the operational behavior of a labyrinth weir (optionally including a f
 | `labyrinth_length`                | float (>0)          | Length of the labyrinth key in flow direction                               | m        | ✓        |
 | `labyrinth_key_angle`             | float (>0)          | Key angle of the labyrinth weir                                             | °        | ✓        |
 | `D`                               | float               | Front wall thickness (same meaning as other labyrinth endpoints)           | m        | ✗ (default: 0.5) |
-| `discharge_vector`                | List[float (>0)]    | Discharge curve that will be interpolated                                   | m³/s     | ✓        |
-| `downstream_water_level_vector`   | List[float]         | Water level history that matches the discharge vector                       | m a.s.l. | ✓        |
+| `discharge_vector`                | List[float (>0)] (max 500) | Discharge curve that will be interpolated                                   | m³/s     | ✓        |
+| `downstream_water_level_vector`   | List[float] (max 500)      | Water level history that matches the discharge vector                       | m a.s.l. | ✓        |
 | `interpolation_method`            | string              | Interpolation method for the hydrograph (`exponential`, `linear`, `quadratic`, `cubic`) | -      | ✗ (default: `"exponential"`) |
-| `interpolation_stepsize`          | float (>0)          | Discharge stepsize used when filling the computed curve                     | m³/s     | ✗ (default: 1) |
+| `interpolation_stepsize`          | float (>0, ≤100)           | Discharge stepsize used when filling the computed curve                     | m³/s     | ✗ (default: 1) |
 | `include_flap_gate`               | bool                | Whether to include the flap gate hydraulics in the simulation               | -        | ✓        |
 | `flap_gate_bottom_level`          | float               | Flap gate sill bottom level (required if `include_flap_gate` is `true`)     | m        | conditional |
 | `flap_gate_downstream_water_level` | float               | Flap gate downstream water level (required if `include_flap_gate` is `true`) | m        | conditional |
