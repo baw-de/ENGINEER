@@ -16,8 +16,7 @@ data = {
     "discharge": 10,
     "labyrinth_width": 15,
     "labyrinth_height": 2.2,
-    "labyrinth_length": 8,
-    "labyrinth_key_angle": 8,
+    "labyrinth_length_max": 8,
     "D": 0.5,
     "t": 0.3,
 }

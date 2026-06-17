@@ -36,4 +36,6 @@ tmp/
 temp/
 *.tmp
 
-example.py
+# cache files
+.pytest_cache/
+.ruff_cache/

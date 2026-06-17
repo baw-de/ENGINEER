@@ -1,3 +1,4 @@
+import logging
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Path
@@ -48,7 +49,8 @@ def get_plot(
     except HTTPException:
         raise
     except Exception as exc:
+        logging.getLogger(__name__).error(f"Failed to generate plot: {exc}", exc_info=True)
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to generate plot: {str(exc)}",
+            detail="An unexpected error occurred while generating the plot.",
         ) from exc

@@ -439,12 +439,13 @@ class Labyrinth:  # this is only one geometry
         except Exception:
             self._last_geometry_svg_bytes = None
 
-        if self.path:
-            plt.savefig(self.path + "\\Labyrinth-Wehr_plot.svg")
-            plt.savefig(self.path + "\\Labyrinth-Wehr_plot.pdf")
-        else:
-            plt.savefig("Labyrinth-Wehr_plot.svg")
-            plt.savefig("Labyrinth-Wehr_plot.pdf")
+        if os.environ.get("SERVER_MODE") != "1":
+            if self.path:
+                plt.savefig(self.path + "\\Labyrinth-Wehr_plot.svg")
+                plt.savefig(self.path + "\\Labyrinth-Wehr_plot.pdf")
+            else:
+                plt.savefig("Labyrinth-Wehr_plot.svg")
+                plt.savefig("Labyrinth-Wehr_plot.pdf")
 
 
 # Berechnung einer hydraulisch optimalen Geometrie aus den baulichen Randbedingungen
@@ -1958,8 +1959,9 @@ def plot_check_FAA_FAbA(Kla, results, results_events, fish_name=None, Bemessungs
     plt.subplots_adjust(hspace=0.35)
     plt.subplots_adjust(top=0.93)
     plt.grid(True)  # Add grid if needed
-    plt.show()
-    plt.savefig("check_FAbA_FAA.png")
+    if os.environ.get("SERVER_MODE") != "1":
+        plt.show()
+        plt.savefig("check_FAbA_FAA.png")
 
 
 # Export Geometry Parameters according to Pralong et al. 2011 or Tullis 20XX

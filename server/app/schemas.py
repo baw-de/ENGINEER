@@ -1,7 +1,7 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import Path
-from pydantic import BaseModel, Field, confloat, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, confloat, field_validator, model_validator
 
 PlotId = Annotated[str, Path(description="Plot identifier (e.g. 'labyrinth' or 'optimize-abc123')")]
 
@@ -17,9 +17,8 @@ class LabyrinthRequest(BaseModel):
     D: float = Field(0.5, description="Front wall width [m]")
     t: float = Field(0.3, description="Key wall thickness [m]")
 
-    class Config:
-        # prefill the example with the default values
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "bottom_level": 0.1,
                 "downstream_water_level": 1.09,
@@ -32,6 +31,7 @@ class LabyrinthRequest(BaseModel):
                 "t": 0.3,
             }
         }
+    )
 
 
 class LabyrinthOptimizeRequest(BaseModel):
@@ -47,9 +47,8 @@ class LabyrinthOptimizeRequest(BaseModel):
         description=("Optional: T is not a parameter for the optimization itself but is required for generating an output geometry (STL). "),
     )
 
-    class Config:
-        # prefill the example with the default values
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "bottom_level": 0.1,
                 "downstream_water_level": 1.8,
@@ -61,6 +60,7 @@ class LabyrinthOptimizeRequest(BaseModel):
                 "t": 0.3,
             }
         }
+    )
 
 
 class FlapGateRequest(BaseModel):
@@ -71,9 +71,8 @@ class FlapGateRequest(BaseModel):
     flap_gate_height: confloat(gt=0) = Field(..., description="Flap height [m]")
     flap_gate_angle: float = Field(..., description="Flap angle [degree]")
 
-    class Config:
-        # prefill the example with the default values
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "bottom_level": 0.1,
                 "downstream_water_level": 1.09,
@@ -83,6 +82,7 @@ class FlapGateRequest(BaseModel):
                 "flap_gate_angle": 74.0,
             }
         }
+    )
 
     @field_validator("flap_gate_angle")
     def flap_gate_angle_range(cls, value):
@@ -100,15 +100,16 @@ class OperationalModelRequest(BaseModel):
     labyrinth_length: confloat(gt=0) = Field(..., description="Labyrinth weir length in flow direction [m]")
     labyrinth_key_angle: confloat(gt=0) = Field(..., description="Key angle [degree]")
     D: float = Field(0.5, description="Front wall width [m]")
-    discharge_vector: list[confloat(gt=0)] = Field(..., description="Discharge vector [m³/s]")
-    downstream_water_level_vector: list[float] = Field(..., description="Downstream water level vector [m]")
-    interpolation_method: str = Field(
+    discharge_vector: list[confloat(gt=0)] = Field(..., max_length=500, description="Discharge vector [m³/s]")
+    downstream_water_level_vector: list[float] = Field(..., max_length=500, description="Downstream water level vector [m]")
+    interpolation_method: Literal["exponential", "linear", "quadratic", "cubic"] = Field(
         "exponential",
         description="Interpolation method for hydrograph data ('exponential', 'linear', 'quadratic', 'cubic')",
     )
     interpolation_stepsize: float = Field(
         1,
         gt=0,
+        le=100,
         description="Step size for interpolating discharge range [m³/s].",
     )
     flap_gate_bottom_level: float | None = Field(None, description="Bottom height at flap gate [m]")
@@ -131,9 +132,8 @@ class OperationalModelRequest(BaseModel):
         description="Whether the operational model should account for the flap gate.",
     )
 
-    class Config:
-        # prefill the example with the default values
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "bottom_level": 0.1,
                 "downstream_water_level": 1.8,
@@ -159,6 +159,7 @@ class OperationalModelRequest(BaseModel):
                 "fish_body_height": 0.4,
             }
         }
+    )
 
     @field_validator("flap_gate_angle", "max_flap_gate_angle")
     def flap_gate_angles_range(cls, value, info):
@@ -171,10 +172,9 @@ class OperationalModelRequest(BaseModel):
         return value
 
     @model_validator(mode="after")
-    def flap_gate_values_presence(cls, values):
-        include_flap_gate = getattr(values, "include_flap_gate", True)
-        if not include_flap_gate:
-            return values
+    def flap_gate_values_presence(self):
+        if not self.include_flap_gate:
+            return self
         mandatory_fields = [
             "flap_gate_bottom_level",
             "flap_gate_downstream_water_level",
@@ -184,10 +184,10 @@ class OperationalModelRequest(BaseModel):
             "flap_gate_angle",
             "max_flap_gate_angle",
         ]
-        missing = [name for name in mandatory_fields if getattr(values, name) is None]
+        missing = [name for name in mandatory_fields if getattr(self, name) is None]
         if missing:
             raise ValueError(f"Flap gate fields required when include_flap_gate is true: {missing}")
-        return values
+        return self
 
 
 class LabyrinthResult(BaseModel):

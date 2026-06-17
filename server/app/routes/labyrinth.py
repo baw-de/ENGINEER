@@ -1,5 +1,6 @@
 import contextlib
 import io
+import logging
 import os
 import tempfile
 
@@ -115,8 +116,8 @@ def download_labyrinth_stl(req: LabyrinthRequest, background_tasks: BackgroundTa
         )
     except Exception as exc:
         _remove_file(temp_file.name)
-        message = str(exc).strip() or "STL generation failed with the provided labyrinth parameters."
-        raise HTTPException(status_code=422, detail=message) from exc
+        logging.getLogger(__name__).error(f"STL generation failed: {exc}", exc_info=True)
+        raise HTTPException(status_code=422, detail="STL generation failed with the provided labyrinth parameters.") from exc
 
     background_tasks.add_task(_remove_file, temp_file.name)
     return FileResponse(
@@ -172,8 +173,8 @@ def download_optimized_labyrinth_stl(req: LabyrinthOptimizeRequest, background_t
         ) from exc
     except Exception as exc:
         _remove_file(temp_file.name)
-        message = str(exc).strip() or "STL generation failed for the optimized labyrinth geometry."
-        raise HTTPException(status_code=422, detail=message) from exc
+        logging.getLogger(__name__).error(f"Optimized STL generation failed: {exc}", exc_info=True)
+        raise HTTPException(status_code=422, detail="STL generation failed for the optimized labyrinth geometry.") from exc
 
     background_tasks.add_task(_remove_file, temp_file.name)
     return FileResponse(

@@ -27,8 +27,8 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins_list,
-        allow_credentials=True,
-        allow_methods=["*"],
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["*"],
     )
 
@@ -36,6 +36,11 @@ def create_app() -> FastAPI:
     app.include_router(flap_gate_router, prefix="/flap", tags=["flap"])
     app.include_router(operational_router, prefix="/operational", tags=["operational"])
     app.include_router(plots_router, tags=["plots"])
+
+    @app.get("/health", tags=["system"])
+    def health_check():
+        return {"status": "ok"}
+
     return app
 
 
