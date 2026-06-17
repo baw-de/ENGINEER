@@ -6,7 +6,7 @@ Welcome to the ENGINEER project (**En**twicklun**g** standardisierter **In**form
 
 The ENGINEER project is developing an automated digital design for labyrinth weir structures. The project was funded by [mFUND](https://bmdv.bund.de/DE/Themen/Digitales/mFund/Projekte/mfund-projekte.html). Participants include the [BAW](https://www.baw.de), [WNA Magdeburg](https://www.wna-magdeburg.wsv.de/Webs/WNA/WNA-Magdeburg/DE/Startseite/startseite_node.html), [Arcadis](https://www.arcadis.com/de-de) and [Cadcom](https://cadcom.de/). The project is funded until end of February 2025. After that, further development will be limited to minor bug fixes as needed and subject to availability of resources.
 
-This repository contains the Python scripts for the hydraulic design of labyrinth weir structures developed by BAW. This is only a small part of the developements from the ENGINEER project but it might be useful for you.
+This repository contains the Python scripts for the hydraulic design of labyrinth weir structures developed by BAW. This is only a small part of the developements from the ENGINEER project but it might be useful for you. The core functionality can be used as a standalone Python library or deployed as a REST API (see the [API Guide](server/API_GUIDE.md) below).
 
 > [!WARNING]
 > The developed source code is the result of a research project. BAW does not accept any responsibility for the correctness of the code or the results achieved with it. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -23,9 +23,9 @@ This code can be used to design labyrinth weir structures consisting of a labyri
 This repository consists mainly of four Python files:
 
 - <pre>engineer.py</pre> This ist the brain. You should not modify this file unless you find an bug or want to develop the project further.<br><br>
-- <pre>example.py</pre> This is an application example. Feel free to adapt this file according to your wishes and your project. You will find all the code snippets from this README.md in example.py.
+- <pre>examples/example.py</pre> This is an application example. Feel free to adapt this file according to your wishes and your project. You will find all the code snippets from this README.md in examples/example.py.
 - <pre>STL_function.py</pre> Single entry point `generate_labyrinth_geometry(...)` builds a trapezoidal labyrinth weir and writes a watertight binary STL mesh that you can download or hand to a slicer.
-- <pre>example_stl_generation.py</pre> Demonstrates how to call `generate_labyrinth_geometry` with typical dimensions and write the resulting STL to disk.
+- <pre>examples/example_stl_generation.py</pre> Demonstrates how to call `generate_labyrinth_geometry` with typical dimensions and write the resulting STL to disk.
 
 **REST API:** All functionality is also available via a REST API. See the [API Guide](server/API_GUIDE.md) for detailed documentation.
 
@@ -262,7 +262,7 @@ To use the `operational_model` the following steps are required:
 
 If you need a geometry file for CAD/3D printing or downstream workflows, `STL_function.generate_labyrinth_geometry(...)` builds a trapezoidal labyrinth weir from the same dimensional parameters used in the hydraulic calculations and writes it as a binary STL mesh. The function returns the written `filename` and an `info` dictionary with derived geometry metrics (cycle widths, crest length, number of teeth, triangle count, etc.).
 
-The helper script `example_stl_generation.py` shows a minimal invocation:
+The helper script `examples/example_stl_generation.py` shows a minimal invocation:
 
 ```python
 from STL_function import generate_labyrinth_geometry
