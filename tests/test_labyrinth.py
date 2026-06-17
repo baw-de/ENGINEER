@@ -220,7 +220,7 @@ class TestLabyrinthAPI:
 
         data = response.json()
         assert "detail" in data
-        assert "too small" in data["detail"].lower()
+        assert "stl generation failed" in data["detail"].lower()
 
     def test_optimize_labyrinth_endpoint(self, client):
         request_data = {
