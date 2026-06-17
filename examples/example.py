@@ -23,6 +23,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # %% Module laden
 
+import os
+import sys
+
+# Add parent directory to path to allow importing engineer
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -122,3 +128,4 @@ results, results_events = operational_model(
 
 write_lab_excel(labyrinth_weir)
 write_flap_excel(flap_gate)
+print("DONE")
