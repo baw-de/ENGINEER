@@ -69,6 +69,24 @@ pre-commit run --all-files
 
 After installation, the hooks will run automatically on every `git commit`. If any hook fails, the commit will be blocked until the issues are resolved.
 
+## Testing
+
+This project uses `pytest` for automated testing.
+
+To run the tests locally, ensure you have installed the necessary testing dependencies (which are not included in the standard `requirements.txt`):
+
+```bash
+pip install pytest pytest-asyncio anyio
+```
+
+Then, you can run the test suite from the root directory:
+
+```bash
+pytest
+```
+
+We also use a GitHub Actions workflow that automatically runs all tests on every push and pull request to the `main` and `dev` branches to ensure continuous integration.
+
 ## Hydraulic Design
 
 ![](assets/pictures/dimensions.svg)
