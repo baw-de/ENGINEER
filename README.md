@@ -76,7 +76,7 @@ This project uses `pytest` for automated testing.
 To run the tests locally, ensure you have installed the necessary testing dependencies (which are not included in the standard `requirements.txt`):
 
 ```bash
-pip install pytest pytest-asyncio anyio
+pip install pytest pytest-asyncio anyio httpx httpx2
 ```
 
 Then, you can run the test suite from the root directory:
