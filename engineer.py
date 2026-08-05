@@ -1159,6 +1159,7 @@ def operational_model(
     flap_gate_opject=None,
     design_upstream_water_level=None,
     max_flap_gate_angle=None,
+    min_flap_gate_angle=None, # !!!
     fish_body_height=None,
     show_plot=False,
     save_plot=False,
@@ -1211,8 +1212,17 @@ def operational_model(
         # Check Stauziel, SohleHoehe, LabyrinthMaxBreite, LabyrinthMaxLaenge, and LabyrinthHoehe
         fehler += input_plausibilty("Stauziel", design_upstream_water_level)
         if include_flap_gate:
-            if max_flap_gate_angle is None or not (0 <= max_flap_gate_angle <= 90):
+            if max_flap_gate_angle is None or not (0 <= max_flap_gate_angle <= 90): # !!!
                 fehler.append("Maximaler Klappenwinkel muss zwischen 0° und 90° liegen.")
+            if min_flap_gate_angle is None or not (0 <= min_flap_gate_angle <= 90):
+                fehler.append("Minimaler Klappenwinkel muss zwischen 0° und 90° liegen.")
+            if (
+                max_flap_gate_angle is not None
+                and min_flap_gate_angle is not None
+                and min_flap_gate_angle > max_flap_gate_angle
+            ):
+                fehler.append("Minimaler Klappenwinkel darf nicht größer sein als der maximale Klappenwinkel.")
+            
         fehler += input_plausibilty("Fishe Hoehe", fish_body_height)
 
         valid_interpolations = ["exponential", "linear", "quadratic", "cubic"]
@@ -1405,7 +1415,7 @@ def operational_model(
             # initial values
             Kalpha0 = Klappe_al[i - 1] if i > 0 else max_flap_gate_angle
             Kalpha_max = Klappe_al[i - 1] if i > 0 else max_flap_gate_angle
-            Kalpha_min = 0
+            Kalpha_min = min_flap_gate_angle
 
             # minmize function
             result = minimize_scalar(Objective_fn, Kalpha0, bounds=(Kalpha_min, Kalpha_max), method="bounded")
