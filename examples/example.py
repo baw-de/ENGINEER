@@ -100,7 +100,7 @@ optimized_labyrinth.print_results()  # print result parameters
 # In doing so, the target water level is maintained for as long as possible by controlling the flap.
 design_upstream_water_level = 2.2  # design water level [m]
 max_flap_gate_angle = 90  # maximum opening angle of the flap gate [degree]
-min_flap_gate_angle = 0 # # maximum opening angle of the flap gate [degree]
+min_flap_gate_angle = 0  # # maximum opening angle of the flap gate [degree]
 fish_body_height = 0.4  # body height of the design fish [m]
 
 # Hydrology

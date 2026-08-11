@@ -34,6 +34,7 @@ class TestOperationalAPI:
             "flap_gate_angle": 74.0,
             "design_upstream_water_level": 2.2,
             "max_flap_gate_angle": 90.0,
+            "min_flap_gate_angle": 0.0,
             "fish_body_height": 0.4,
             "include_flap_gate": True,
         }
@@ -95,6 +96,7 @@ class TestOperationalAPI:
             "flap_gate_angle": 74.0,
             "design_upstream_water_level": 2.2,
             "max_flap_gate_angle": 90.0,
+            "min_flap_gate_angle": 0.0,
             "fish_body_height": 0.4,
             "include_flap_gate": True,
         }
@@ -130,6 +132,7 @@ class TestOperationalAPI:
             "flap_gate_angle": 74.0,
             "design_upstream_water_level": 2.2,
             "max_flap_gate_angle": 90.0,
+            "min_flap_gate_angle": 0.0,
             "fish_body_height": 0.4,
             "include_flap_gate": True,
         }
@@ -165,6 +168,7 @@ class TestOperationalAPI:
             "flap_gate_angle": 74.0,
             "design_upstream_water_level": 2.2,
             "max_flap_gate_angle": 90.0,
+            "min_flap_gate_angle": 0.0,
             "fish_body_height": 0.4,
             "include_flap_gate": True,
         }
@@ -197,6 +201,7 @@ class TestOperationalAPI:
             "flap_gate_angle": -5.0,
             "design_upstream_water_level": 2.2,
             "max_flap_gate_angle": 90.0,
+            "min_flap_gate_angle": 0.0,
             "fish_body_height": 0.4,
         }
 
@@ -207,10 +212,10 @@ class TestOperationalAPI:
         # support both pydantic error list and ENGINEER dict
         if isinstance(data["detail"], dict):
             errors = data["detail"]["errors"]
-            assert any("Klappenwinkel β" in err for err in errors)
+            assert any("Flap gate angle β" in err for err in errors)
         else:
             errors = data["detail"]
-            assert any("Klappenwinkel β" in err.get("msg", "") for err in errors)
+            assert any("Flap gate angle β" in err.get("msg", "") for err in errors)
 
     def test_compute_operational_endpoint_max_flap_angle_range(self, client):
         request_data = {
@@ -233,6 +238,7 @@ class TestOperationalAPI:
             "flap_gate_angle": 74.0,
             "design_upstream_water_level": 2.2,
             "max_flap_gate_angle": 120.0,
+            "min_flap_gate_angle": 0.0,
             "fish_body_height": 0.4,
             "include_flap_gate": True,
         }
@@ -243,10 +249,10 @@ class TestOperationalAPI:
         data = response.json()
         if isinstance(data["detail"], dict):
             errors = data["detail"]["errors"]
-            assert any("Maximaler Klappenwinkel" in err for err in errors)
+            assert any("Maximum flap gate angle" in err for err in errors)
         else:
             errors = data["detail"]
-            assert any("Maximaler Klappenwinkel" in err.get("msg", "") for err in errors)
+            assert any("Maximum flap gate angle" in err.get("msg", "") for err in errors)
 
     def test_compute_operational_endpoint_empty_vectors(self, client):
         request_data = {
@@ -269,6 +275,7 @@ class TestOperationalAPI:
             "flap_gate_angle": 74.0,
             "design_upstream_water_level": 2.2,
             "max_flap_gate_angle": 90.0,
+            "min_flap_gate_angle": 0.0,
             "fish_body_height": 0.4,
             "include_flap_gate": True,
         }
@@ -306,6 +313,7 @@ class TestOperationalAPI:
             "flap_gate_angle": 74.0,
             "design_upstream_water_level": 2.2,
             "max_flap_gate_angle": 90.0,
+            "min_flap_gate_angle": 0.0,
             "fish_body_height": 0.4,
             "include_flap_gate": True,
         }
@@ -343,6 +351,7 @@ class TestOperationalAPI:
             "flap_gate_angle": 74.0,
             "design_upstream_water_level": 2.2,
             "max_flap_gate_angle": 90.0,
+            "min_flap_gate_angle": 0.0,
             "fish_body_height": 0.4,
             "include_flap_gate": True,
         }
