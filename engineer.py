@@ -651,7 +651,7 @@ class FlapGate:
         fehler += input_plausibilty("Klappe Hoehe", self.KP)
 
         if self.Kalpha is None or not (0 <= self.Kalpha <= 90):
-            fehler.append("Klappenwinkel β muss zwischen 0° und 90° liegen.")
+            fehler.append("Flap gate angle β must be between 0° and 90°.")
 
         if all(message.startswith("Achtung:") for message in fehler):
             # Only warnings -> optionally print to console, but allow computation to continue
@@ -1212,16 +1212,18 @@ def operational_model(
         # Check Stauziel, SohleHoehe, LabyrinthMaxBreite, LabyrinthMaxLaenge, and LabyrinthHoehe
         fehler += input_plausibilty("Stauziel", design_upstream_water_level)
         if include_flap_gate:
-            if max_flap_gate_angle is None or not (0 <= max_flap_gate_angle <= 90): # !!!
-                fehler.append("Maximaler Klappenwinkel muss zwischen 0° und 90° liegen.")
-            if min_flap_gate_angle is None or not (0 <= min_flap_gate_angle <= 90):
-                fehler.append("Minimaler Klappenwinkel muss zwischen 0° und 90° liegen.")
+            if max_flap_gate_angle is not None:
+                if not (0 <= max_flap_gate_angle <= 90):
+                    fehler.append("Maximum flap gate angle must be between 0° and 90°.")
+            if min_flap_gate_angle is not None:
+                if not (0 <= min_flap_gate_angle <= 90):
+                    fehler.append("Minimum flap gate angle must be between 0° and 90°.")
             if (
                 max_flap_gate_angle is not None
                 and min_flap_gate_angle is not None
                 and min_flap_gate_angle > max_flap_gate_angle
             ):
-                fehler.append("Minimaler Klappenwinkel darf nicht größer sein als der maximale Klappenwinkel.")
+                fehler.append("Minimum flap gate angle cannot be greater than maximum flap gate angle.")
             
         fehler += input_plausibilty("Fishe Hoehe", fish_body_height)
 

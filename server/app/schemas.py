@@ -126,6 +126,10 @@ class OperationalModelRequest(BaseModel):
         None,
         description="Maximum flap gate angle [degree]",
     )
+    min_flap_gate_angle: float | None = Field(
+        None,
+        description="Minimum flap gate angle [degree]",
+    )
     fish_body_height: float = Field(..., description="Fish body height for bypass design [m]")
     include_flap_gate: bool = Field(
         ...,
@@ -156,19 +160,22 @@ class OperationalModelRequest(BaseModel):
                 "interpolation_stepsize": 1,
                 "design_upstream_water_level": 2.2,
                 "max_flap_gate_angle": 90.0,
+                "min_flap_gate_angle": 0.0,
                 "fish_body_height": 0.4,
             }
         }
     )
 
-    @field_validator("flap_gate_angle", "max_flap_gate_angle")
+    @field_validator("flap_gate_angle", "max_flap_gate_angle", "min_flap_gate_angle")
     def flap_gate_angles_range(cls, value, info):
         if value is None:
             return value
         if not 0 <= value <= 90:
             if info.field_name == "flap_gate_angle":
-                raise ValueError("Klappenwinkel β muss im Bereich 0° ≤ β ≤ 90° liegen.")
-            raise ValueError("Maximaler Klappenwinkel (β) muss im Bereich 0° ≤ β ≤ 90° liegen.")
+                raise ValueError("Flap gate angle β must be between 0° and 90°.")
+            if info.field_name == "min_flap_gate_angle":
+                raise ValueError("Minimum flap gate angle must be between 0° and 90°.")
+            raise ValueError("Maximum flap gate angle (β) must be between 0° and 90°.")
         return value
 
     @model_validator(mode="after")
@@ -183,10 +190,13 @@ class OperationalModelRequest(BaseModel):
             "flap_gate_height",
             "flap_gate_angle",
             "max_flap_gate_angle",
+            "min_flap_gate_angle",
         ]
         missing = [name for name in mandatory_fields if getattr(self, name) is None]
         if missing:
             raise ValueError(f"Flap gate fields required when include_flap_gate is true: {missing}")
+        if self.min_flap_gate_angle > self.max_flap_gate_angle:
+            raise ValueError("Minimum flap gate angle cannot be greater than maximum flap gate angle.")
         return self
 
 
