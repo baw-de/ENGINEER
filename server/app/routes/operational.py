@@ -68,6 +68,7 @@ def compute_operational_model(req: OperationalModelRequest) -> OperationalModelR
                 flap_gate_opject=flap_gate,
                 design_upstream_water_level=req.design_upstream_water_level,
                 max_flap_gate_angle=req.max_flap_gate_angle,
+                min_flap_gate_angle=req.min_flap_gate_angle,
                 fish_body_height=req.fish_body_height,
                 show_plot=False,
                 save_plot=False,
