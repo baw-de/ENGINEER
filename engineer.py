@@ -812,7 +812,12 @@ class FlapGate:
     def FAA_FAbA(self):
         self.h_gr = pow((pow(self.Q / self.KW, 2)) / self.g, 0.33)
         self.v_gr = pow((self.g * self.h_gr), 0.5)
-        self.beschleunigung = (self.v_gr - self.v) / (self.KP * (math.sin(math.radians(abs(self._Kalpha_intern)))))
+        denom = self.KP * (math.sin(math.radians(abs(self._Kalpha_intern))))
+        # Avoid division by zero when the flap gate is vertical (flap_gate_angle = 90°, so _Kalpha_intern = 0°)
+        if denom == 0:
+            self.beschleunigung = 0.0
+        else:
+            self.beschleunigung = (self.v_gr - self.v) / denom
 
     # Grenzen der Variablen
     def check_for_error(self):
