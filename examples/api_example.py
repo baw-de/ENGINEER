@@ -92,6 +92,7 @@ data = {
     "flap_gate_angle": 74,
     "design_upstream_water_level": 2.2,
     "max_flap_gate_angle": 90,
+    "min_flap_gate_angle": 0.0,
     "fish_body_height": 0.4,
     "include_flap_gate": True,
 }

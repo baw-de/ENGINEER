@@ -347,9 +347,10 @@ Simulates the operational behavior of a labyrinth weir (optionally including a f
 | `flap_gate_angle`                 | float               | Flap gate angle (required if `include_flap_gate` is `true`)                 | °        | conditional |
 | `design_upstream_water_level`     | float               | Design upstream water level for flap gate control                          | m a.s.l. | ✓        |
 | `max_flap_gate_angle`             | float               | Maximum allowed flap gate angle                                            | °        | ✓        |
+| `min_flap_gate_angle`             | float               | Minimum allowed flap gate angle                                            | °        | ✓        |
 | `fish_body_height`                | float               | Height of the fish body used for bypass flow design                         | m        | ✓        |
 
-> **Note:** When `include_flap_gate` is `false`, the flap gate-specific fields may be omitted; when it is `true`, they are required and the `max_flap_gate_angle` / `design_upstream_water_level` / `fish_body_height` fields must also be supplied.
+> **Note:** When `include_flap_gate` is `false`, the flap gate-specific fields may be omitted; when it is `true`, they are required and the `max_flap_gate_angle` / `min_flap_gate_angle` / `design_upstream_water_level` / `fish_body_height` fields must also be supplied.
 
 #### Response Schema (Output)
 
@@ -397,6 +398,7 @@ Simulates the operational behavior of a labyrinth weir (optionally including a f
   "flap_gate_angle": 74,
   "design_upstream_water_level": 2.2,
   "max_flap_gate_angle": 90,
+  "min_flap_gate_angle": 0.0,
   "fish_body_height": 0.4
 }
 ```
