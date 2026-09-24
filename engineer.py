@@ -1225,7 +1225,6 @@ def operational_model(
                     fehler.append("Minimum flap gate angle must be between 0° and 90°.")
             if max_flap_gate_angle is not None and min_flap_gate_angle is not None and min_flap_gate_angle > max_flap_gate_angle:
                 fehler.append("Minimum flap gate angle cannot be greater than maximum flap gate angle.")
-
         fehler += input_plausibilty("Fishe Hoehe", fish_body_height)
 
         valid_interpolations = ["exponential", "linear", "quadratic", "cubic"]
