@@ -6,7 +6,7 @@ os.environ["SERVER_MODE"] = "1"
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from server.app.routes.flap_gate import router as flap_gate_router
 from server.app.routes.labyrinth import router as labyrinth_router
@@ -23,6 +23,7 @@ def create_app() -> FastAPI:
         version="0.1.0",
         docs_url=None,
         redoc_url=None,
+        root_path=os.getenv("API_PREFIX", ""),
     )
 
     # CORS configuration from environment variable
@@ -44,16 +45,23 @@ def create_app() -> FastAPI:
     app.include_router(operational_router, prefix="/operational", tags=["operational"])
     app.include_router(plots_router, tags=["plots"])
 
-    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+    # Serve Swagger UI assets as explicit endpoints (avoids StaticFiles + reverse proxy issues)
+    @app.get("/static/swagger-ui-bundle.js", include_in_schema=False)
+    async def swagger_ui_js():
+        return FileResponse(STATIC_DIR / "swagger-ui-bundle.js", media_type="application/javascript")
+
+    @app.get("/static/swagger-ui.css", include_in_schema=False)
+    async def swagger_ui_css():
+        return FileResponse(STATIC_DIR / "swagger-ui.css", media_type="text/css")
 
     @app.get("/docs", include_in_schema=False)
     async def custom_swagger_ui_html():
         return get_swagger_ui_html(
-            openapi_url=app.openapi_url,
+            openapi_url="openapi.json",
             title=app.title + " - Swagger UI",
-            oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
-            swagger_js_url="/static/swagger-ui-bundle.js",
-            swagger_css_url="/static/swagger-ui.css",
+            swagger_js_url="static/swagger-ui-bundle.js",
+            swagger_css_url="static/swagger-ui.css",
+            swagger_favicon_url="data:,",
         )
 
     @app.get("/health", tags=["system"])
